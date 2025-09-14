@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাডমিন প্যানেল</title>
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Google Fonts for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- পরিবর্তন: বর্ণমালা ফন্ট যোগ করা হলো -->
+    <link href="https://fonts.googleapis.com/css2?family=Bornomala&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries for Exporting, Zipping & Saving -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- New Libraries for DOCX and JPEG Export -->
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --accent-color: #f97316;
+            --light-bg: #f1f5f9;
+            --dark-text: #0f172a;
+            --light-text: #64748b;
+            --success-color: #16a34a;
+            --danger-color: #dc2626; 
+            --admin-color: #6d28d9; /* New color for admin card */
+            --border-radius: 10px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --box-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease-in-out;
+            --sidebar-width: 260px;
+            --background-color: #f8fafc;
+            --card-background: white;
+            --text-color: var(--dark-text);
+            --border-color: #e2e8f0;
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #2563eb;
+            --background-color: #121212;
+            --card-background: #1e1e1e;
+            --text-color: #e2e8f0;
+            --light-text: #94a3b8;
+            --border-color: #3a3a3a;
+            --light-bg: #2a2a2a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        
+        /* --- পরিবর্তন: সকল বাটনে বর্ণমালা ফন্ট প্রয়োগ --- */
+        button, .action-btn, .info-btn, .btn-login, .btn-submit, .modal-footer button {
+            font-family: 'Bornomala', 'Hind Siliguri', sans-serif !important;
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--background-color);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .preloader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-bg);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- পরিবর্তন: নতুন লগইন পেইজ ডিজাইন --- */
+        .login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000; 
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .login-screen .gif-background { /* পরিবর্তন: video-background থেকে gif-background */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .login-screen img { /* পরিবর্তন: video থেকে img */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) blur(2px);
+        }
+        .login-screen.hidden {
+             opacity: 0;
+             visibility: hidden;
+        }
+        .login-box {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.4);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 2;
+        }
+        .login-box h2 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .login-box p {
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+        .login-form .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .login-form .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1rem;
+        }
+         .login-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        .login-form .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .login-form .btn-login:hover {
+            background: var(--secondary-color);
+        }
+        .login-form .error-message {
+            color: #ff8a8a;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        /* --- নতুন লগইন ডিজাইন শেষ --- */
+
+
+        .admin-layout { 
+            display: flex;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+        }
+        .admin-layout.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-background);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width));
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 1001;
+        }
+        .sidebar.open { left: 0; }
+        
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 1000; opacity: 0;
+            visibility: hidden; transition: opacity 0.3s ease;
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .sidebar-header h2 { color: var(--primary-color); font-size: 1.5rem; }
+        .sidebar-nav { flex-grow: 1; list-style: none; padding: 20px 0; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--light-text); text-decoration: none; font-weight: 500; transition: var(--transition); border-left: 4px solid transparent; }
+        .sidebar-nav a:hover { background-color: var(--light-bg); color: var(--primary-color); }
+        .sidebar-nav a.active { background-color: var(--light-bg); color: var(--primary-color); border-left-color: var(--primary-color); font-weight: 600; }
+        .sidebar-nav a i { width: 20px; text-align: center; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
+        
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .theme-switch-wrapper { display: flex; align-items: center; gap: 10px; }
+        .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
+        .theme-switch input { display: none; }
+        .slider { background-color: #777; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
+        .slider:before {
+            background-color: #fff; content: '\f185'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            display: flex; align-items: center; justify-content: center; color: #777;
+            bottom: 4px; height: 18px; left: 4px; position: absolute;
+            transition: .4s; width: 18px;
+        }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(24px); content: '\f186'; color: var(--primary-color); }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+
+        .content-wrapper { width: 100%; transition: margin-left var(--transition); }
+        
+        .app-header {
+            background-color: var(--card-background); 
+            padding: 15px 25px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border-color); box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu-toggle { background: transparent; border: none; color: var(--primary-color); font-size: 1.5rem; cursor: pointer; }
+        
+        .search-bar {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(250px, 40%, 400px);
+        }
+        .search-bar input {
+            background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            padding: 10px 15px 10px 40px; width: 100%; transition: var(--transition);
+        }
+        .search-bar input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+        .search-bar i { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--light-text); }
+        
+        .main-content { 
+            padding: 25px; 
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar { left: 0; }
+            .content-wrapper { margin-left: var(--sidebar-width); }
+            .sidebar.collapsed { left: calc(-1 * var(--sidebar-width)); }
+            .sidebar.collapsed ~ .content-wrapper { margin-left: 0; }
+            .overlay { display: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .search-bar { display: none; }
+        }
+
+        .stat-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-hover);
+        }
+        .stat-card .icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            background-color: var(--light-bg);
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-card .info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .stat-card .info p {
+            font-size: 1rem;
+            color: var(--light-text);
+        }
+        .stat-card.admins .icon { color: var(--admin-color); } .stat-card.admins { border-color: var(--admin-color); }
+        .stat-card.institutions .icon { color: var(--success-color); } .stat-card.institutions { border-color: var(--success-color); }
+        .stat-card.students .icon { color: var(--accent-color); } .stat-card.students { border-color: var(--accent-color); }
+
+        .institution-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .institution-card { 
+            background-color: var(--card-background); border-radius: var(--border-radius); 
+            padding: 20px; box-shadow: var(--box-shadow); border: 1px solid var(--border-color); 
+            cursor: pointer; transition: var(--transition); 
+            position: relative;
+        }
+        .institution-card:hover { transform: translateY(-5px); box-shadow: var(--box-shadow-hover); }
+        .institution-card h3 { color: var(--text-color); margin-bottom: 8px; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .institution-card p { font-size: 0.9rem; color: var(--light-text); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .institution-card .student-count { font-weight: 600; color: var(--primary-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; border-top: 1px solid var(--border-color); padding-top: 10px; }
+        
+        .institution-card-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(220, 38, 38, 0.1);
+            color: var(--danger-color);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8);
+            transition: all 0.2s ease-in-out;
+        }
+        .institution-card:hover .institution-card-delete-btn {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+        .institution-card-delete-btn:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* --- পরিবর্তন: কার্ড অ্যাকশন আইকনের জন্য নতুন স্টাইল --- */
+        .card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease-in-out;
+        }
+        .user-card:hover .card-actions, .sub-admin-card:hover .card-actions {
+             opacity: 1;
+             visibility: visible;
+        }
+        .card-action-btn {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--light-text);
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .card-action-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        [data-theme="dark"] .card-action-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        /* --- কার্ড অ্যাকশন স্টাইল শেষ --- */
+
+        .routine-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 25px; margin-bottom: 25px; }
+        
+        .no-data-container {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--light-text);
+        }
+        .no-data-container .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+        .no-data-container h3 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .routine-header { margin-bottom: 25px; }
+        .routine-header .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 70px;
+        }
+        .routine-header .institution-logo {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            /* --- পরিবর্তন: লোগো সম্পূর্ণ গোল করা হলো --- */
+            border-radius: 50%; 
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            object-fit: cover;
+            border: 2px solid var(--border-color); 
+        }
+        .routine-header .institution-logo:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+        .routine-header .institution-details { text-align: center; }
+        .routine-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-color); margin: 0 0 5px 0; }
+        .routine-header p { font-size: 1rem; color: var(--light-text); margin: 0; }
+        .routine-header h2 { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); margin-top: 15px; text-align: center; }
+        
+        /* --- এডিট আইকন স্টাইল --- */
+        #editInstDetailsBtn {
+            background: transparent;
+            border: none;
+            color: var(--light-text);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.3s ease;
+            vertical-align: middle;
+        }
+        #editInstDetailsBtn:hover {
+            color: var(--primary-color);
+        }
+        #saveInstDetailsBtn {
+             padding: 5px 10px; 
+             font-size: 0.9rem;
+             background-color: var(--success-color);
+        }
+        /* --- এডিট আইকন স্টাইল শেষ --- */
+
+        .detail-actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .back-button button { background: none; border: none; color: var(--primary-color); font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        
+        .actions-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .actions-group .action-btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 8px; }
+        .actions-group .action-btn:hover { opacity: 0.9; }
+        .actions-group .action-btn:active, .back-button button:active { transform: scale(0.97); }
+        .download-btn { background-color: var(--success-color) !important; }
+        
+        .info-buttons-container {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .info-btn {
+            background-color: var(--card-background);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .info-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .info-btn:active { transform: scale(0.97); }
+
+
+        .dropdown-menu {
+            position: absolute; right: 0; top: 110%; background-color: var(--card-background); border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-hover); border: 1px solid var(--border-color); z-index: 10;
+            width: 240px; overflow: hidden; max-height: 0; transition: max-height 0.3s ease-out;
+        }
+        .dropdown-menu.show { max-height: 400px; }
+        .dropdown-menu a { display: block; padding: 12px 15px; color: var(--text-color); text-decoration: none; font-size: 0.9rem; }
+        .dropdown-menu a:hover { background-color: var(--light-bg); color: var(--primary-color); }
+
+        .routine-table-wrapper { overflow-x: auto; }
+        .routine-table { width: 100%; border-collapse: collapse; text-align: center; table-layout: fixed; }
+        /* --- পরিবর্তন: শিক্ষার্থীদের তালিকায় বর্ণমালা ফন্ট এবং ক্রমিক নং কলামের প্রস্থ কমানো --- */
+        .routine-table {
+            font-family: 'Bornomala', 'Hind Siliguri', sans-serif;
+        }
+        .routine-table th:first-child, .routine-table td:first-child {
+            width: 60px; /* ক্রমিক নং এর জন্য ছোট প্রস্থ */
+        }
+        /* --- পরিবর্তন শেষ --- */
+        .routine-table th, .routine-table td { border: 1px solid var(--border-color); padding: 12px; }
+        .routine-table thead { background-color: var(--light-bg); }
+        .routine-table th { font-weight: 600; color: var(--text-color); }
+        .routine-table td[contenteditable="true"] { background-color: rgba(254, 249, 195, 0.5); outline: 2px dashed var(--primary-color); }
+        
+        .routine-table td[contenteditable="true"].truncate-text {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            max-width: none;
+        }
+
+        .routine-table .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin: auto; cursor: pointer; transition: transform 0.2s; }
+        .routine-table .student-photo:hover { transform: scale(1.1); }
+        .table-actions button { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin: 0 5px; transition: color 0.2s; }
+        .table-actions .edit-btn { color: var(--primary-color); } .table-actions .delete-btn { color: var(--danger-color); } .table-actions .save-btn { color: var(--success-color); }
+        
+        .truncate-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px; 
+        }
+
+        .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .user-card { background-color: var(--card-background); border-radius: var(--border-radius); padding: 20px; box-shadow: var(--box-shadow); border-left: 5px solid var(--success-color); transition: var(--transition); position: relative; }
+        .user-card .card-content { cursor: pointer; }
+        .user-card:hover { transform: translateY(-5px); box-shadow: var(--box-shadow-hover); }
+        .user-card h3 { color: var(--text-color); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .user-card p { color: var(--light-text); margin-bottom: 5px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+        
+        .hidden { display: none !important; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-container {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            width: 90%;
+            max-width: 550px; 
+            box-shadow: var(--box-shadow-hover);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container { transform: scale(1); }
+        .modal-header { text-align: center; margin-bottom: 15px; }
+        .modal-header .icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .modal-header .icon.success { color: var(--success-color); }
+        .modal-header .icon.danger { color: var(--danger-color); }
+        .modal-header .icon.info { color: var(--primary-color); }
+        .modal-header h3 { font-size: 1.4rem; color: var(--text-color); }
+        .modal-body { text-align: center; color: var(--light-text); margin-bottom: 25px; line-height: 1.7; white-space: pre-wrap; }
+        .modal-body .form-group { text-align: left; margin-bottom: 15px; } /* Modal form styles */
+        .modal-body label { font-weight: 600; display: block; margin-bottom: 5px; }
+        .modal-body input { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+
+        .modal-footer { display: flex; justify-content: center; gap: 15px; }
+        .modal-footer button {
+            border: none; border-radius: var(--border-radius);
+            padding: 10px 20px; font-weight: 600; cursor: pointer;
+            transition: var(--transition);
+            flex-grow: 1;
+        }
+        .modal-footer .btn-primary { background-color: var(--primary-color); color: #fff; }
+        .modal-footer .btn-danger { background-color: var(--danger-color); color: #fff; }
+        .modal-footer .btn-secondary { background-color: var(--light-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+        .modal-footer button:hover { opacity: 0.85; }
+
+        /* --- পরিবর্তন শুরু: সাব-এডমিন ক্রিডেনশিয়াল Modal-এর নতুন ডিজাইন --- */
+        .credential-modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+        .credential-item {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+        }
+        .credential-item label {
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .username-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .username-display input {
+            flex-grow: 1;
+            background: var(--card-background);
+            border: none;
+            font-size: 1.1rem;
+            color: var(--light-text);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .copy-btn {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .copy-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .password-input-wrapper {
+            position: relative;
+        }
+        .password-input-wrapper input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--light-text);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        /* --- পরিবর্তন শেষ: Modal ডিজাইন --- */
+
+
+        .image-preview-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 3000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        .image-preview-modal.active { opacity: 1; visibility: visible; }
+        .image-preview-modal .close-btn {
+            position: absolute; top: 20px; right: 30px;
+            color: #fff; font-size: 2.5rem; font-weight: bold;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .image-preview-modal .close-btn:hover { transform: scale(1.1); color: #ddd; }
+        .image-preview-modal img {
+            max-width: 90%; max-height: 75vh;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+        .preview-caption {
+            color: #fff; margin-top: 15px;
+            font-size: 1.2rem; font-weight: 500;
+            text-align: center;
+        }
+        .preview-actions {
+            margin-top: 20px;
+            display: flex; gap: 20px;
+        }
+        .preview-actions button {
+            background-color: var(--primary-color);
+            color: white; border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer; font-weight: 600;
+            transition: var(--transition); display: flex;
+            align-items: center; gap: 10px; font-size: 1rem;
+        }
+        .preview-actions button:hover { background-color: var(--secondary-color); }
+        .preview-actions button:active { transform: scale(0.97); }
+
+        .admin-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .admin-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .admin-form input, .admin-form select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1rem;
+        }
+        .admin-form input:focus, .admin-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .admin-form .btn-submit, .admin-form .btn-assign-users { /* --- পরিবর্তন --- */
+            width: 100%;
+            padding: 12px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .admin-form .btn-submit:hover {
+            opacity: 0.9;
+        }
+        
+        .field-settings-container {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .field-settings-container h4 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .field-settings-list {
+            list-style: none;
+        }
+        .field-list-item {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* --- মোবাইল রেসপন্সিভনেসের জন্য --- */
+        }
+        .field-list-item .drag-handle { cursor: grab; color: var(--light-text); }
+        .field-list-item .field-label-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px; border-radius: 5px; background-color: var(--card-background); color: var(--text-color); min-width: 150px; }
+        .field-list-item .field-controls { display: flex; align-items: center; gap: 15px; color: var(--light-text); }
+        .field-list-item .field-controls label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .field-list-item .order-buttons button { background: none; border: 1px solid var(--border-color); color: var(--light-text); cursor: pointer; width: 25px; height: 25px; border-radius: 5px; }
+        .field-list-item .delete-field-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1rem; }
+        .settings-actions { margin-top: 25px; display: flex; gap: 15px; justify-content: flex-end; }
+        .settings-actions button { padding: 10px 20px; }
+
+
+        .download-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+        }
+        .download-modal-overlay.active { opacity: 1; visibility: visible; }
+        .download-modal-container {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 0;
+            width: 90%;
+            max-width: 650px; 
+            box-shadow: var(--box-shadow-hover);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .download-modal-overlay.active .download-modal-container { transform: scale(1); }
+        .download-modal-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .download-modal-header h3 { font-size: 1.3rem; color: var(--text-color); }
+        .download-modal-header .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--light-text); }
+        .download-modal-body { padding: 25px; max-height: 60vh; overflow-y: auto; }
+        
+        .download-step .step-title { font-size: 1.1rem; color: var(--primary-color); margin-bottom: 20px; text-align: center; }
+
+        #downloadClassList { list-style: none; }
+        #downloadClassList li {
+            padding: 15px; border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            margin-bottom: 10px; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 15px;
+        }
+        #downloadClassList li:hover { background-color: var(--light-bg); border-color: var(--primary-color); }
+        #downloadClassList li input[type="radio"] { transform: scale(1.2); }
+        
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        .format-item {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        .format-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .format-item i { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .format-item span { font-weight: 600; font-size: 0.9rem; }
+        
+        .download-modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .sub-admin-creator {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        .sub-admin-creator .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .sub-admin-creator .form-group label {
+            font-size: 0.9rem;
+        }
+         .sub-admin-creator .btn-submit, .sub-admin-creator .btn-assign-users { /* --- পরিবর্তন --- */
+            height: 48px;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+        }
+        .sub-admin-creator .btn-submit:hover, .sub-admin-creator .btn-assign-users:hover { /* --- পরিবর্তন --- */
+            background-color: var(--secondary-color);
+        }
+
+        .sub-admin-list-container {
+            margin-top: 30px;
+        }
+        .sub-admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .sub-admin-card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid var(--admin-color);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .sub-admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-hover);
+        }
+        .sub-admin-card .card-content { flex-grow: 1; cursor: pointer;}
+        .sub-admin-card .icon {
+            font-size: 2rem;
+            color: var(--admin-color);
+            background-color: var(--light-bg);
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sub-admin-card .info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .sub-admin-card .info p {
+            font-size: 0.85rem;
+            color: var(--light-text);
+            margin: 5px 0 0 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- পরিবর্তন শুরু: ব্যবহারকারী নির্ধারণের জন্য নতুন Modal-এর স্টাইল --- */
+        .assignment-modal-container {
+            max-width: 800px;
+        }
+        .assignment-modal-body {
+            display: flex;
+            gap: 20px;
+            min-height: 40vh;
+        }
+        .user-list-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--background-color);
+        }
+        .user-list-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-list-header input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+        }
+        .user-list {
+            list-style: none;
+            padding: 10px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .user-list-item {
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-list-item:hover {
+            background-color: var(--light-bg);
+        }
+        .user-list-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+        .user-transfer-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .transfer-btn {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .transfer-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .assignment-modal-body {
+                flex-direction: column;
+            }
+            .user-transfer-actions {
+                flex-direction: row;
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+        /* --- পরিবর্তন শেষ --- */
+
+
+        /* --- অতিরিক্ত মোবাইল রেসপন্সিভনেস --- */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 15px;
+            }
+            .sub-admin-creator .form-grid {
+                grid-template-columns: 1fr; /* Stack everything in one column */
+            }
+            .modal-container, .download-modal-container {
+                padding: 15px;
+            }
+            .routine-header .header-content {
+                padding: 0 10px; /* Reduce padding to give more space */
+                flex-direction: column; /* Stack logo and text */
+                gap: 10px;
+            }
+            .routine-header .institution-logo {
+                position: static; /* Remove absolute positioning */
+                transform: none;
+            }
+            .detail-actions-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .field-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .field-list-item .field-label-input {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            @page { size: auto; margin: 20px; }
+            body, .admin-layout, .content-wrapper, .routine-container { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background-color: #fff !important; 
+                color: #000 !important;
+                font-family: 'Bornomala', 'Hind Siliguri', sans-serif !important;
+            }
+            .sidebar, .app-header, .detail-actions-bar, .sidebar-footer, .modal-overlay, .info-buttons-container, .download-modal-overlay { display: none !important; }
+            .main-content { padding: 0 !important; }
+            .routine-container.print-area {
+                visibility: visible;
+                position: static;
+                box-shadow: none;
+                border: none;
+                margin-bottom: 0;
+                page-break-after: always;
+            }
+            .routine-container.print-area:last-of-type {
+                page-break-after: auto;
+            }
+            .non-printable { display: none !important; }
+            
+            /* --- প্রিন্ট থেকে এডিট বাটন হাইড করা --- */
+            #editInstDetailsBtn, #saveInstDetailsBtn {
+                display: none !important;
+            }
+            /* --- হাইড করা শেষ --- */
+
+            .routine-header h1, .routine-header h2, .routine-table th, .routine-table td, .routine-header p { 
+                color: #000 !important; 
+            }
+            .routine-table th, .routine-table td { border: 1px solid #ccc !important; }
+            .routine-table thead { background-color: #f2f2f2 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact;}
+            .student-photo { max-width: 40px; max-height: 40px; }
+            .table-actions-col { display: none; }
+            .truncate-text {
+                max-width: none;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader" id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="login-screen" id="loginScreen">
+        <!-- পরিবর্তন: ভিডিও ব্যাকগ্রাউন্ডের পরিবর্তে GIF ব্যাকগ্রাউন্ড -->
+        <div class="gif-background">
+            <img id="loginGif" src="" alt="Nature Waterfall Background">
+        </div>
+        <div class="login-box">
+            <h2><i class="fas fa-user-shield"></i> অ্যাডমিন লগইন</h2>
+            <p>আপনার অ্যাকাউন্ট দিয়ে লগইন করুন</p>
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="ইউজারনেম" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
+                </div>
+                <button type="submit" class="btn-login">লগইন করুন</button>
+                <p class="error-message" id="errorMessage">ভুল ইউজারনেম অথবা পাসওয়ার্ড</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="admin-layout" id="adminLayout">
+        <aside class="sidebar" id="sidebar">
+             <div class="sidebar-header"><h2><i class="fas fa-user-shield"></i> অ্যাডমিন প্যানেল</h2></div>
+             <ul class="sidebar-nav">
+                <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড</a></li>
+                <li><a href="#users" data-view="users"><i class="fas fa-users"></i> ব্যবহারকারী</a></li>
+                <li><a href="#create-admin" data-view="create-admin"><i class="fas fa-user-plus"></i> অ্যাডমিন তৈরি করুন</a></li>
+                <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> ফর্ম সেটিংস</a></li>
+             </ul>
+             <div class="sidebar-footer">
+                 <button id="logoutBtn" style="width: 100%; padding: 10px; margin-top: 15px; border: none; background-color: var(--danger-color); color: white; border-radius: var(--border-radius); cursor: pointer; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> লগ আউট</button>
+             </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header class="app-header">
+                <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearchInput" placeholder="এখানে সার্চ করুন...">
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="nightModeToggle">
+                            <input type="checkbox" id="nightModeToggle" />
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </header>
+            <main class="main-content" id="mainContent">
+                <!-- Dynamic Content Goes Here -->
+            </main>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-container">
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <!-- পরিবর্তন শুরু: ব্যবহারকারী নির্ধারণের জন্য নতুন Modal -->
+    <div class="modal-overlay" id="assignmentModal">
+        <div class="modal-container assignment-modal-container">
+            <div class="modal-header">
+                <h3 id="assignmentModalTitle">ব্যবহারকারী নির্ধারণ করুন</h3>
+            </div>
+            <div class="modal-body assignment-modal-body">
+                <!-- Available Users Column -->
+                <div class="user-list-column">
+                    <div class="user-list-header">
+                        <input type="text" id="availableUsersSearch" placeholder="ব্যবহারকারী খুঁজুন...">
+                    </div>
+                    <ul class="user-list" id="availableUsersList">
+                        <!-- JS দ্বারা লোড হবে -->
+                    </ul>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="user-transfer-actions">
+                    <button class="transfer-btn" id="assignUserBtn" title="নির্ধারণ করুন"><i class="fas fa-chevron-right"></i></button>
+                    <button class="transfer-btn" id="unassignUserBtn" title="বাতিল করুন"><i class="fas fa-chevron-left"></i></button>
+                </div>
+
+                <!-- Assigned Users Column -->
+                <div class="user-list-column">
+                    <div class="user-list-header">
+                        <input type="text" id="assignedUsersSearch" placeholder="নির্ধারিত ব্যবহারকারী খুঁজুন...">
+                    </div>
+                    <ul class="user-list" id="assignedUsersList">
+                        <!-- JS দ্বারা লোড হবে -->
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeAssignmentModalBtn">বাতিল</button>
+                <button class="btn-primary" id="saveAssignmentBtn">সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+    <!-- পরিবর্তন শেষ -->
+    
+    <div class="image-preview-modal" id="imagePreviewModal">
+        <span class="close-btn" id="imagePreviewCloseBtn">&times;</span>
+        <img src="" alt="Student Photo Preview" id="previewImage">
+        <div class="preview-caption" id="previewCaption"></div>
+        <div class="preview-actions">
+            <button id="shareBtn"><i class="fas fa-share-alt"></i> শেয়ার</button>
+            <button id="downloadImageBtn"><i class="fas fa-download"></i> ডাউনলোড</button>
+        </div>
+    </div>
+
+    <div class="download-modal-overlay" id="downloadModal">
+        <div class="download-modal-container">
+            <div class="download-modal-header">
+                <h3 id="downloadModalTitle">ডাউনলোড অপশন</h3>
+                <button class="close-btn" id="downloadModalCloseBtn">&times;</button>
+            </div>
+            <div class="download-modal-body">
+                <div class="download-step" id="downloadStep1">
+                    <p class="step-title">ধাপ ১: কোন তালিকাটি ডাউনলোড করতে চান তা নির্বাচন করুন</p>
+                    <ul id="downloadClassList"></ul>
+                </div>
+                <div class="download-step hidden" id="downloadStep2">
+                    <p class="step-title">ধাপ ২: আপনার পছন্দের ডাউনলোড ফরম্যাট বেছে নিন</p>
+                    <div class="format-grid" id="downloadFormatGrid">
+                         <a href="#" class="format-item" data-format="csv"><i class="fas fa-file-csv"></i><span>CSV</span></a>
+                         <a href="#" class="format-item" data-format="tsv"><i class="fas fa-file-alt"></i><span>TSV</span></a>
+                         <a href="#" class="format-item" data-format="xlsx"><i class="fas fa-file-excel"></i><span>Excel (.xlsx)</span></a>
+                         <a href="#" class="format-item" data-format="ods"><i class="fas fa-file-alt"></i><span>OpenDocument</span></a>
+                         <a href="#" class="format-item" data-format="doc"><i class="fas fa-file-word"></i><span>Word (.doc)</span></a>
+                         <a href="#" class="format-item" data-format="html"><i class="fas fa-file-code"></i><span>Web Page</span></a>
+                         <a href="#" class="format-item" data-format="jpg"><i class="fas fa-file-image"></i><span>IMAGE (.jpg)</span></a>
+                         <a href="#" class="format-item" data-format="pdf"><i class="fas fa-file-pdf"></i><span>PDF</span></a>
+                    </div>
+                </div>
+            </div>
+            <div class="download-modal-footer">
+                <button class="modal-footer button btn-secondary" id="downloadModalBackBtn">পূর্ববর্তী</button>
+                <button class="modal-footer button btn-primary" id="downloadModalNextBtn">পরবর্তী <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Firebase Initialization ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyD9BwVMQy5lX63-Lnsy_8oBw4rfoROp4Ec",
+        authDomain: "data-collection-app-c055e.firebaseapp.com",
+        projectId: "data-collection-app-c055e",
+        storageBucket: "data-collection-app-c055e.appspot.com",
+        messagingSenderId: "856960918481",
+        appId: "1:856960918481:web:053c011242460f16d7b6f0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // --- Global State Variables ---
+    let allInstitutions = [];
+    let allUsers = [];
+    let allSubAdmins = [];
+    let currentView = 'dashboard';
+    let currentViewId = null; // Used for institution ID, user ID etc.
+    let unsubscribeListeners = []; // To store realtime listener functions
+    
+    // --- পরিবর্তন: প্রতিষ্ঠানের লোগোর জন্য প্রফেশনাল খালি ইমেজ আইকন ---
+    const placeholderImageSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTIxIDE5VjVjMC0xLjEtLjktMi0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnpNOC41IDEyLjVsMi41IDMuMDFMMTMuNSA5bDQuNSA2SDV6Ii8+PC9zdmc+`;
+    // --- পরিবর্তন: শিক্ষার্থীর ছবির জন্য ম্যান আইকন ---
+    const placeholderUserSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+`;
+
+
+    // --- DOM Element References ---
+    const mainContent = document.getElementById('mainContent');
+    const nightModeToggle = document.getElementById('nightModeToggle');
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+    const sidebar = document.getElementById('sidebar');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const overlay = document.getElementById('overlay');
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const customModal = document.getElementById('customModal');
+    const loginScreen = document.getElementById('loginScreen');
+    const adminLayout = document.getElementById('adminLayout');
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('errorMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const preloader = document.getElementById('preloader');
+    
+    const imagePreviewModal = document.getElementById('imagePreviewModal');
+    const imagePreviewCloseBtn = document.getElementById('imagePreviewCloseBtn');
+    const previewImage = document.getElementById('previewImage');
+    const previewCaption = document.getElementById('previewCaption');
+    const shareBtn = document.getElementById('shareBtn');
+    const downloadImageBtn = document.getElementById('downloadImageBtn');
+
+    const downloadModal = document.getElementById('downloadModal');
+    const downloadModalCloseBtn = document.getElementById('downloadModalCloseBtn');
+    const downloadModalNextBtn = document.getElementById('downloadModalNextBtn');
+    const downloadModalBackBtn = document.getElementById('downloadModalBackBtn');
+    const downloadStep1 = document.getElementById('downloadStep1');
+    const downloadStep2 = document.getElementById('downloadStep2');
+    const downloadClassList = document.getElementById('downloadClassList');
+    const downloadFormatGrid = document.getElementById('downloadFormatGrid');
+
+    const assignmentModal = document.getElementById('assignmentModal');
+    const closeAssignmentModalBtn = document.getElementById('closeAssignmentModalBtn');
+    const saveAssignmentBtn = document.getElementById('saveAssignmentBtn');
+    
+    const loginGifs = [
+        'https://i.gifer.com/72Iu.gif',
+        'https://i.pinimg.com/originals/39/3a/0d/393a0df470e8a7c2936733221dee7e61.gif',
+        'https://i.pinimg.com/originals/b7/d8/51/b7d8515057b56f8f117f7b3bb697c6d5.gif',
+        'https://i.pinimg.com/originals/44/2c/8b/442c8b87c71e0690184b9f3cd67e588d.gif',
+        'https://i.pinimg.com/originals/a2/5c/4a/a25c4a1e944b1b36a18d3637e6d0a7a3.gif',
+        'https://64.media.tumblr.com/1cecf5781a7b8e5c32b50428d0520610/tumblr_oo0nflG81t1v830keo1_500.gif',
+        'https://giffiles.alphacoders.com/214/214436.gif',
+        'https://giffiles.alphacoders.com/208/208836.gif',
+        'https://i.gifer.com/origin/79/79366d7de07c917f30bf24f2160d2b63_w200.gif',
+        'https://i.pinimg.com/originals/52/68/a2/5268a26227b61f8753a43a137b019623.gif',
+        'https://i.gifer.com/fyrq.gif',
+        'https://i.gifer.com/4l0.gif',
+        'https://giffiles.alphacoders.com/138/13813.gif',
+        'https://www.icegif.com/wp-content/uploads/2023/04/icegif-94.gif',
+        'https://media1.giphy.com/media/l4pTkygrkP3h4Q1mU/giphy.gif',
+        'https://gifdb.com/images/high/mesmerizing-waterfall-over-icelandic-cliffs-ns38992kfeul7jqm.gif',
+        'https://i.pinimg.com/originals/b4/0f/09/b40f09a531b782924a1a6f0278a514d3.gif',
+        'https://giffiles.alphacoders.com/137/13797.gif',
+        'https://media.tenor.com/DQRH8BcFnoAAAAAM/waterfall-view.gif',
+        'https://i.pinimg.com/originals/d4/0b/a4/d40ba405f6e8102a0a2542a275f92265.gif',
+        'https://media.tenor.com/uR4pWpBcsjQAAAAM/waterfall.gif',
+        'https://i.gifer.com/1G66.gif',
+        'https://i.gifer.com/An9u.gif',
+        'https://media.baamboozle.com/uploads/images/303507/1628109315_525940.gif',
+        'https://i.makeagif.com/media/8-18-2017/L1tC3M.gif',
+        'https://gif Abyss.com/wp-content/uploads/2022/04/waterfall-gif-by-gif-abyss.gif',
+        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXpsbzN5ZTVidHB4dDBsb3J1OGQ4anV6eWhmbGZzcDdnMjVxMG1ocCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L2N2V418AKxgc/giphy.gif',
+        'https://media4.giphy.com/media/4Z1wOi78ZGz28/giphy.gif',
+        'https://i.pinimg.com/originals/6e/c3/8c/6ec38c4c7b8c2d1c68f6d7d6f554072f.gif',
+        'https://i.pinimg.com/originals/7d/5c/8c/7d5c8c1a1b3b5b7b9c9c8c5c4a5c9d9d.gif',
+        'https://i.pinimg.com/originals/c7/b6/d1/c7b6d1c8c5c4a5c9d9d8c8c5c4a5c9d9.gif',
+        'https://giffiles.alphacoders.com/208/208865.gif',
+        'https://media.tenor.com/5VWWiUXJblAAAAAM/waterfall.gif',
+        'https://i.pinimg.com/originals/9f/61/88/9f618841451f50f2f11ec39f1c73a6ca.gif',
+        'https://media.tenor.com/u682A7G8Iq4AAAAM/skogafoss-iceland.gif',
+        'https://gifdb.com/images/high/beautiful-nature-4k-aesthetic-forest-waterfall-swnexr9s0nvafl7l.gif',
+        'https://www.funimada.com/assets/images/cards/big/waterfall-13.gif',
+        'https://media.tenor.com/tHmyG5FmAwEAAAAC/water-waterfall.gif',
+        'https://animesher.com/orig/1/141/1416/14169/animesher.com_nature-gif-waterfall-1416952.gif',
+        'https://64.media.tumblr.com/e2e6c51817452d3a778e7c10b232070e/tumblr_mpy5pddGGO1rlnnpro1_r1_500.gif',
+        'https://64.media.tumblr.com/0d9fb82d1c120a174411130d21659a72/tumblr_nscb0oNlZI1uhpzxoo1_500.gif',
+        'https://media.tenor.com/o3VplwAHRx4AAAAd/waterfall.gif',
+        'https://media1.giphy.com/media/4N1wOi78ZGz28/200.gif',
+        'https://media.tenor.com/dJnBOyX6EScAAAAM/chute-tree.gif',
+        'https://www.icegif.com/wp-content/uploads/waterfall-icegif-2.gif',
+        'https://media2.giphy.com/media/xUPGcm3irK16ev4jMA/giphy.gif',
+        'https://media.tenor.com/Qj4dG002VlwAAAAM/waterfalls-nature.gif',
+        'https://media.tenor.com/M6LcHj5IksYAAAAC/waterfall.gif',
+        'https://media.tenor.com/vHqAAa5ZVUcAAAAM/cascada-de-agua.gif',
+        'https://media.tenor.com/2-I3nKlp11sAAAAC/waterfalls-forest.gif'
+    ];
+    const loginGifElement = document.getElementById('loginGif');
+
+    function setRandomLoginBackground() {
+        if (loginGifElement) {
+            const randomGifUrl = loginGifs[Math.floor(Math.random() * loginGifs.length)];
+            loginGifElement.src = randomGifUrl;
+        }
+    }
+    setRandomLoginBackground();
+
+    // --- পরিবর্তন: বাংলা সংখ্যায় রূপান্তরের জন্য ফাংশন ---
+    function convertToBengaliNumber(num) {
+        const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        return String(num).replace(/\d/g, d => bengaliDigits[d]);
+    }
+    
+    // --- রিয়েল-টাইম ডাটা লোডিং ফাংশন ---
+    // এই ফাংশনটি Firestore থেকে রিয়েল-টাইম আপডেট শোনার জন্য সেট আপ করা হয়েছে।
+    // ডাটাবেজে কোনো পরিবর্তন হলে এটি স্বয়ংক্রিয়ভাবে UI আপডেট করে।
+    function setupRealtimeListeners() {
+        unsubscribeListeners.forEach(unsubscribe => unsubscribe());
+        unsubscribeListeners = [];
+
+        const handleError = (error, collectionName) => {
+            console.error(`Error fetching real-time data from ${collectionName}:`, error);
+            showModal({ type: 'danger', title: 'লাইভ আপডেট ত্রুটি', message: `${collectionName} থেকে রিয়েল-টাইম ডেটা লোড করা সম্ভব হয়নি।` });
+        };
+
+        const usersUnsubscribe = db.collection('users').onSnapshot(snapshot => {
+            allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            rerenderCurrentView();
+        }, error => handleError(error, 'users'));
+        unsubscribeListeners.push(usersUnsubscribe);
+        
+        const subAdminsUnsubscribe = db.collection('subAdmins').onSnapshot(snapshot => {
+            allSubAdmins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            rerenderCurrentView();
+        }, error => handleError(error, 'subAdmins'));
+        unsubscribeListeners.push(subAdminsUnsubscribe);
+
+        const institutionsUnsubscribe = db.collection('institutions').onSnapshot(async (snapshot) => {
+            const institutionPromises = snapshot.docs.map(async (doc) => {
+                const institutionData = { id: doc.id, ...doc.data(), students: [], classes: [] };
+                
+                const mainStudentsSnapshot = await db.collection('institutions').doc(doc.id).collection('students').get();
+                institutionData.students = mainStudentsSnapshot.docs.map(studentDoc => ({ id: studentDoc.id, ...studentDoc.data() }));
+
+                const classesSnapshot = await db.collection('institutions').doc(doc.id).collection('classes').get();
+                const classPromises = classesSnapshot.docs.map(async (classDoc) => {
+                    const classData = { id: classDoc.id, ...classDoc.data(), students: [] };
+                    const classStudentsSnapshot = await db.collection('institutions').doc(doc.id).collection('classes').doc(classDoc.id).collection('students').get();
+                    classData.students = classStudentsSnapshot.docs.map(studentDoc => ({ id: studentDoc.id, ...studentDoc.data() }));
+                    return classData;
+                });
+                institutionData.classes = await Promise.all(classPromises);
+                
+                institutionData.formConfiguration = institutionData.formConfiguration || institutionData.formConfig;
+                delete institutionData.formConfig;
+
+                return institutionData;
+            });
+            allInstitutions = await Promise.all(institutionPromises);
+            rerenderCurrentView();
+        }, error => handleError(error, 'institutions'));
+        unsubscribeListeners.push(institutionsUnsubscribe);
+    }
+    
+    // রিয়েল-টাইম আপডেটের পরে বর্তমান ভিউ পুনরায় রেন্ডার করার ফাংশন
+    function rerenderCurrentView() {
+        if (customModal.classList.contains('active') || downloadModal.classList.contains('active') || assignmentModal.classList.contains('active')) {
+            return; 
+        }
+
+        const route = parseUrl();
+        renderView(route.view, route.id);
+    }
+    
+    function parseUrl() {
+        const hash = window.location.hash.substring(1);
+        const parts = hash.split('/');
+        return {
+            view: parts[0] || 'dashboard',
+            id: parts[1] || null
+        };
+    }
+
+    function navigateTo(view, id = null) {
+        const newUrl = id ? `#${view}/${id}` : `#${view}`;
+        if (window.location.hash !== newUrl) {
+            history.pushState({ view, id }, '', newUrl);
+        }
+        renderView(view, id);
+    }
+
+    function renderView(view, id) {
+        currentView = view;
+        currentViewId = id;
+        globalSearchInput.value = '';
+
+        sidebarLinks.forEach(l => l.classList.remove('active'));
+        const activeLink = document.querySelector(`.sidebar-nav a[data-view="${view}"]`);
+        if (activeLink) activeLink.classList.add('active');
+
+        switch (view) {
+            case 'dashboard':
+                const userRole = sessionStorage.getItem('userRole');
+                if (userRole === 'subAdmin') {
+                    renderSubAdminUserDashboard();
+                } else {
+                    renderDashboard();
+                }
+                break;
+            case 'users':
+                renderUsersView();
+                break;
+            case 'create-admin':
+                renderCreateAdminView();
+                break;
+            case 'settings':
+                renderSettingsView();
+                break;
+            case 'institutionDetails':
+                renderInstitutionDetails(id);
+                break;
+            case 'userDashboard':
+                 renderUserDashboard(id);
+                 break;
+            case 'subAdminDetails':
+                 renderSubAdminDetails(id);
+                 break;
+            case 'allInstitutions':
+                renderAllInstitutionsView();
+                break;
+            case 'allStudents':
+                renderAllStudentsView();
+                break;
+            default:
+                navigateTo('dashboard');
+        }
+    }
+    
+    window.addEventListener('popstate', (event) => {
+        if (event.state) {
+            renderView(event.state.view, event.state.id);
+        } else {
+            const initialRoute = parseUrl();
+            renderView(initialRoute.view, initialRoute.id);
+        }
+    });
+
+    // --- THEME & SIDEBAR ---
+    function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); nightModeToggle.checked = theme === 'dark'; }
+    nightModeToggle.addEventListener('change', () => { const theme = nightModeToggle.checked ? 'dark' : 'light'; localStorage.setItem('theme', theme); applyTheme(theme); });
+    function handleSidebar() {
+        if (window.innerWidth < 1024) { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); } 
+        else { sidebar.classList.toggle('collapsed'); }
+    }
+    menuToggleBtn.addEventListener('click', handleSidebar);
+    overlay.addEventListener('click', handleSidebar);
+
+    // --- NAVIGATION & ROUTING ---
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const view = link.dataset.view;
+            if (window.innerWidth < 1024 && sidebar.classList.contains('open')) { handleSidebar(); }
+            navigateTo(view);
+        });
+    });
+
+    // --- SEARCH ---
+    globalSearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        if (['dashboard', 'userDashboard', 'allInstitutions', 'subAdminUserDashboard'].includes(currentView)) { 
+            document.querySelectorAll('.institution-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none'); 
+        } else if (['institutionDetails', 'allStudents'].includes(currentView)) { 
+            document.querySelectorAll('.routine-table tbody tr').forEach(row => row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none'); 
+        } else if (['users', 'subAdminDetails'].includes(currentView)) { 
+            document.querySelectorAll('.user-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none'); 
+        } else if (currentView === 'create-admin') {
+            document.querySelectorAll('.sub-admin-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none');
+        }
+    });
+    
+    // --- RENDER FUNCTIONS ---
+    function renderDashboard() {
+        const totalUsers = allUsers.length;
+        const totalAdmins = allSubAdmins.length;
+        const totalInstitutions = allInstitutions.length;
+        const totalStudents = allInstitutions.reduce((acc, inst) => {
+            const classStudents = (inst.classes || []).reduce((classAcc, c) => classAcc + c.students.length, 0);
+            return acc + (inst.students ? inst.students.length : 0) + classStudents;
+        }, 0);
+
+        const statCardsHTML = `<div class="stat-card-grid">
+            <div class="stat-card" id="totalUsersCard"><div class="icon"><i class="fas fa-users"></i></div><div class="info"><h3>${totalUsers}</h3><p>মোট ব্যবহারকারী</p></div></div>
+            <div class="stat-card admins" id="totalAdminsCard"><div class="icon"><i class="fas fa-user-shield"></i></div><div class="info"><h3>${totalAdmins}</h3><p>মোট অ্যাডমিন</p></div></div>
+            <div class="stat-card institutions" id="totalInstitutionsCard"><div class="icon"><i class="fas fa-school"></i></div><div class="info"><h3>${totalInstitutions}</h3><p>মোট প্রতিষ্ঠান</p></div></div>
+            <div class="stat-card students" id="totalStudentsCard"><div class="icon"><i class="fas fa-user-graduate"></i></div><div class="info"><h3>${totalStudents}</h3><p>মোট শিক্ষার্থী</p></div></div>
+        </div><hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 30px;">`;
+
+        mainContent.innerHTML = `<div class="page-header"></div>${statCardsHTML}<div class="institution-grid" id="institutionGrid"></div>`;
+        const grid = document.getElementById('institutionGrid');
+        
+        allInstitutions.forEach(inst => {
+            const classStudents = (inst.classes || []).reduce((classAcc, c) => classAcc + c.students.length, 0);
+            const totalInstStudents = (inst.students ? inst.students.length : 0) + classStudents;
+            const card = document.createElement('div');
+            card.className = 'institution-card';
+            card.dataset.id = inst.id;
+            
+            const cardContent = document.createElement('div');
+            cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+            cardContent.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'institution-card-delete-btn';
+            deleteBtn.title = 'প্রতিষ্ঠান মুছে ফেলুন';
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showModal({
+                    type: 'delete',
+                    title: 'আপনি কি নিশ্চিত?',
+                    message: `আপনি "${inst.name}" প্রতিষ্ঠানটি এবং এর অধীনে থাকা সকল তথ্য স্থায়ীভাবে মুছে ফেলতে চলেছেন। এই কাজটি আর ফেরানো যাবে না।`,
+                    onConfirm: () => deleteInstitution(inst.id)
+                });
+            });
+
+            card.appendChild(deleteBtn);
+            card.appendChild(cardContent);
+            grid.appendChild(card);
+        });
+        
+        document.getElementById('totalUsersCard').addEventListener('click', () => navigateTo('users'));
+        document.getElementById('totalInstitutionsCard').addEventListener('click', () => navigateTo('allInstitutions'));
+        document.getElementById('totalStudentsCard').addEventListener('click', () => navigateTo('allStudents'));
+        document.getElementById('totalAdminsCard').addEventListener('click', () => navigateTo('create-admin'));
+    }
+    
+    function renderSubAdminUserDashboard() {
+        const loggedInSubAdmin = allSubAdmins.find(admin => admin.username === sessionStorage.getItem('username'));
+        if (!loggedInSubAdmin) return;
+
+        const assignedUserIds = loggedInSubAdmin.assignedUserIds || [];
+
+        if (assignedUserIds.length === 0) {
+            mainContent.innerHTML = `<div class="no-data-container"><h3>কোনো ব্যবহারকারী নির্ধারিত নেই</h3><p>আপনাকে এখনো কোনো ব্যবহারকারী পরিচালনার দায়িত্ব দেওয়া হয়নি।</p></div>`;
+            return;
+        }
+
+        const accessibleUsers = allUsers.filter(user => assignedUserIds.includes(user.id));
+
+        if (accessibleUsers.length === 0) {
+            mainContent.innerHTML = `<div class="no-data-container"><h3>নির্ধারিত ব্যবহারকারী খুঁজে পাওয়া যায়নি</h3></div>`;
+            return;
+        }
+        
+        mainContent.innerHTML = `<div class="page-header"><h1>আমার নির্ধারিত ব্যবহারকারীগণ</h1><p>আপনার নির্ধারিত ব্যবহারকারীদের তথ্য দেখুন।</p></div><div class="user-grid" id="userGrid"></div>`;
+        const userGrid = document.getElementById('userGrid');
+
+        accessibleUsers.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+            const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
+            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+            cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
+            
+            card.appendChild(cardContent);
+            userGrid.appendChild(card);
+        });
+    }
+    
+    async function deleteInstitution(institutionId) {
+        const instRef = db.collection('institutions').doc(institutionId);
+        try {
+            const classesSnapshot = await instRef.collection('classes').get();
+            for (const classDoc of classesSnapshot.docs) {
+                const studentsSnapshot = await classDoc.ref.collection('students').get();
+                const studentDeletions = studentsSnapshot.docs.map(doc => doc.ref.delete());
+                await Promise.all(studentDeletions);
+                await classDoc.ref.delete();
+            }
+
+            const mainStudentsSnapshot = await instRef.collection('students').get();
+            const mainStudentDeletions = mainStudentsSnapshot.docs.map(doc => doc.ref.delete());
+            await Promise.all(mainStudentDeletions);
+
+            await instRef.delete();
+            
+            showModal({ type: 'success', title: 'সফল', message: 'প্রতিষ্ঠানটি সফলভাবে মুছে ফেলা হয়েছে।' });
+        } catch (error) {
+            console.error("Error deleting institution:", error);
+            showModal({ type: 'danger', title: 'ত্রুটি', message: 'প্রতিষ্ঠানটি মোছার সময় একটি সমস্যা হয়েছে।' });
+        }
+    }
+
+    function renderAllInstitutionsView() {
+        mainContent.innerHTML = `<div class="page-header"><h1>সকল প্রতিষ্ঠান</h1><p>সিস্টেমে থাকা সকল প্রতিষ্ঠানের তালিকা।</p></div><div class="institution-grid" id="institutionGrid"></div>`;
+        const grid = document.getElementById('institutionGrid');
+        allInstitutions.forEach(inst => {
+            const classStudents = (inst.classes || []).reduce((classAcc, c) => classAcc + c.students.length, 0);
+            const totalInstStudents = (inst.students ? inst.students.length : 0) + classStudents;
+            const card = document.createElement('div');
+            card.className = 'institution-card';
+            card.dataset.id = inst.id;
+            card.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+            card.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
+            grid.appendChild(card);
+        });
+    }
+
+    function renderAllStudentsView() {
+        let allStudentsList = [];
+        allInstitutions.forEach(inst => {
+            const studentsWithInst = (inst.students || []).map(s => ({ ...s, institutionName: inst.name, className: 'সাধারণ' }));
+            allStudentsList.push(...studentsWithInst);
+            (inst.classes || []).forEach(cls => {
+                const studentsWithClass = cls.students.map(s => ({ ...s, institutionName: inst.name, className: cls.name }));
+                allStudentsList.push(...studentsWithClass);
+            });
+        });
+
+        const tableHeaders = ['ক্রমিক', 'ছবি', 'নাম', 'পিতার নাম', 'মোবাইল', 'শ্রেণী', 'প্রতিষ্ঠান'];
+        const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
+
+        let tableRows = allStudentsList.map((student, index) => {
+            const studentNameForFunc = (student.studentName || 'student_photo').replace(/'/g, "\\'");
+            // --- পরিবর্তন: শিক্ষার্থীর ছবি না থাকলে placeholderUserSVG ব্যবহার করা হচ্ছে ---
+            const photoSrc = student.studentPhotoUrl || placeholderUserSVG; 
+            return `<tr>
+                <td>${convertToBengaliNumber(index + 1)}</td>
+                <td><img src="${photoSrc}" alt="Photo" class="student-photo" onclick="showImagePreview('${student.studentPhotoUrl || ''}', '${studentNameForFunc}')"></td>
+                <td>${student.studentName || ''}</td>
+                <td>${student.fatherName || ''}</td>
+                <td>${student.studentMobile || ''}</td>
+                <td>${student.className || ''}</td>
+                <td>${student.institutionName || ''}</td>
+            </tr>`;
+        }).join('');
+
+        const backButtonHTML = `<button id="backToDashboardBtn"><i class="fas fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</button>`;
+        mainContent.innerHTML = `
+            <div class="detail-actions-bar"><div class="back-button">${backButtonHTML}</div></div>
+            <div class="routine-container">
+                <div class="routine-header"><h2>সকল শিক্ষার্থীর তালিকা (${convertToBengaliNumber(allStudentsList.length)} জন)</h2></div>
+                <div class="routine-table-wrapper"><table class="routine-table">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
+            </div>`;
+        
+        document.getElementById('backToDashboardBtn').addEventListener('click', () => navigateTo('dashboard'));
+    }
+
+    function renderInstitutionDetails(institutionId) {
+        if (!institutionId) { navigateTo('dashboard'); return; }
+        const institution = allInstitutions.find(inst => inst.id === institutionId);
+        if (!institution) { mainContent.innerHTML = `<div class="no-data-container"><h3>প্রতিষ্ঠান খুঁজে পাওয়া যায়নি।</h3></div>`; return; }
+        
+        const totalStudents = (institution.students?.length || 0) + (institution.classes || []).reduce((acc, cls) => acc + (cls.students?.length || 0), 0);
+        
+        const backButtonHTML = `<button id="backBtn"><i class="fas fa-arrow-left"></i> ফিরে যান</button>`;
+        
+        // --- পরিবর্তন: প্রতিষ্ঠানের লোগো না থাকলে placeholderImageSVG ব্যবহার করা হচ্ছে ---
+        const logoSrc = institution.logoUrl || placeholderImageSVG;
+        const logoOnClick = `showImagePreview('${institution.logoUrl || ''}', '${(institution.name || 'Logo').replace(/'/g, "\\'")}')`;
+        
+        const institutionDetailsHTML = `
+            <div class="institution-details">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                     <h1 id="editableInstName" data-field="name">${institution.name}</h1>
+                     <button id="editInstDetailsBtn" title="তথ্য সম্পাদনা করুন"><i class="fas fa-pencil-alt"></i></button>
+                     <button class="action-btn hidden" id="saveInstDetailsBtn" title="সেভ করুন"><i class="fas fa-check"></i></button>
+                </div>
+                <p>
+                    <span id="editableInstAddress" data-field="address">${institution.address || ''}</span> | 
+                    <span id="editableInstNumber" data-field="number">${institution.number || ''}</span>
+                </p>
+            </div>`;
+
+        if (totalStudents === 0) {
+            mainContent.innerHTML = `
+                <div class="detail-actions-bar">
+                    <div class="back-button">${backButtonHTML}</div>
+                </div>
+                <div class="routine-container">
+                    <div class="routine-header">
+                        <div class="header-content">
+                            <img src="${logoSrc}" alt="Institution Logo" class="institution-logo" onclick="${logoOnClick}">
+                            ${institutionDetailsHTML}
+                        </div>
+                    </div>
+                    <div class="no-data-container">
+                        <div class="icon"><i class="fas fa-folder-open"></i></div>
+                        <h3>কোন তথ্য পাওয়া যায়নি</h3>
+                        <p>এই প্রতিষ্ঠানে এখনো কোনো শিক্ষার্থীর তথ্য যোগ করা হয়নি।</p>
+                    </div>
+                </div>`;
+        } else {
+            let contentHTML = '';
+            const createStudentListHTML = (studentList, title, listId, isClass = false) => {
+                if (!studentList || studentList.length === 0) return '';
+                
+                const formConfig = institution.formConfiguration || getDefaultFormConfig();
+                
+                const enabledStudentFields = (formConfig.studentFields || [])
+                    .filter(f => f.enabled && f.type !== 'file')
+                    .sort((a, b) => a.order - b.order);
+
+                const photoFieldEnabled = (formConfig.studentFields || []).some(f => f.id === 'studentPhoto' && f.enabled);
+
+                const tableHeaders = ['ক্রমিক'];
+                if (photoFieldEnabled) {
+                    tableHeaders.push('ছবি');
+                }
+                tableHeaders.push(...enabledStudentFields.map(f => f.label), 'অ্যাকশন');
+                
+                const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th class=${h === 'অ্যাকশন' ? 'table-actions-col' : ''}>${h}</th>`).join('')}</tr></thead>`;
+                
+                let tableRows = studentList.map((student, index) => {
+                    const cells = enabledStudentFields.map(field => {
+                        const value = student[field.id] || '';
+                        const cellClass = (field.type === 'text' || field.type === 'textarea') ? 'truncate-text' : '';
+                        return `<td data-field="${field.id}" class="${cellClass}" title="${value}">${value}</td>`;
+                    }).join('');
+
+                    const classDataAttr = isClass ? `data-class-id="${listId}"` : '';
+                    
+                    const studentNameForFunc = (student.studentName || 'student_photo').replace(/'/g, "\\'");
+                    // --- পরিবর্তন: শিক্ষার্থীর ছবি না থাকলে placeholderUserSVG ব্যবহার করা হচ্ছে ---
+                    const photoSrc = student.studentPhotoUrl || placeholderUserSVG;
+                    const studentPhotoOnClick = `showImagePreview('${student.studentPhotoUrl || ''}', '${studentNameForFunc}')`;
+                    
+                    const photoCell = photoFieldEnabled ? `<td><img src="${photoSrc}" alt="Photo" class="student-photo" onclick="${studentPhotoOnClick}"></td>` : '';
+
+                    return `<tr data-student-id="${student.id}" data-institution-id="${institution.id}" ${classDataAttr}>
+                        <td>${convertToBengaliNumber(index + 1)}</td>
+                        ${photoCell}
+                        ${cells}
+                        <td class="table-actions-col"><div class="table-actions"><button class="edit-btn" title="সম্পাদনা"><i class="fas fa-pencil-alt"></i></button><button class="save-btn hidden" title="সেভ"><i class="fas fa-check"></i></button><button class="delete-btn" title="মুছে ফেলুন"><i class="fas fa-trash-alt"></i></button></div></td>
+                    </tr>`;
+                }).join('');
+
+                return `
+                <div class="routine-container print-area" id="print-area-${listId}">
+                    <div class="routine-header">
+                        <div class="header-content">
+                            <img src="${logoSrc}" alt="Institution Logo" class="institution-logo" onclick="${logoOnClick}">
+                            ${institutionDetailsHTML}
+                        </div>
+                        <h2>${title}</h2>
+                    </div>
+                    <div class="routine-table-wrapper"><table class="routine-table" id="studentTable-${listId}">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
+                </div>`;
+            };
+            contentHTML += createStudentListHTML(institution.students, 'শিক্ষার্থীদের তালিকা (সাধারণ)', 'main');
+            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `শ্রেণী: ${cls.name}`, cls.id, true); });
+            const printButtonHTML = `<div style="position: relative;"><button class="action-btn" id="printBtn"><i class="fas fa-print"></i> প্রিন্ট</button><div class="dropdown-menu" id="printOptions" style="right: auto; left: 0; width: 200px;"></div></div>`;
+            const imageDownloadButtonHTML = `<div style="position: relative;"><button class="action-btn" id="imageDownloadBtn"><i class="fas fa-images"></i> ছবি ডাউনলোড</button><div class="dropdown-menu" id="imageDownloadOptions"></div></div>`;
+            mainContent.innerHTML = `
+                <div class="detail-actions-bar">
+                    <div class="back-button">${backButtonHTML}</div>
+                    <div class="actions-group">
+                        ${printButtonHTML}
+                        ${imageDownloadButtonHTML}
+                        <button class="action-btn download-btn" id="downloadBtn"><i class="fas fa-download"></i> ডাউনলোড</button>
+                    </div>
+                </div>
+                <div id="student-lists-container">${contentHTML}</div>`;
+        }
+        attachDetailViewEventListeners(institutionId);
+    }
+    
+    function renderUserDashboard(userId) {
+        if (!userId) { navigateTo('users'); return; }
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) { mainContent.innerHTML = `<div class="no-data-container"><h3>ব্যবহারকারী খুঁজে পাওয়া যায়নি।</h3></div>`; return; }
+        
+        const accessibleInstIds = (user.accessibleInstitutions || []).map(inst => inst.id);
+        const userInstitutions = allInstitutions.filter(inst => accessibleInstIds.includes(inst.id));
+        
+        const backButtonHTML = `<div class="back-button"><button id="backBtn"><i class="fas fa-arrow-left"></i> ফিরে যান</button></div>`;
+        
+        mainContent.innerHTML = `
+            <div class="detail-actions-bar">${backButtonHTML}</div>
+            <div class="page-header"><h1>ব্যবহারকারী: ${user.name}</h1><p>এর অধীনে থাকা সকল প্রতিষ্ঠানসমূহ।</p></div>
+            <div class="institution-grid" id="institutionGrid"></div>`;
+        
+        const grid = document.getElementById('institutionGrid');
+
+        if (userInstitutions.length === 0) {
+            grid.innerHTML = `<div class="no-data-container" style="grid-column: 1 / -1;">
+                <div class="icon"><i class="fas fa-school"></i></div>
+                <h3>কোনো প্রতিষ্ঠান পাওয়া যায়নি</h3>
+                <p>এই ব্যবহারকারী এখনো কোনো প্রতিষ্ঠান যোগ করেননি বা কোনো প্রতিষ্ঠান তাকে অর্পণ করা হয়নি।</p>
+            </div>`;
+        } else {
+            userInstitutions.forEach(inst => {
+                const classStudents = (inst.classes || []).reduce((classAcc, c) => classAcc + c.students.length, 0);
+                const totalInstStudents = (inst.students ? inst.students.length : 0) + classStudents;
+                const card = document.createElement('div');
+                card.className = 'institution-card';
+                card.dataset.id = inst.id;
+                
+                const cardContent = document.createElement('div');
+                cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+                cardContent.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'institution-card-delete-btn';
+                deleteBtn.title = 'প্রতিষ্ঠান মুছে ফেলুন';
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showModal({
+                        type: 'delete',
+                        title: 'আপনি কি নিশ্চিত?',
+                        message: `আপনি "${inst.name}" প্রতিষ্ঠানটি এবং এর অধীনে থাকা সকল তথ্য স্থায়ীভাবে মুছে ফেলতে চলেছেন।`,
+                        onConfirm: () => deleteInstitution(inst.id)
+                    });
+                });
+    
+                card.appendChild(deleteBtn);
+                card.appendChild(cardContent);
+                grid.appendChild(card);
+            });
+        }
+        
+        document.getElementById('backBtn').addEventListener('click', () => {
+             const userRole = sessionStorage.getItem('userRole');
+             if (userRole === 'subAdmin') {
+                navigateTo('dashboard');
+             } else {
+                history.back(); 
+             }
+        });
+    }
+    
+    function renderUsersView() { 
+        mainContent.innerHTML = `<div class="page-header"></div><div class="user-grid" id="userGrid"></div>`;
+        const userGrid = document.getElementById('userGrid');
+        allUsers.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+            const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
+            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+            cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'card-actions';
+            actionsDiv.innerHTML = `
+                <button class="card-action-btn" title="ইউজার আইডি দেখুন"><i class="fas fa-key"></i></button>
+                <button class="card-action-btn" title="ব্যবহারকারী মুছুন" style="color: var(--danger-color);"><i class="fas fa-user-times"></i></button>
+            `;
+
+            actionsDiv.querySelector('.fa-key').parentElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showModal({
+                    type: 'info',
+                    title: `ব্যবহারকারীর আইডি`,
+                    message: `"${user.name}" এর লগইন আইডি হলো:\n\n${user.id}\n\nএই আইডিটি ব্যবহার করে তিনি অ্যাপে লগইন করেন।`
+                });
+            });
+
+            actionsDiv.querySelector('.fa-user-times').parentElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showModal({
+                    type: 'delete',
+                    title: 'আপনি কি সম্পূর্ণ নিশ্চিত?',
+                    message: `আপনি "${user.name}" ব্যবহারকারী এবং তার অধীনে থাকা সকল প্রতিষ্ঠান ও শিক্ষার্থীর তথ্য স্থায়ীভাবে মুছে ফেলতে চলেছেন। এই কাজটি ফেরানো যাবে না।`,
+                    onConfirm: () => deleteUserAndData(user.id)
+                });
+            });
+
+            card.appendChild(actionsDiv);
+            card.appendChild(cardContent);
+            userGrid.appendChild(card);
+        });
+    }
+
+    async function deleteUserAndData(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) {
+             showModal({ type: 'danger', title: 'ত্রুটি', message: 'ব্যবহারকারীকে খুঁজে পাওয়া যায়নি।' });
+             return;
+        }
+
+        try {
+            const accessibleInstIds = (user.accessibleInstitutions || []).map(inst => inst.id);
+            const institutionsToDelete = allInstitutions.filter(inst => accessibleInstIds.includes(inst.id));
+            
+            for (const inst of institutionsToDelete) {
+                await deleteInstitution(inst.id); 
+            }
+            await db.collection('users').doc(userId).delete();
+            showModal({ type: 'success', title: 'সফল', message: `"${user.name}" ব্যবহারকারী এবং তার সকল তথ্য সফলভাবে মুছে ফেলা হয়েছে।` });
+        } catch (error) {
+            console.error("Error deleting user and their data:", error);
+            showModal({ type: 'danger', title: 'মারাত্মক ত্রুটি', message: 'ব্যবহারকারীর তথ্য মোছার সময় একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' });
+        }
+    }
+
+    function renderCreateAdminView() {
+        mainContent.innerHTML = `
+            <div class="page-header">
+                <h1>সাব-অ্যাডমিন ম্যানেজমেন্ট</h1>
+                <p>এখানে ব্যবহারকারীদের পরিচালনার জন্য সীমিত ক্ষমতার অ্যাডমিন তৈরি এবং পরিচালনা করুন।</p>
+            </div>
+            <div class="routine-container">
+                <form class="admin-form sub-admin-creator" id="createSubAdminForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="subAdminName">সাব-অ্যাডমিনের নাম</label>
+                            <input type="text" id="subAdminName" placeholder="সম্পূর্ণ নাম" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUsername">ইউজারনেম</label>
+                            <input type="text" id="newUsername" placeholder="ইউনিক ইউজারনেম" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">পাসওয়ার্ড</label>
+                            <input type="password" id="newPassword" placeholder="পাসওয়ার্ড দিন" required>
+                        </div>
+                         <div class="form-group">
+                            <label>ব্যবহারকারী নির্ধারণ</label>
+                            <input type="hidden" id="assignedUserIdsInput">
+                            <button type="button" id="openAssignUserModalBtn" class="btn-assign-users"><i class="fas fa-users-cog"></i> ব্যবহারকারী নির্ধারণ করুন</button>
+                        </div>
+                        <button type="submit" class="btn-submit"><i class="fas fa-user-check"></i> অ্যাডমিন তৈরি করুন</button>
+                    </div>
+                </form>
+
+                <div class="sub-admin-list-container">
+                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                    <h3 style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">অ্যাক্টিভ সাব-অ্যাডমিনদের তালিকা</h3>
+                    <div class="sub-admin-grid" id="subAdminsGrid"></div>
+                </div>
+            </div>`;
+
+        renderSubAdminCards();
+
+        document.getElementById('openAssignUserModalBtn').addEventListener('click', () => {
+            const assignedIds = document.getElementById('assignedUserIdsInput').value.split(',').filter(Boolean);
+            showAssignUserModal(null, assignedIds, (newAssignedIds) => {
+                document.getElementById('assignedUserIdsInput').value = newAssignedIds.join(',');
+                document.getElementById('openAssignUserModalBtn').innerHTML = `<i class="fas fa-check-circle"></i> ${convertToBengaliNumber(newAssignedIds.length)} জন নির্ধারিত`;
+            });
+        });
+
+        document.getElementById('createSubAdminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('subAdminName').value;
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const assignedUserIds = document.getElementById('assignedUserIdsInput').value.split(',').filter(Boolean);
+
+            if (!name || !username || !password) {
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'অনুগ্রহ করে নাম, ইউজারনেম এবং পাসওয়ার্ড পূরণ করুন।' });
+                return;
+            }
+
+            const existingAdmin = allSubAdmins.find(admin => admin.username === username);
+            if (existingAdmin) {
+                 showModal({ type: 'danger', title: 'ত্রুটি', message: 'এই ইউজারনেমটি bereits vorhanden। অনুগ্রহ করে একটি ইউনিক ইউজারনেম ব্যবহার করুন।' });
+                 return;
+            }
+
+            const newSubAdmin = {
+                name,
+                username,
+                password,
+                assignedUserIds: assignedUserIds,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection('subAdmins').add(newSubAdmin);
+                e.target.reset();
+                document.getElementById('openAssignUserModalBtn').innerHTML = `<i class="fas fa-users-cog"></i> ব্যবহারকারী নির্ধারণ করুন`;
+                showModal({ type: 'success', title: 'সফল', message: `"${name}" এর জন্য একটি নতুন সাব-অ্যাডমিন অ্যাকাউন্ট সফলভাবে তৈরি করা হয়েছে।` });
+            } catch (error) {
+                console.error("Error creating new sub-admin: ", error);
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'সাব-অ্যাডমিন অ্যাকাউন্ট তৈরি করা সম্ভব হয়নি।' });
+            }
+        });
+    }
+
+    function renderSubAdminCards() {
+        const grid = document.getElementById('subAdminsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (allSubAdmins.length === 0) {
+            grid.innerHTML = `<div class="no-data-container" style="grid-column: 1 / -1;"><h3>কোনো সাব-অ্যাডমিন এখনো তৈরি করা হয়নি।</h3></div>`;
+            return;
+        }
+
+        allSubAdmins.forEach(admin => {
+            const card = document.createElement('div');
+            card.className = 'sub-admin-card';
+            
+            const assignedIds = admin.assignedUserIds || [];
+            
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+            cardContent.innerHTML = `
+                <div class="info">
+                    <h4>${admin.name}</h4>
+                    <p><i class="fas fa-users"></i> পরিচালনা করে: ${convertToBengaliNumber(assignedIds.length)} জন ব্যবহারকারী</p>
+                </div>`;
+            
+            cardContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigateTo('subAdminDetails', admin.id);
+            });
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'card-actions';
+            actionsDiv.innerHTML = `
+                <button class="card-action-btn" title="ব্যবহারকারী নির্ধারণ করুন"><i class="fas fa-user-plus"></i></button>
+                <button class="card-action-btn" title="ক্রিডেনশিয়াল দেখুন/রিসেট করুন"><i class="fas fa-key"></i></button>
+                <button class="card-action-btn" title="অ্যাডমিন মুছুন" style="color: var(--danger-color);"><i class="fas fa-trash-alt"></i></button>
+            `;
+
+            actionsDiv.querySelector('.fa-user-plus').parentElement.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                showAssignUserModal(admin); 
+            });
+            actionsDiv.querySelector('.fa-key').parentElement.addEventListener('click', (e) => { e.stopPropagation(); showAdminCredentialsModal(admin); });
+            actionsDiv.querySelector('.fa-trash-alt').parentElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showModal({
+                    type: 'delete',
+                    title: 'আপনি কি নিশ্চিত?',
+                    message: `আপনি "${admin.name}" সাব-অ্যাডমিনকে স্থায়ীভাবে মুছে ফেলতে চলেছেন।`,
+                    onConfirm: () => deleteSubAdmin(admin.id)
+                });
+            });
+
+            card.innerHTML = `<div class="icon"><i class="fas fa-user-cog"></i></div>`;
+            card.appendChild(cardContent);
+            card.appendChild(actionsDiv);
+            grid.appendChild(card);
+        });
+    }
+    
+    function renderSubAdminDetails(adminId) {
+        if (!adminId) { navigateTo('create-admin'); return; }
+        const subAdmin = allSubAdmins.find(admin => admin.id === adminId);
+        if (!subAdmin) { mainContent.innerHTML = `<div class="no-data-container"><h3>সাব-অ্যাডমিন খুঁজে পাওয়া যায়নি।</h3></div>`; return; }
+        
+        const assignedUserIds = subAdmin.assignedUserIds || [];
+        const assignedUsers = allUsers.filter(user => assignedUserIds.includes(user.id));
+
+        const backButtonHTML = `<div class="back-button"><button id="backBtn"><i class="fas fa-arrow-left"></i> ফিরে যান</button></div>`;
+        
+        mainContent.innerHTML = `
+            <div class="detail-actions-bar">${backButtonHTML}</div>
+            <div class="page-header"><h1>অ্যাডমিন: ${subAdmin.name}</h1><p>এর অধীনে থাকা সকল ব্যবহারকারীগণ।</p></div>
+            <div class="user-grid" id="userGrid"></div>`;
+        
+        const userGrid = document.getElementById('userGrid');
+
+        if (assignedUsers.length === 0) {
+            userGrid.innerHTML = `<div class="no-data-container" style="grid-column: 1 / -1;">
+                <div class="icon"><i class="fas fa-user-slash"></i></div>
+                <h3>কোনো ব্যবহারকারী পাওয়া যায়নি</h3>
+                <p>এই সাব-অ্যাডমিনের অধীনে কোনো ব্যবহারকারী নির্ধারিত নেই।</p>
+            </div>`;
+        } else {
+            assignedUsers.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                
+                const cardContent = document.createElement('div');
+                cardContent.className = 'card-content';
+                const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
+                cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+                cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
+                
+                card.appendChild(cardContent);
+                userGrid.appendChild(card);
+            });
+        }
+        
+        document.getElementById('backBtn').addEventListener('click', () => navigateTo('create-admin'));
+    }
+
+    function showAssignUserModal(admin, preSelectedIds = [], callback = null) {
+        const assignmentModalTitle = document.getElementById('assignmentModalTitle');
+        const availableUsersList = document.getElementById('availableUsersList');
+        const assignedUsersList = document.getElementById('assignedUsersList');
+        const availableUsersSearch = document.getElementById('availableUsersSearch');
+        const assignedUsersSearch = document.getElementById('assignedUsersSearch');
+
+        assignmentModalTitle.textContent = admin ? `"${admin.name}" এর জন্য ব্যবহারকারী নির্ধারণ করুন` : "নতুন অ্যাডমিনের জন্য ব্যবহারকারী নির্ধারণ করুন";
+
+        const assignedIds = admin ? (admin.assignedUserIds || []) : preSelectedIds;
+        
+        const populateLists = () => {
+            availableUsersList.innerHTML = '';
+            assignedUsersList.innerHTML = '';
+            
+            const assignedIdSet = new Set(assignedIds);
+
+            allUsers.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-list-item';
+                li.dataset.userId = user.id;
+                li.innerHTML = `<i class="fas fa-user-circle"></i> ${user.name}`;
+                
+                if (assignedIdSet.has(user.id)) {
+                    assignedUsersList.appendChild(li);
+                } else {
+                    availableUsersList.appendChild(li);
+                }
+            });
+        };
+        
+        populateLists();
+
+        const handleSelection = (e) => {
+            if (e.target.tagName === 'LI') {
+                e.target.classList.toggle('selected');
+            }
+        };
+
+        availableUsersList.addEventListener('click', handleSelection);
+        assignedUsersList.addEventListener('click', handleSelection);
+
+        document.getElementById('assignUserBtn').onclick = () => {
+            availableUsersList.querySelectorAll('.selected').forEach(li => {
+                li.classList.remove('selected');
+                assignedUsersList.appendChild(li);
+            });
+        };
+
+        document.getElementById('unassignUserBtn').onclick = () => {
+            assignedUsersList.querySelectorAll('.selected').forEach(li => {
+                li.classList.remove('selected');
+                availableUsersList.appendChild(li);
+            });
+        };
+        
+        const filterList = (input, list) => {
+            const searchTerm = input.value.toLowerCase();
+            list.querySelectorAll('li').forEach(li => {
+                li.style.display = li.textContent.toLowerCase().includes(searchTerm) ? 'flex' : 'none';
+            });
+        };
+        
+        availableUsersSearch.oninput = () => filterList(availableUsersSearch, availableUsersList);
+        assignedUsersSearch.oninput = () => filterList(assignedUsersSearch, assignedUsersList);
+
+        saveAssignmentBtn.onclick = async () => {
+            const newAssignedIds = Array.from(assignedUsersList.querySelectorAll('li')).map(li => li.dataset.userId);
+
+            if (admin) { // Existing admin
+                try {
+                    await db.collection('subAdmins').doc(admin.id).update({ assignedUserIds: newAssignedIds });
+                    assignmentModal.classList.remove('active');
+                    showModal({ type: 'success', title: 'সফল', message: 'ব্যবহারকারীর তালিকা সফলভাবে আপডেট করা হয়েছে।' });
+                } catch(error) {
+                    console.error("Error updating assigned users:", error);
+                    showModal({ type: 'danger', title: 'ত্রুটি', message: 'আপডেট করা সম্ভব হয়নি।'});
+                }
+            } else if (callback) { // New admin
+                callback(newAssignedIds);
+                assignmentModal.classList.remove('active');
+            }
+        };
+
+        assignmentModal.classList.add('active');
+    }
+
+    closeAssignmentModalBtn.onclick = () => assignmentModal.classList.remove('active');
+    assignmentModal.addEventListener('click', (e) => {
+        if (e.target === assignmentModal) assignmentModal.classList.remove('active');
+    });
+
+    function showAdminCredentialsModal(admin) {
+        showModal({
+            type: 'info',
+            title: `"${admin.name}" এর ক্রিডেনশিয়াল এডিট করুন`,
+            message: '',
+            onConfirm: null 
+        });
+
+        const modalBody = document.getElementById('modalBody');
+        const modalFooter = document.getElementById('modalFooter');
+        
+        modalBody.innerHTML = `
+            <form class="admin-form" id="credentialUpdateForm" onsubmit="return false;">
+                <p style="text-align: center; color: var(--light-text); margin-bottom: 20px;">এখানে ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করতে পারবেন।</p>
+                <div class="form-group">
+                    <label for="adminUsernameInput">ইউজারনেম</label>
+                    <input type="text" id="adminUsernameInput" value="${admin.username}" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPasswordInput">পাসওয়ার্ড</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="adminPasswordInput" value="${admin.password}" required>
+                        <button type="button" class="password-toggle-btn" id="passwordToggle"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+            </form>
+        `;
+        
+        modalFooter.innerHTML = `<button class="btn-secondary">বাতিল</button><button class="btn-primary" id="updateCredentialsBtn"><i class="fas fa-save"></i> আপডেট করুন</button>`;
+        
+        const usernameInput = modalBody.querySelector('#adminUsernameInput');
+        const passwordInput = modalBody.querySelector('#adminPasswordInput');
+        const passwordToggle = modalBody.querySelector('#passwordToggle');
+
+        passwordToggle.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            passwordToggle.querySelector('i').classList.toggle('fa-eye');
+            passwordToggle.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+
+        modalFooter.querySelector('.btn-secondary').onclick = hideModal;
+
+        modalFooter.querySelector('#updateCredentialsBtn').onclick = async () => {
+            const newUsername = usernameInput.value.trim();
+            const newPassword = passwordInput.value;
+
+            if (!newUsername) {
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'ইউজারনেম খালি রাখা যাবে না।'});
+                return;
+            }
+            if (!newPassword || newPassword.length < 6) {
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'});
+                return;
+            }
+
+            const existingAdmin = allSubAdmins.find(a => a.username === newUsername && a.id !== admin.id);
+            if (existingAdmin) {
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'এই ইউজারনেমটি অন্য একজন অ্যাডমিন ব্যবহার করছেন। অনুগ্রহ করে একটি ইউনিক ইউজারনেম দিন।' });
+                return;
+            }
+
+            try {
+                await db.collection('subAdmins').doc(admin.id).update({ 
+                    username: newUsername,
+                    password: newPassword 
+                });
+                showModal({ type: 'success', title: 'সফল', message: 'ক্রিডেনশিয়াল সফলভাবে আপডেট করা হয়েছে।' });
+            } catch(error) {
+                console.error("Error updating credentials:", error);
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'ক্রিডেনশিয়াল আপডেট করা সম্ভব হয়নি।'});
+            }
+        };
+    }
+    
+    async function deleteSubAdmin(adminId) {
+        try {
+            await db.collection('subAdmins').doc(adminId).delete();
+            showModal({ type: 'success', title: 'সফল', message: 'সাব-অ্যাডমিন সফলভাবে মুছে ফেলা হয়েছে।' });
+        } catch (error) {
+            console.error("Error deleting sub-admin: ", error);
+            showModal({ type: 'danger', title: 'ত্রুটি', message: 'সাব-অ্যাডমিন মোছার সময় একটি সমস্যা হয়েছে।' });
+        }
+    }
+
+    function renderSettingsView() { 
+        mainContent.innerHTML = `
+            <div class="page-header"><h1>ফর্ম সেটিংস</h1><p>ব্যবহারকারীর অ্যাপের তথ্য সংগ্রহ ফর্ম নিয়ন্ত্রণ করুন।</p></div>
+            <div class="routine-container" id="settingsContainer"></div>`;
+
+        const institutionOptions = allInstitutions.map(inst => `<option value="${inst.id}">${inst.name}</option>`).join('');
+        document.getElementById('settingsContainer').innerHTML = `
+            <div class="admin-form">
+                <div class="form-group">
+                    <label for="institutionSelectForSettings">কোন প্রতিষ্ঠানের ফর্ম পরিবর্তন করতে চান?</label>
+                    <select id="institutionSelectForSettings">
+                        <option value="" disabled selected>একটি প্রতিষ্ঠান নির্বাচন করুন...</option>
+                        ${institutionOptions}
+                    </select>
+                </div>
+            </div>
+            <div id="fieldSettingsContainer" class="hidden"></div>`;
+        
+        document.getElementById('institutionSelectForSettings').addEventListener('change', (e) => {
+            const institutionId = e.target.value;
+            const institution = allInstitutions.find(inst => inst.id === institutionId);
+            document.getElementById('fieldSettingsContainer').classList.remove('hidden');
+            renderFieldsForEditing(institution);
+        });
+    }
+    
+    function renderFieldsForEditing(institution) {
+        const formConfig = institution.formConfiguration || getDefaultFormConfig();
+        const settingsContainer = document.getElementById('fieldSettingsContainer');
+
+        settingsContainer.innerHTML = `
+            <div class="field-settings-container">
+                <h4>প্রতিষ্ঠান সম্পর্কিত ফিল্ড</h4>
+                <ul class="field-settings-list" id="institutionFieldsList"></ul>
+            </div>
+            <div class="field-settings-container">
+                <h4>শিক্ষার্থী সম্পর্কিত ফিল্ড</h4>
+                <ul class="field-settings-list" id="studentFieldsList"></ul>
+                <div class="settings-actions" style="justify-content: flex-start;">
+                    <button id="addNewStudentFieldBtn" class="modal-footer button btn-secondary"><i class="fas fa-plus"></i> নতুন ফিল্ড যোগ করুন</button>
+                </div>
+            </div>
+            <div class="settings-actions">
+                <button id="saveFormSettingsBtn" class="modal-footer button btn-primary"><i class="fas fa-save"></i> সকল পরিবর্তন সেভ করুন</button>
+            </div>
+        `;
+
+        renderFieldEditorList(formConfig.institutionFields, 'institutionFieldsList', 'institution');
+        renderFieldEditorList(formConfig.studentFields, 'studentFieldsList', 'student');
+
+        document.getElementById('saveFormSettingsBtn').onclick = () => saveFormSettings(institution.id);
+        document.getElementById('addNewStudentFieldBtn').onclick = () => {
+             const newId = `customField_${Date.now()}`;
+             const newField = { id: newId, label: "নতুন ফিল্ড", type: "text", enabled: true, required: false, order: formConfig.studentFields.length + 1 };
+             formConfig.studentFields.push(newField);
+             renderFieldEditorList(formConfig.studentFields, 'studentFieldsList', 'student');
+        };
+    }
+
+    function renderFieldEditorList(fields, containerId, type) {
+        const listContainer = document.getElementById(containerId);
+        listContainer.innerHTML = '';
+        if (!fields) return;
+
+        fields.sort((a,b) => a.order - b.order).forEach((field, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'field-list-item';
+            listItem.dataset.id = field.id;
+            listItem.dataset.type = field.type || 'text'; 
+            
+            const isStudentField = type === 'student';
+            const isCustomField = isStudentField && field.id.startsWith('customField');
+            const deleteBtnHtml = isCustomField ? `<button class="delete-field-btn"><i class="fas fa-trash-alt"></i></button>` : '';
+            const requiredCheckboxDisabled = field.type === 'file';
+
+            listItem.innerHTML = `
+                <i class="fas fa-grip-vertical drag-handle"></i>
+                <input type="text" class="field-label-input" value="${field.label}">
+                <div class="field-controls">
+                    <label><input type="checkbox" class="field-enabled" ${field.enabled ? 'checked' : ''}> চালু</label>
+                    <label><input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} ${requiredCheckboxDisabled ? 'disabled' : ''}> আবশ্যক</label>
+                </div>
+                <div class="order-buttons">
+                    <button class="order-up" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
+                    <button class="order-down" ${index === fields.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                </div>
+                ${deleteBtnHtml}
+            `;
+            listContainer.appendChild(listItem);
+        });
+        
+        listContainer.querySelectorAll('.delete-field-btn').forEach(btn => btn.onclick = (e) => e.currentTarget.closest('li').remove());
+        listContainer.querySelectorAll('.order-buttons button').forEach(btn => {
+            btn.onclick = (e) => {
+                const li = e.currentTarget.closest('li');
+                if (e.currentTarget.classList.contains('order-up') && li.previousElementSibling) {
+                    listContainer.insertBefore(li, li.previousElementSibling);
+                } else if (e.currentTarget.classList.contains('order-down') && li.nextElementSibling) {
+                    listContainer.insertBefore(li.nextElementSibling, li);
+                }
+                
+                const institutionId = document.getElementById('institutionSelectForSettings').value;
+                if(institutionId) saveAndReRenderFields(institutionId);
+            }
+        });
+    }
+    async function saveAndReRenderFields(institutionId) { 
+        await saveFormSettings(institutionId, true); 
+        const institution = allInstitutions.find(inst => inst.id === institutionId);
+        renderFieldsForEditing(institution); 
+    }
+    async function saveFormSettings(institutionId, silent = false) { 
+        const newFormConfig = { institutionFields: [], studentFields: [] };
+        
+        document.querySelectorAll('#institutionFieldsList .field-list-item').forEach((item, index) => {
+            newFormConfig.institutionFields.push({ id: item.dataset.id, type: item.dataset.type, label: item.querySelector('.field-label-input').value, enabled: item.querySelector('.field-enabled').checked, required: item.querySelector('.field-required').checked, order: index + 1 });
+        });
+        document.querySelectorAll('#studentFieldsList .field-list-item').forEach((item, index) => {
+            newFormConfig.studentFields.push({ id: item.dataset.id, type: item.dataset.type, label: item.querySelector('.field-label-input').value, enabled: item.querySelector('.field-enabled').checked, required: item.querySelector('.field-required').checked, order: index + 1 });
+        });
+
+        try {
+            await db.collection('institutions').doc(institutionId).update({ formConfiguration: newFormConfig });
+            if (!silent) showModal({ type: 'success', title: 'সফল', message: 'ফর্মের সেটিংস সফলভাবে সেভ করা হয়েছে।' });
+        } catch (error) {
+            console.error("Error saving form settings:", error);
+            if (!silent) showModal({ type: 'danger', title: 'ত্রুটি', message: 'সেটিংস সেভ করা সম্ভব হয়নি।' });
+        }
+    }
+    function getDefaultFormConfig() { 
+        return {
+            institutionFields: [ { id: "institutionName", label: "প্রতিষ্ঠানের নাম", type: "text", enabled: true, required: true, order: 1 }, { id: "institutionAddress", label: "প্রতিষ্ঠানের ঠিকানা", type: "text", enabled: true, required: false, order: 2 }, { id: "institutionNumber", label: "প্রতিষ্ঠানের ফোন নম্বর", type: "tel", enabled: true, required: false, order: 3 }, { id: "institutionLogo", label: "প্রতিষ্ঠানের লোগো", type: "file", enabled: true, required: false, order: 4 }, { id: "institutionAdvice", label: "উপদেশ বা বাণী", type: "textarea", enabled: true, required: false, order: 5 }, { id: "institutionConclusion", label: "কি সমাপনী", type: "textarea", enabled: true, required: false, order: 6 } ],
+            studentFields: [ { id: "studentName", label: "শিক্ষার্থীর নাম", type: "text", enabled: true, required: true, order: 1 }, { id: "fatherName", label: "পিতার নাম", type: "text", enabled: true, required: true, order: 2 }, { id: "studentAddress", label: "ঠিকানা", type: "text", enabled: true, required: true, order: 3 }, { id: "studentMobile", label: "মোবাইল নম্বর", type: "tel", enabled: true, required: false, order: 4 }, { id: "studentPhoto", label: "শিক্ষার্থীর ছবি", type: "file", enabled: true, required: false, order: 5 } ]
+        };
+    }
+    
+    // --- MODAL ---
+    function showModal({ type, title, message, onConfirm }) {
+        const modalHeader = document.getElementById('modalHeader'); const modalBody = document.getElementById('modalBody'); const modalFooter = document.getElementById('modalFooter');
+        modalHeader.innerHTML = ''; modalFooter.innerHTML = '';
+        const iconClassMap = {
+            success: 'fas fa-check-circle success',
+            info: 'fas fa-info-circle info',
+            danger: 'fas fa-exclamation-triangle danger',
+            delete: 'fas fa-exclamation-triangle danger'
+        };
+        const iconClass = iconClassMap[type] || 'fas fa-info-circle info';
+        modalHeader.innerHTML = `<div class="icon"><i class="${iconClass}"></i></div><h3>${title}</h3>`;
+        
+        if (type === 'delete') {
+            modalFooter.innerHTML = `<button class="btn-secondary">না</button><button class="btn-danger">হ্যাঁ</button>`;
+            modalFooter.querySelector('.btn-secondary').onclick = hideModal;
+            modalFooter.querySelector('.btn-danger').onclick = () => { onConfirm(); hideModal(); };
+        } else {
+            modalFooter.innerHTML = `<button class="btn-primary">ওকে</button>`;
+            modalFooter.querySelector('button').onclick = onConfirm ? () => { onConfirm(); hideModal(); } : hideModal;
+        }
+
+        modalBody.innerHTML = message.replace(/\n/g, '<br>');
+        customModal.classList.add('active');
+    }
+
+    function hideModal() { customModal.classList.remove('active'); }
+    customModal.addEventListener('click', (e) => { if (e.target === customModal) hideModal(); });
+
+    // --- EVENT LISTENERS & HANDLERS ---
+    function attachDetailViewEventListeners(institutionId) {
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                history.back();
+            });
+        }
+        
+        const setupDropdown = (btnId, menuId) => { const btn = document.getElementById(btnId); const menu = document.getElementById(menuId); if(btn && menu) btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); }); };
+        document.addEventListener('click', () => document.querySelectorAll('.dropdown-menu.show').forEach(menu => menu.classList.remove('show')));
+
+        const institution = allInstitutions.find(inst => inst.id === institutionId);
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => openDownloadModal(institutionId));
+        }
+        
+        const printBtn = document.getElementById('printBtn');
+        if (printBtn) {
+            setupDropdown('printBtn', 'printOptions');
+            const printOptions = document.getElementById('printOptions');
+            printOptions.innerHTML = '';
+            if (institution.students && institution.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="main">সাধারণ তালিকা</a>`; }
+            (institution.classes || []).forEach(cls => { if (cls.students && cls.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="${cls.id}">শ্রেণী: ${cls.name}</a>`; } });
+            if (printOptions.innerHTML !== '') { printOptions.innerHTML += `<hr style="margin: 5px 0; border-color: var(--border-color);"><a href="#" data-print-target="all"><b>সকল শ্রেণী প্রিন্ট করুন</b></a>`; }
+            printOptions.querySelectorAll('a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); handlePrint(e.target.dataset.printTarget); }); });
+        }
+
+        const imageDownloadBtn = document.getElementById('imageDownloadBtn');
+        if (imageDownloadBtn) {
+            setupDropdown('imageDownloadBtn', 'imageDownloadOptions');
+            const imageOptions = document.getElementById('imageDownloadOptions');
+            imageOptions.innerHTML = '';
+            let hasContent = false;
+            if(institution.logoUrl) {
+                imageOptions.innerHTML += `<a href="#" data-download-target="logo">প্রতিষ্ঠানের লোগো</a>`;
+                hasContent = true;
+            }
+            if(institution.students && institution.students.length > 0) {
+                imageOptions.innerHTML += `<a href="#" data-download-target="main">সাধারণ তালিকা (ছবি)</a>`;
+                hasContent = true;
+            }
+            (institution.classes || []).forEach(cls => {
+                if (cls.students && cls.students.length > 0) {
+                    imageOptions.innerHTML += `<a href="#" data-download-target="class" data-class-id="${cls.id}">শ্রেণী: ${cls.name} (ছবি)</a>`;
+                    hasContent = true;
+                }
+            });
+
+            if (hasContent) {
+                imageOptions.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = e.target.dataset.downloadTarget;
+                        const classId = e.target.dataset.classId;
+                        handleImageDownload(institutionId, target, classId);
+                    });
+                });
+            } else {
+                imageOptions.innerHTML = `<a href="#" style="color: var(--light-text); cursor: not-allowed;">কোন ছবি নেই</a>`;
+            }
+        }
+        
+        const editInstBtn = document.getElementById('editInstDetailsBtn');
+        const saveInstBtn = document.getElementById('saveInstDetailsBtn');
+        const instNameEl = document.getElementById('editableInstName');
+        const instAddressEl = document.getElementById('editableInstAddress');
+        const instNumberEl = document.getElementById('editableInstNumber');
+        
+        if (editInstBtn) {
+            editInstBtn.addEventListener('click', () => {
+                instNameEl.contentEditable = true;
+                instAddressEl.contentEditable = true;
+                instNumberEl.contentEditable = true;
+                instNameEl.focus();
+                
+                editInstBtn.classList.add('hidden');
+                saveInstBtn.classList.remove('hidden');
+            });
+        }
+        
+        if (saveInstBtn) {
+            saveInstBtn.addEventListener('click', async () => {
+                const updatedData = {
+                    name: instNameEl.textContent.trim(),
+                    address: instAddressEl.textContent.trim(),
+                    number: instNumberEl.textContent.trim()
+                };
+
+                try {
+                    await db.collection('institutions').doc(institutionId).update(updatedData);
+                    instNameEl.contentEditable = false;
+                    instAddressEl.contentEditable = false;
+                    instNumberEl.contentEditable = false;
+                    
+                    saveInstBtn.classList.add('hidden');
+                    editInstBtn.classList.remove('hidden');
+                    
+                    showModal({ type: 'success', title: 'সফল', message: 'প্রতিষ্ঠানের তথ্য সফলভাবে আপডেট করা হয়েছে।' });
+                } catch (error) {
+                    console.error("Error updating institution details:", error);
+                    showModal({ type: 'danger', title: 'ত্রুটি', message: 'তথ্য আপডেট করা সম্ভব হয়নি।'});
+                }
+            });
+        }
+
+        const studentListsContainer = document.getElementById('student-lists-container');
+        if (studentListsContainer) {
+            studentListsContainer.addEventListener('click', (e) => {
+                const row = e.target.closest('tr'); if (!row) return; 
+                const studentId = row.dataset.studentId; 
+                const instId = row.dataset.institutionId;
+                const classId = row.dataset.classId;
+
+                if (e.target.closest('.edit-btn')) {
+                    row.querySelectorAll('td[data-field]').forEach(cell => cell.contentEditable = true);
+                    row.querySelector('.edit-btn').classList.add('hidden');
+                    row.querySelector('.save-btn').classList.remove('hidden');
+                    row.querySelector('td[contenteditable="true"]')?.focus();
+                } else if (e.target.closest('.save-btn')) { 
+                    row.querySelectorAll('td[data-field]').forEach(cell => cell.contentEditable = false);
+                    row.querySelector('.edit-btn').classList.remove('hidden');
+                    row.querySelector('.save-btn').classList.add('hidden');
+                    const updatedData = {};
+                    row.querySelectorAll('td[data-field]').forEach(cell => {
+                        updatedData[cell.dataset.field] = cell.textContent;
+                    });
+                    
+                    let studentRef = classId 
+                        ? db.collection('institutions').doc(instId).collection('classes').doc(classId).collection('students').doc(studentId)
+                        : db.collection('institutions').doc(instId).collection('students').doc(studentId);
+
+                    studentRef.update(updatedData)
+                        .then(() => { 
+                            showModal({ type: 'success', title: 'সফল', message: 'শিক্ষার্থীর তথ্য সফলভাবে আপডেট করা হয়েছে।' }); 
+                        })
+                        .catch(err => { console.error("Error updating student:", err); showModal({ type: 'danger', title: 'ত্রুটি', message: 'তথ্য আপডেট করা সম্ভব হয়নি।'}); });
+                } else if (e.target.closest('.delete-btn')) { 
+                     showModal({ 
+                        type: 'delete', 
+                        title: 'আপনি কি নিশ্চিত?', 
+                        message: 'আপনি এই শিক্ষার্থীর তথ্য স্থায়ীভাবে মুছে ফেলতে চলেছেন।', 
+                        onConfirm: async () => { 
+                            let studentRef = classId 
+                                ? db.collection('institutions').doc(instId).collection('classes').doc(classId).collection('students').doc(studentId)
+                                : db.collection('institutions').doc(instId).collection('students').doc(studentId);
+                            try { 
+                                await studentRef.delete(); 
+                                showModal({type: 'success', title: 'সফল', message: 'শিক্ষার্থীর তথ্য মুছে ফেলা হয়েছে।'}); 
+                            } catch (err) { 
+                                console.error("Error deleting student:", err); 
+                                showModal({ type: 'danger', title: 'ত্রুটি', message: 'তথ্য মোছা সম্ভব হয়নি।'}); 
+                            } 
+                        } 
+                    });
+                }
+            });
+        }
+    }
+
+    // --- PRINT FUNCTION ---
+    function handlePrint(targetId) {
+        const allPrintAreas = document.querySelectorAll('.print-area');
+        allPrintAreas.forEach(area => area.classList.add('non-printable'));
+        
+        if (targetId === 'all') {
+            allPrintAreas.forEach(area => area.classList.remove('non-printable'));
+        } else {
+            const targetArea = document.getElementById(`print-area-${targetId}`);
+            if (targetArea) {
+                targetArea.classList.remove('non-printable');
+            }
+        }
+        
+        window.print();
+        
+        allPrintAreas.forEach(area => area.classList.remove('non-printable'));
+    }
+
+    // --- EXPORT & DOWNLOAD FUNCTIONS ---
+    let currentDownloadHandler = null;
+    function openDownloadModal(institutionId) {
+        const institution = allInstitutions.find(inst => inst.id === institutionId);
+        if (!institution) return;
+
+        downloadClassList.innerHTML = '';
+        let hasStudents = false;
+
+        const allOptionLi = document.createElement('li');
+        allOptionLi.innerHTML = `<input type="radio" name="classSelect" id="class_all" value="all" checked><label for="class_all"><strong>All Page Download (সকল তালিকা)</strong></label>`;
+        downloadClassList.appendChild(allOptionLi);
+        
+        if(institution.students && institution.students.length > 0) {
+            hasStudents = true;
+            const generalLi = document.createElement('li');
+            generalLi.innerHTML = `<input type="radio" name="classSelect" id="class_main" value="main"><label for="class_main">সাধারণ তালিকা (${convertToBengaliNumber(institution.students.length)} জন)</label>`;
+            downloadClassList.appendChild(generalLi);
+        }
+        
+        (institution.classes || []).forEach(cls => {
+            if (cls.students && cls.students.length > 0) {
+                hasStudents = true;
+                const classLi = document.createElement('li');
+                classLi.innerHTML = `<input type="radio" name="classSelect" id="class_${cls.id}" value="${cls.id}"><label for="class_${cls.id}">শ্রেণী: ${cls.name} (${convertToBengaliNumber(cls.students.length)} জন)</label>`;
+                downloadClassList.appendChild(classLi);
+            }
+        });
+        
+        if (!hasStudents) {
+            downloadClassList.innerHTML = `<p style='text-align: center; color: var(--light-text);'>ডাউনলোড করার মতো কোনো শিক্ষার্থীর তথ্য নেই।</p>`;
+            downloadModalNextBtn.classList.add('hidden');
+        } else {
+            downloadModalNextBtn.classList.remove('hidden');
+        }
+
+        downloadStep1.classList.remove('hidden');
+        downloadStep2.classList.add('hidden');
+        downloadModalBackBtn.classList.add('hidden');
+        downloadModalNextBtn.classList.remove('hidden');
+        downloadModal.classList.add('active');
+
+        if (currentDownloadHandler) {
+            downloadFormatGrid.removeEventListener('click', currentDownloadHandler);
+        }
+        
+        currentDownloadHandler = (e) => {
+            e.preventDefault();
+            const formatItem = e.target.closest('.format-item');
+            if (!formatItem) return;
+
+            const selectedClass = document.querySelector('input[name="classSelect"]:checked').value;
+            const format = formatItem.dataset.format;
+            handleAdvancedExport(institution, selectedClass, format);
+            closeDownloadModal();
+        };
+
+        downloadFormatGrid.addEventListener('click', currentDownloadHandler);
+    }
+    
+    function closeDownloadModal() {
+        downloadModal.classList.remove('active');
+    }
+
+    downloadModalCloseBtn.addEventListener('click', closeDownloadModal);
+    downloadModal.addEventListener('click', (e) => { if(e.target === downloadModal) closeDownloadModal(); });
+
+    downloadModalNextBtn.addEventListener('click', () => {
+        const selectedRadio = document.querySelector('input[name="classSelect"]:checked');
+        if (!selectedRadio) {
+            showModal({type: 'danger', title: 'ত্রুটি', message: 'অনুগ্রহ করে একটি তালিকা নির্বাচন করুন।'});
+            return;
+        }
+        downloadStep1.classList.add('hidden');
+        downloadStep2.classList.remove('hidden');
+        downloadModalNextBtn.classList.add('hidden');
+        downloadModalBackBtn.classList.remove('hidden');
+    });
+
+    downloadModalBackBtn.addEventListener('click', () => {
+        downloadStep1.classList.remove('hidden');
+        downloadStep2.classList.add('hidden');
+        downloadModalNextBtn.classList.remove('hidden');
+        downloadModalBackBtn.classList.add('hidden');
+    });
+
+    function getStudentDataForExport(institution, selectedClassId) {
+        let studentsToExport = [];
+        let exportTitle = "সকল_শিক্ষার্থী";
+
+        if (selectedClassId === 'all') {
+            if (institution.students) {
+                studentsToExport.push(...institution.students.map(s => ({ ...s, className: 'সাধারণ' })));
+            }
+            (institution.classes || []).forEach(cls => {
+                studentsToExport.push(...cls.students.map(s => ({ ...s, className: cls.name })));
+            });
+        } else if (selectedClassId === 'main') {
+            studentsToExport = institution.students.map(s => ({ ...s, className: 'সাধারণ' }));
+            exportTitle = "সাধারণ_শিক্ষার্থী";
+        } else {
+            const selectedClass = institution.classes.find(c => c.id === selectedClassId);
+            if (selectedClass) {
+                studentsToExport = selectedClass.students.map(s => ({ ...s, className: selectedClass.name }));
+                exportTitle = `শ্রেণী_${selectedClass.name}`;
+            }
+        }
+        return { students: studentsToExport, title: exportTitle };
+    }
+
+    async function handleAdvancedExport(institution, selectedClassId, format) {
+        const { students, title } = getStudentDataForExport(institution, selectedClassId);
+        if (students.length === 0) {
+            showModal({ type: 'info', title: 'ফলাফল', message: 'ডাউনলোড করার জন্য কোনো শিক্ষার্থী পাওয়া যায়নি।' });
+            return;
+        }
+        
+        const formConfig = institution.formConfiguration || getDefaultFormConfig();
+        const enabledStudentFields = (formConfig.studentFields || []).filter(f => f.enabled && f.type !== 'file').sort((a, b) => a.order - b.order);
+
+        const headers = ["ক্রমিক", "শ্রেণী", ...enabledStudentFields.map(f => f.label)];
+        const data = students.map((student, i) => [convertToBengaliNumber(i + 1), student.className || '', ...enabledStudentFields.map(field => student[field.id] || '')]);
+        const dataAsObjects = students.map((student, i) => {
+            const obj = { 'ক্রমিক': convertToBengaliNumber(i + 1), 'শ্রেণী': student.className || '' };
+            enabledStudentFields.forEach(field => {
+                obj[field.label] = student[field.id] || '';
+            });
+            return obj;
+        });
+
+        const fileName = `${institution.name.replace(/\s+/g, '_')}_${title.replace(/\s+/g, '_')}`;
+
+        showModal({ type: 'info', title: 'প্রসেসিং...', message: `আপনার ${format.toUpperCase()} ফাইলটি তৈরি করা হচ্ছে।` });
+        
+        setTimeout(async () => {
+            try {
+                switch(format) {
+                    case 'xlsx': case 'ods': exportWithSheetJS(headers, data, fileName, format, institution.name); break;
+                    case 'pdf': exportToPDF(headers, data, fileName, institution.name, institution.address); break;
+                    case 'csv': case 'tsv': exportToSeparatedValues(headers, data, fileName, format); break;
+                    case 'doc': exportToDocx(headers, dataAsObjects, fileName, institution.name, institution.address); break;
+                    case 'html': exportToHtml(headers, data, fileName, institution.name, institution.address); break;
+                    case 'jpg': await exportToJpg(selectedClassId, fileName, institution.name); break;
+                }
+                 setTimeout(hideModal, 1000);
+            } catch (error) {
+                 console.error(`Error exporting to ${format}:`, error);
+                 showModal({ type: 'danger', title: 'ত্রুটি', message: `${format.toUpperCase()} ফাইল তৈরি করতে একটি সমস্যা হয়েছে।` });
+            }
+        }, 500);
+    }
+    
+    function exportWithSheetJS(headers, data, title, format, institutionName) { 
+        const wsData = [ [`প্রতিষ্ঠানের নাম: ${institutionName}`], [], headers, ...data ]; 
+        const ws = XLSX.utils.aoa_to_sheet(wsData); 
+        ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }]; 
+        ws['!cols'] = headers.map(() => ({ wch: 25 })); 
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, "শিক্ষার্থীদের তালিকা");
+        XLSX.writeFile(wb, `${title}.${format}`, { bookType: format }); 
+    }
+    
+    function exportToPDF(headers, data, title, institutionName, address) { 
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF(); 
+        doc.addFont('https://fonts.gstatic.com/s/hindsiliguri/v12/ijwOs5juQtsyLLOKSblDOMlXwzh-S-s.ttf', 'HindSiliguri', 'normal'); 
+        doc.setFont('HindSiliguri'); 
+        doc.text(`${institutionName}`, 105, 15, { align: 'center' }); 
+        doc.text(address || '', 105, 22, { align: 'center' }); 
+        doc.text("শিক্ষার্থীদের তালিকা", 105, 30, { align: 'center' }); 
+        doc.autoTable({ 
+            head: [headers], 
+            body: data, 
+            startY: 35, 
+            theme: 'grid', 
+            styles: { 
+                font: 'HindSiliguri', 
+                halign: 'center',
+                fontStyle: 'normal'
+            }, 
+            headStyles: { 
+                fillColor: [37, 99, 235],
+                textColor: 255, 
+                fontStyle: 'bold'
+            } 
+        }); 
+        doc.save(`${title}.pdf`); 
+    }
+    
+    function exportToSeparatedValues(headers, data, fileName, format) {
+        const separator = format === 'csv' ? ',' : '\t';
+        let content = headers.join(separator) + '\n';
+        data.forEach(row => {
+            content += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(separator) + '\n';
+        });
+        const blob = new Blob(["\uFEFF" + content], { type: `text/${format};charset=utf-8;` });
+        saveAs(blob, `${fileName}.${format}`);
+    }
+
+    function exportToHtml(headers, data, fileName, institutionName, address) {
+        let tableRows = data.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('');
+        const htmlContent = `
+            <!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8"><title>${institutionName}</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Bornomala&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+                body{font-family: 'Bornomala', 'Hind Siliguri', sans-serif; text-align: center;} 
+                table{width: 100%; border-collapse: collapse; margin-top: 20px;} 
+                th, td{border: 1px solid #ddd; padding: 8px;} 
+                th{background-color: #4a5568; color: white;}
+            </style>
+            </head><body>
+            <h1>${institutionName}</h1><p>${address || ''}</p><h2>শিক্ষার্থীদের তালিকা</h2>
+            <table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${tableRows}</tbody></table>
+            </body></html>`;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+        saveAs(blob, `${fileName}.html`);
+    }
+
+    function exportToDocx(headers, data, fileName, institutionName, address) {
+        const headerObjects = headers.map(header => new docx.TableCell({
+            children: [new docx.Paragraph({ text: header, bold: true, style: "bengaliStyle" })],
+            shading: { fill: "E2E8F0" },
+        }));
+
+        const tableRows = data.map(rowData => new docx.TableRow({
+            children: headers.map(header => new docx.TableCell({
+                children: [new docx.Paragraph({
+                    text: String(rowData[header] || ''),
+                    style: "bengaliStyle"
+                })],
+                verticalAlign: docx.VerticalAlign.CENTER,
+            })),
+        }));
+
+        const table = new docx.Table({
+            rows: [ new docx.TableRow({ children: headerObjects }), ...tableRows ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE },
+        });
+
+        const doc = new docx.Document({
+            styles: {
+                paragraphStyles: [{
+                    id: "bengaliStyle", name: "Bengali Style",
+                    run: { font: "Bornomala" }
+                }]
+            },
+            sections: [{
+                children: [
+                    new docx.Paragraph({ text: institutionName, heading: docx.HeadingLevel.HEADING_1, alignment: docx.AlignmentType.CENTER, style: "bengaliStyle" }),
+                    new docx.Paragraph({ text: address || '', alignment: docx.AlignmentType.CENTER, style: "bengaliStyle" }),
+                    new docx.Paragraph({ text: ' ', children:[] }),
+                    table,
+                ],
+            }],
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+            saveAs(blob, `${fileName}.docx`);
+        });
+    }
+
+    async function exportToJpg(targetId, fileName) {
+        const allPrintAreas = document.querySelectorAll('.print-area');
+        allPrintAreas.forEach(area => area.classList.add('non-printable'));
+        
+        let elementsToCapture = [];
+        if (targetId === 'all') {
+            elementsToCapture = Array.from(allPrintAreas);
+        } else {
+            const targetArea = document.getElementById(`print-area-${targetId}`);
+            if (targetArea) elementsToCapture.push(targetArea);
+        }
+
+        if (elementsToCapture.length === 0) {
+             showModal({ type: 'info', title: 'ফলাফল', message: 'ছবি তৈরি করার মতো কোনো তালিকা পাওয়া যায়নি।' });
+             allPrintAreas.forEach(area => area.classList.remove('non-printable'));
+             return;
+        }
+
+        const zip = new JSZip();
+        for (let i = 0; i < elementsToCapture.length; i++) {
+            const element = elementsToCapture[i];
+            element.classList.remove('non-printable');
+            const canvas = await html2canvas(element, { scale: 2 });
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+            const title = element.querySelector('h2').textContent.replace(/\s/g, '_');
+            zip.file(`${i + 1}_${title}.jpg`, blob);
+            element.classList.add('non-printable');
+        }
+
+        allPrintAreas.forEach(area => area.classList.remove('non-printable'));
+        
+        const content = await zip.generateAsync({ type: "blob" });
+        saveAs(content, `${fileName}.zip`);
+    }
+
+    async function handleImageDownload(institutionId, target, classId = null) {
+        const institution = allInstitutions.find(inst => inst.id === institutionId);
+        if (!institution) return;
+
+        showModal({ type: 'info', title: 'প্রসেসিং...', message: 'ছবি ডাউনলোড করার জন্য প্রস্তুত করা হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন...' });
+
+        const zip = new JSZip();
+        let imageSources = [];
+        let zipFileName = `${institution.name.replace(/\s+/g, '_')}_ছবি.zip`;
+
+        if (target === 'logo' && institution.logoUrl) {
+            imageSources.push({ url: institution.logoUrl, filename: 'logo.jpg' });
+            zipFileName = `${institution.name.replace(/\s+/g, '_')}_লোগো.zip`;
+        } else if (target === 'main') {
+            const studentsWithPhotos = (institution.students || []).filter(s => s.studentPhotoUrl);
+            studentsWithPhotos.forEach(s => {
+                const filename = `${s.studentName || 'student_photo'}.jpg`;
+                imageSources.push({ url: s.studentPhotoUrl, filename: `সাধারণ/${filename}` });
+            });
+            zipFileName = `${institution.name.replace(/\s+/g, '_')}_সাধারণ_শিক্ষার্থী_ছবি.zip`;
+        } else if (target === 'class' && classId) {
+            const cls = (institution.classes || []).find(c => c.id === classId);
+            if (cls) {
+                const studentsWithPhotos = (cls.students || []).filter(s => s.studentPhotoUrl);
+                studentsWithPhotos.forEach(s => {
+                    const filename = `${s.studentName || 'student_photo'}.jpg`;
+                    imageSources.push({ url: s.studentPhotoUrl, filename: `শ্রেণী-${cls.name}/${filename}` });
+                });
+                zipFileName = `${institution.name.replace(/\s+/g, '_')}_শ্রেণী_${cls.name}_ছবি.zip`;
+            }
+        }
+
+        if (imageSources.length === 0) {
+            showModal({ type: 'info', title: 'ফলাফল', message: 'ডাউনলোড করার মতো কোনো ছবি পাওয়া যায়নি।' });
+            return;
+        }
+
+        const fetchPromises = imageSources.map(async (source) => {
+            try {
+                const response = await fetch(source.url);
+                if (!response.ok) throw new Error(`Failed to fetch ${source.url}`);
+                const blob = await response.blob();
+                zip.file(source.filename, blob);
+            } catch (error) {
+                console.error(`Could not download image from ${source.url}:`, error);
+            }
+        });
+
+        await Promise.all(fetchPromises);
+
+        try {
+            const content = await zip.generateAsync({ type: "blob" });
+            saveAs(content, zipFileName);
+            hideModal();
+        } catch (error) {
+            console.error('Error generating zip file:', error);
+            showModal({ type: 'danger', title: 'ত্রুটি', message: 'ফাইল জিপ করার সময় একটি সমস্যা হয়েছে।' });
+        }
+    }
+
+    window.showImagePreview = (imageUrl, studentName) => {
+        if (!imageUrl) return;
+        
+        previewImage.src = imageUrl;
+        previewCaption.textContent = studentName;
+        imagePreviewModal.classList.add('active');
+
+        shareBtn.onclick = () => {
+            navigator.clipboard.writeText(imageUrl).then(() => {
+                shareBtn.innerHTML = '<i class="fas fa-check"></i> কপি হয়েছে!';
+                setTimeout(() => {
+                    shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> শেয়ার';
+                }, 2000);
+            });
+        };
+
+        downloadImageBtn.onclick = () => {
+            fetch(imageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `${studentName}.jpg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                })
+                .catch(() => alert('ছবিটি ডাউনলোড করা সম্ভব হয়নি।'));
+        };
+    }
+    
+    imagePreviewCloseBtn.addEventListener('click', () => imagePreviewModal.classList.remove('active'));
+    imagePreviewModal.addEventListener('click', (e) => {
+        if (e.target === imagePreviewModal) {
+            imagePreviewModal.classList.remove('active');
+        }
+    });
+
+    // --- LOGIN & INITIALIZATION ---
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorMessage.style.display = 'none';
+        const userVal = usernameInput.value;
+        const passVal = passwordInput.value;
+
+        if (userVal === 'Ebrahim' && passVal === '424311') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userRole', 'mainAdmin');
+            sessionStorage.setItem('username', userVal);
+            loginSuccess();
+            return;
+        }
+
+        try {
+            const querySnapshot = await db.collection('subAdmins')
+                .where('username', '==', userVal)
+                .where('password', '==', passVal)
+                .limit(1)
+                .get();
+
+            if (!querySnapshot.empty) {
+                const subAdminData = querySnapshot.docs[0].data();
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userRole', 'subAdmin');
+                sessionStorage.setItem('username', userVal);
+                sessionStorage.setItem('assignedUserIds', (subAdminData.assignedUserIds || []).join(','));
+                loginSuccess();
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            errorMessage.textContent = 'লগইন করার সময় একটি ত্রুটি হয়েছে।';
+            errorMessage.style.display = 'block';
+        }
+    });
+
+    function loginSuccess() {
+        preloader.classList.add('hidden');
+        loginScreen.classList.add('hidden');
+        adminLayout.classList.add('visible');
+        initApp();
+    }
+
+    logoutBtn.addEventListener('click', () => { 
+        showModal({ 
+            type: 'delete', 
+            title: 'লগ আউট নিশ্চিত করুন', 
+            message: 'আপনি কি নিশ্চিতভাবে লগ আউট করতে চান?', 
+            onConfirm: () => { 
+                sessionStorage.clear();
+                unsubscribeListeners.forEach(unsubscribe => unsubscribe()); 
+                unsubscribeListeners = [];
+                window.location.hash = '';
+                location.reload(); 
+            } 
+        }); 
+    });
+
+    function setupUIForRole(role) {
+        const dashboardLink = document.querySelector('.sidebar-nav a[data-view="dashboard"]');
+        const usersLink = document.querySelector('.sidebar-nav a[data-view="users"]');
+        const createAdminLink = document.querySelector('.sidebar-nav a[data-view="create-admin"]');
+        const settingsLink = document.querySelector('.sidebar-nav a[data-view="settings"]');
+        
+        if (role === 'subAdmin') {
+            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-home"></i> হোম`;
+            if(usersLink) usersLink.parentElement.style.display = 'none';
+            if(createAdminLink) createAdminLink.parentElement.style.display = 'none';
+            if(settingsLink) settingsLink.parentElement.style.display = 'none';
+        } else {
+            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড`;
+            if(usersLink) usersLink.parentElement.style.display = 'block';
+            if(createAdminLink) createAdminLink.parentElement.style.display = 'block';
+            if(settingsLink) settingsLink.parentElement.style.display = 'block';
+        }
+    }
+
+    function initApp() {
+        applyTheme(localStorage.getItem('theme') || 'light');
+        if (window.innerWidth >= 1024) { sidebar.classList.remove('collapsed'); } else { sidebar.classList.add('collapsed'); }
+        
+        const userRole = sessionStorage.getItem('userRole');
+        setupUIForRole(userRole);
+        
+        const initialRoute = parseUrl();
+        renderView(initialRoute.view, initialRoute.id);
+
+        setupRealtimeListeners();
+    }
+    
+    function checkLoginStatus() {
+        if (sessionStorage.getItem('isLoggedIn') === 'true') { 
+            loginScreen.classList.add('hidden'); 
+            adminLayout.classList.add('visible'); 
+            initApp();
+        } else { 
+            loginScreen.classList.remove('hidden'); 
+            adminLayout.classList.remove('visible'); 
+        }
+        preloader.classList.add('hidden');
+    }
+    
+    checkLoginStatus();
+});
+</script>
+
+</body>
+</html>
