@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <!-- Google Fonts for Bengali -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- পরিবর্তন: বর্ণমালা ফন্ট যোগ করা হলো -->
-    <link href="https://fonts.googleapis.com/css2?family=Bornomala&display=swap" rel="stylesheet">
     
     <!-- External Libraries for Exporting, Zipping & Saving -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -26,6 +24,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <style>
+        /* পরিবর্তন ২: বর্ণমালা ফন্টের জন্য @font-face নিয়ম */
+        /* Bornomala.ttf বা Bornomala.woff2 ফাইলটি এই HTML ফাইলের সাথে একই ফোল্ডারে রাখুন */
+        @font-face {
+            font-family: 'Bornomala';
+            src: url('Bornomala.woff2') format('woff2'), /* আধুনিক ব্রাউজার */
+                 url('Bornomala.ttf') format('truetype'); /* Safari, Android, iOS */
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --primary-color: #2563eb;
             --secondary-color: #1d4ed8;
@@ -68,7 +76,6 @@
             overflow-x: hidden;
         }
         
-        /* --- পরিবর্তন: সকল বাটনে বর্ণমালা ফন্ট প্রয়োগ --- */
         button, .action-btn, .info-btn, .btn-login, .btn-submit, .modal-footer button {
             font-family: 'Bornomala', 'Hind Siliguri', sans-serif !important;
         }
@@ -100,7 +107,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* --- পরিবর্তন: নতুন লগইন পেইজ ডিজাইন --- */
         .login-screen {
             position: fixed;
             top: 0; left: 0;
@@ -114,7 +120,7 @@
             visibility: visible;
             transition: opacity 0.5s ease, visibility 0.5s;
         }
-        .login-screen .gif-background { /* পরিবর্তন: video-background থেকে gif-background */
+        .login-screen .video-background { /* পরিবর্তন ১: GIF থেকে video তে পরিবর্তন */
             position: absolute;
             top: 0;
             left: 0;
@@ -123,7 +129,7 @@
             overflow: hidden;
             z-index: 1;
         }
-        .login-screen img { /* পরিবর্তন: video থেকে img */
+        .login-screen video { /* পরিবর্তন ১: GIF থেকে video তে পরিবর্তন */
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -181,6 +187,18 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
+        /* পরিবর্তন ১: পাসওয়ার্ড টগল বাটনের জন্য নতুন স্টাইল */
+        .login-form .password-toggle-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
         .login-form .btn-login {
             width: 100%;
             padding: 12px;
@@ -202,8 +220,6 @@
             font-size: 0.9rem;
             display: none;
         }
-        /* --- নতুন লগইন ডিজাইন শেষ --- */
-
 
         .admin-layout { 
             display: flex;
@@ -215,7 +231,6 @@
             opacity: 1;
             visibility: visible;
         }
-
 
         .sidebar {
             width: var(--sidebar-width);
@@ -246,10 +261,21 @@
         .sidebar-nav a:hover { background-color: var(--light-bg); color: var(--primary-color); }
         .sidebar-nav a.active { background-color: var(--light-bg); color: var(--primary-color); border-left-color: var(--primary-color); font-weight: 600; }
         .sidebar-nav a i { width: 20px; text-align: center; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
         
-        .header-actions { display: flex; align-items: center; gap: 20px; }
-        .theme-switch-wrapper { display: flex; align-items: center; gap: 10px; }
+        .sidebar-footer { 
+            padding: 20px; 
+            border-top: 1px solid var(--border-color); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .theme-switch-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            justify-content: center;
+        }
         .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
         .slider { background-color: #777; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
@@ -268,27 +294,48 @@
         
         .app-header {
             background-color: var(--card-background); 
-            padding: 15px 25px;
+            padding: 20px 30px;
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid var(--border-color); box-shadow: var(--box-shadow);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
-        .menu-toggle { background: transparent; border: none; color: var(--primary-color); font-size: 1.5rem; cursor: pointer; }
+        .menu-toggle { background: transparent; border: none; color: var(--primary-color); font-size: 1.8rem; cursor: pointer; }
         
+        /* পরিবর্তন ২: সার্চবারকে সেন্টারে আনার জন্য বেস স্টাইল পরিবর্তন করা হলো */
         .search-bar {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: clamp(250px, 40%, 400px);
+            position: relative;
+            width: 100%;
+            max-width: 500px;
         }
         .search-bar input {
-            background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--border-radius);
-            padding: 10px 15px 10px 40px; width: 100%; transition: var(--transition);
+            background-color: var(--background-color); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--border-radius);
+            padding: 12px 20px 12px 45px;
+            width: 100%; 
+            transition: var(--transition);
+            color: var(--text-color);
+            font-size: 1rem;
         }
-        .search-bar input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
-        .search-bar i { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--light-text); }
+        .search-bar input::placeholder {
+            color: var(--light-text);
+        }
+        .search-bar input:focus { 
+            border-color: var(--primary-color); 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        .search-bar i { 
+            position: absolute; 
+            top: 50%; 
+            left: 15px; 
+            transform: translateY(-50%); 
+            color: var(--light-text); 
+            font-size: 1.1rem;
+        }
+        
+        .header-actions { display: flex; align-items: center; gap: 20px; }
         
         .main-content { 
             padding: 25px; 
@@ -303,7 +350,54 @@
         }
         
         @media (max-width: 768px) {
-            .search-bar { display: none; }
+            .search-bar { 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                background-color: var(--card-background);
+                border-bottom: 1px solid var(--border-color);
+                margin: 0;
+                z-index: -1;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+            }
+            .app-header.search-active .search-bar {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            .search-toggle-btn {
+                background: transparent;
+                border: none;
+                color: var(--primary-color);
+                font-size: 1.4rem;
+                cursor: pointer;
+                display: block;
+            }
+            .header-actions {
+                display: none;
+            }
+        }
+        
+        /* পরিবর্তন ২: ডেস্কটপ ভিউতে সার্চবারকে সেন্টারে আনা হলো */
+        @media (min-width: 769px) {
+            .app-header {
+                 position: relative; /* অ্যাবসোলুট চাইল্ডের জন্য */
+            }
+            .search-bar {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0;
+            }
+            .search-toggle-btn {
+                display: none;
+            }
         }
 
         .stat-card-grid {
@@ -394,7 +488,6 @@
             color: white;
         }
 
-        /* --- পরিবর্তন: কার্ড অ্যাকশন আইকনের জন্য নতুন স্টাইল --- */
         .card-actions {
             position: absolute;
             top: 10px;
@@ -431,8 +524,7 @@
         [data-theme="dark"] .card-action-btn {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        /* --- কার্ড অ্যাকশন স্টাইল শেষ --- */
-
+        
         .routine-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 25px; margin-bottom: 25px; }
         
         .no-data-container {
@@ -465,7 +557,6 @@
             transform: translateY(-50%);
             width: 60px;
             height: 60px;
-            /* --- পরিবর্তন: লোগো সম্পূর্ণ গোল করা হলো --- */
             border-radius: 50%; 
             cursor: pointer;
             transition: transform 0.2s ease;
@@ -480,7 +571,6 @@
         .routine-header p { font-size: 1rem; color: var(--light-text); margin: 0; }
         .routine-header h2 { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); margin-top: 15px; text-align: center; }
         
-        /* --- এডিট আইকন স্টাইল --- */
         #editInstDetailsBtn {
             background: transparent;
             border: none;
@@ -499,8 +589,7 @@
              font-size: 0.9rem;
              background-color: var(--success-color);
         }
-        /* --- এডিট আইকন স্টাইল শেষ --- */
-
+        
         .detail-actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .back-button button { background: none; border: none; color: var(--primary-color); font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         
@@ -535,7 +624,6 @@
         }
         .info-btn:active { transform: scale(0.97); }
 
-
         .dropdown-menu {
             position: absolute; right: 0; top: 110%; background-color: var(--card-background); border-radius: var(--border-radius);
             box-shadow: var(--box-shadow-hover); border: 1px solid var(--border-color); z-index: 10;
@@ -547,14 +635,13 @@
 
         .routine-table-wrapper { overflow-x: auto; }
         .routine-table { width: 100%; border-collapse: collapse; text-align: center; table-layout: fixed; }
-        /* --- পরিবর্তন: শিক্ষার্থীদের তালিকায় বর্ণমালা ফন্ট এবং ক্রমিক নং কলামের প্রস্থ কমানো --- */
         .routine-table {
             font-family: 'Bornomala', 'Hind Siliguri', sans-serif;
         }
         .routine-table th:first-child, .routine-table td:first-child {
-            width: 60px; /* ক্রমিক নং এর জন্য ছোট প্রস্থ */
+            width: 60px;
         }
-        /* --- পরিবর্তন শেষ --- */
+        
         .routine-table th, .routine-table td { border: 1px solid var(--border-color); padding: 12px; }
         .routine-table thead { background-color: var(--light-bg); }
         .routine-table th { font-weight: 600; color: var(--text-color); }
@@ -629,78 +716,73 @@
         .modal-footer .btn-secondary { background-color: var(--light-bg); color: var(--text-color); border: 1px solid var(--border-color); }
         .modal-footer button:hover { opacity: 0.85; }
 
-        /* --- পরিবর্তন শুরু: সাব-এডমিন ক্রিডেনশিয়াল Modal-এর নতুন ডিজাইন --- */
-        .credential-modal-content {
+        /* পরিবর্তন ৩: সাব-অ্যাডমিন ক্রেডেনশিয়াল মডালের জন্য নতুন স্টাইল */
+        .credential-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2500;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            text-align: left;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease;
         }
-        .credential-item {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
+        .credential-modal-overlay.active {
+            opacity: 1; visibility: visible;
+        }
+        .credential-modal-box {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
             border-radius: var(--border-radius);
-            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.4);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
         }
-        .credential-item label {
-            font-weight: 600;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
+        .credential-modal-overlay.active .credential-modal-box {
+            transform: scale(1);
         }
-        .username-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .username-display input {
-            flex-grow: 1;
-            background: var(--card-background);
-            border: none;
-            font-size: 1.1rem;
-            color: var(--light-text);
-            padding: 8px;
-            border-radius: 5px;
-        }
-        .copy-btn {
-            background-color: var(--light-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        .credential-modal-box .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            color: #aaa;
             cursor: pointer;
-            transition: var(--transition);
+            transition: color 0.2s;
         }
-        .copy-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
+        .credential-modal-box .close-btn:hover {
+            color: #fff;
         }
-        .password-input-wrapper {
+        .credential-modal-box h2 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .credential-modal-box p {
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+        .credential-modal-box .password-input-wrapper {
             position: relative;
         }
-        .password-input-wrapper input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            background-color: var(--card-background);
-        }
-        .password-toggle-btn {
+        .credential-modal-box .password-toggle-btn {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--light-text);
+            color: #999;
             cursor: pointer;
             font-size: 1.1rem;
         }
-        /* --- পরিবর্তন শেষ: Modal ডিজাইন --- */
-
 
         .image-preview-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -768,7 +850,7 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
-        .admin-form .btn-submit, .admin-form .btn-assign-users { /* --- পরিবর্তন --- */
+        .admin-form .btn-submit, .admin-form .btn-assign-users {
             width: 100%;
             padding: 12px;
             background: var(--success-color);
@@ -808,7 +890,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            flex-wrap: wrap; /* --- মোবাইল রেসপন্সিভনেসের জন্য --- */
+            flex-wrap: wrap;
         }
         .field-list-item .drag-handle { cursor: grab; color: var(--light-text); }
         .field-list-item .field-label-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px; border-radius: 5px; background-color: var(--card-background); color: var(--text-color); min-width: 150px; }
@@ -818,7 +900,6 @@
         .field-list-item .delete-field-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1rem; }
         .settings-actions { margin-top: 25px; display: flex; gap: 15px; justify-content: flex-end; }
         .settings-actions button { padding: 10px 20px; }
-
 
         .download-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -910,12 +991,12 @@
         .sub-admin-creator .form-group label {
             font-size: 0.9rem;
         }
-         .sub-admin-creator .btn-submit, .sub-admin-creator .btn-assign-users { /* --- পরিবর্তন --- */
+         .sub-admin-creator .btn-submit, .sub-admin-creator .btn-assign-users {
             height: 48px;
             font-size: 1rem;
             background-color: var(--primary-color);
         }
-        .sub-admin-creator .btn-submit:hover, .sub-admin-creator .btn-assign-users:hover { /* --- পরিবর্তন --- */
+        .sub-admin-creator .btn-submit:hover, .sub-admin-creator .btn-assign-users:hover {
             background-color: var(--secondary-color);
         }
 
@@ -971,7 +1052,6 @@
             gap: 8px;
         }
 
-        /* --- পরিবর্তন শুরু: ব্যবহারকারী নির্ধারণের জন্য নতুন Modal-এর স্টাইল --- */
         .assignment-modal-container {
             max-width: 800px;
         }
@@ -1055,10 +1135,7 @@
                 margin: 10px 0;
             }
         }
-        /* --- পরিবর্তন শেষ --- */
 
-
-        /* --- অতিরিক্ত মোবাইল রেসপন্সিভনেস --- */
         @media (max-width: 480px) {
             .main-content {
                 padding: 15px;
@@ -1110,16 +1187,18 @@
                 margin-bottom: 0;
                 page-break-after: always;
             }
+            /* পরিবর্তন ৩: 'সকল শিক্ষার্থী' তালিকার প্রিন্ট স্টাইল নিশ্চিত করা */
+            #all-students-print-area.print-area {
+                 page-break-after: auto;
+            }
             .routine-container.print-area:last-of-type {
                 page-break-after: auto;
             }
             .non-printable { display: none !important; }
             
-            /* --- প্রিন্ট থেকে এডিট বাটন হাইড করা --- */
             #editInstDetailsBtn, #saveInstDetailsBtn {
                 display: none !important;
             }
-            /* --- হাইড করা শেষ --- */
 
             .routine-header h1, .routine-header h2, .routine-table th, .routine-table td, .routine-header p { 
                 color: #000 !important; 
@@ -1143,9 +1222,10 @@
     </div>
 
     <div class="login-screen" id="loginScreen">
-        <!-- পরিবর্তন: ভিডিও ব্যাকগ্রাউন্ডের পরিবর্তে GIF ব্যাকগ্রাউন্ড -->
-        <div class="gif-background">
-            <img id="loginGif" src="" alt="Nature Waterfall Background">
+        <!-- পরিবর্তন ১: img এর পরিবর্তে video ট্যাগ ব্যবহার করা হলো -->
+        <div class="video-background">
+            <!-- নিচের src অংশে আপনার ডাউনলোড করা ভিডিও ফাইলের সঠিক পাথ বা লিংক দিন -->
+            <video src="login-background.mp4" autoplay loop muted playsinline></video>
         </div>
         <div class="login-box">
             <h2><i class="fas fa-user-shield"></i> অ্যাডমিন লগইন</h2>
@@ -1158,6 +1238,10 @@
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
+                    <!-- পরিবর্তন ১: পাসওয়ার্ড টগল বাটন যোগ করা হলো -->
+                    <button type="button" class="password-toggle-btn" id="loginPasswordToggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
                 <button type="submit" class="btn-login">লগইন করুন</button>
                 <p class="error-message" id="errorMessage">ভুল ইউজারনেম অথবা পাসওয়ার্ড</p>
@@ -1176,25 +1260,26 @@
                 <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> ফর্ম সেটিংস</a></li>
              </ul>
              <div class="sidebar-footer">
-                 <button id="logoutBtn" style="width: 100%; padding: 10px; margin-top: 15px; border: none; background-color: var(--danger-color); color: white; border-radius: var(--border-radius); cursor: pointer; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> লগ আউট</button>
+                <div class="theme-switch-wrapper">
+                    <i class="fas fa-sun" style="color: var(--light-text);"></i>
+                    <label class="theme-switch" for="nightModeToggle">
+                        <input type="checkbox" id="nightModeToggle" />
+                        <span class="slider round"></span>
+                    </label>
+                    <i class="fas fa-moon" style="color: var(--light-text);"></i>
+                </div>
+                <button id="logoutBtn" style="width: 100%; padding: 10px; border: none; background-color: var(--danger-color); color: white; border-radius: var(--border-radius); cursor: pointer; font-weight: 600;"><i class="fas fa-sign-out-alt"></i> লগ আউট</button>
              </div>
         </aside>
 
         <div class="content-wrapper">
-            <header class="app-header">
+            <header class="app-header" id="appHeader">
                 <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" id="globalSearchInput" placeholder="এখানে সার্চ করুন...">
                 </div>
-                <div class="header-actions">
-                    <div class="theme-switch-wrapper">
-                        <label class="theme-switch" for="nightModeToggle">
-                            <input type="checkbox" id="nightModeToggle" />
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
+                 <button class="search-toggle-btn" id="searchToggleBtn"><i class="fas fa-search"></i></button>
             </header>
             <main class="main-content" id="mainContent">
                 <!-- Dynamic Content Goes Here -->
@@ -1209,38 +1294,49 @@
             <div class="modal-footer" id="modalFooter"></div>
         </div>
     </div>
+    
+    <!-- পরিবর্তন ৩: সাব-অ্যাডমিন ক্রেডেনশিয়াল মডালের জন্য নতুন HTML -->
+    <div class="credential-modal-overlay" id="credentialLoginModal">
+        <div class="credential-modal-box">
+            <span class="close-btn" id="credentialModalCloseBtn">&times;</span>
+            <h2 id="credentialModalTitle"><i class="fas fa-key"></i> ক্রেডেনশিয়াল</h2>
+            <p>এখানে ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করতে পারবেন।</p>
+            <form class="login-form" id="credentialUpdateForm" onsubmit="return false;">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="adminUsernameInput" placeholder="ইউজারনেম" required>
+                </div>
+                <div class="input-group password-input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="adminPasswordInput" placeholder="পাসওয়ার্ড" required>
+                    <button type="button" class="password-toggle-btn" id="credentialPasswordToggle"><i class="fas fa-eye"></i></button>
+                </div>
+                <button type="submit" class="btn-login" id="updateCredentialsBtn">আপডেট করুন</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- পরিবর্তন শুরু: ব্যবহারকারী নির্ধারণের জন্য নতুন Modal -->
     <div class="modal-overlay" id="assignmentModal">
         <div class="modal-container assignment-modal-container">
             <div class="modal-header">
                 <h3 id="assignmentModalTitle">ব্যবহারকারী নির্ধারণ করুন</h3>
             </div>
             <div class="modal-body assignment-modal-body">
-                <!-- Available Users Column -->
                 <div class="user-list-column">
                     <div class="user-list-header">
                         <input type="text" id="availableUsersSearch" placeholder="ব্যবহারকারী খুঁজুন...">
                     </div>
-                    <ul class="user-list" id="availableUsersList">
-                        <!-- JS দ্বারা লোড হবে -->
-                    </ul>
+                    <ul class="user-list" id="availableUsersList"></ul>
                 </div>
-                
-                <!-- Action Buttons -->
                 <div class="user-transfer-actions">
                     <button class="transfer-btn" id="assignUserBtn" title="নির্ধারণ করুন"><i class="fas fa-chevron-right"></i></button>
                     <button class="transfer-btn" id="unassignUserBtn" title="বাতিল করুন"><i class="fas fa-chevron-left"></i></button>
                 </div>
-
-                <!-- Assigned Users Column -->
                 <div class="user-list-column">
                     <div class="user-list-header">
                         <input type="text" id="assignedUsersSearch" placeholder="নির্ধারিত ব্যবহারকারী খুঁজুন...">
                     </div>
-                    <ul class="user-list" id="assignedUsersList">
-                        <!-- JS দ্বারা লোড হবে -->
-                    </ul>
+                    <ul class="user-list" id="assignedUsersList"></ul>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1249,7 +1345,6 @@
             </div>
         </div>
     </div>
-    <!-- পরিবর্তন শেষ -->
     
     <div class="image-preview-modal" id="imagePreviewModal">
         <span class="close-btn" id="imagePreviewCloseBtn">&times;</span>
@@ -1286,8 +1381,9 @@
                     </div>
                 </div>
             </div>
+             <!-- পরিবর্তন ২: ডাউনলোড পপ-আপ বাটন উন্নত করা হলো -->
             <div class="download-modal-footer">
-                <button class="modal-footer button btn-secondary" id="downloadModalBackBtn">পূর্ববর্তী</button>
+                <button class="modal-footer button btn-secondary" id="downloadModalBackBtn"><i class="fas fa-arrow-left"></i> পূর্ববর্তী</button>
                 <button class="modal-footer button btn-primary" id="downloadModalNextBtn">পরবর্তী <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
@@ -1317,9 +1413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentViewId = null; // Used for institution ID, user ID etc.
     let unsubscribeListeners = []; // To store realtime listener functions
     
-    // --- পরিবর্তন: প্রতিষ্ঠানের লোগোর জন্য প্রফেশনাল খালি ইমেজ আইকন ---
     const placeholderImageSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTIxIDE5VjVjMC0xLjEtLjktMi0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnpNOC41IDEyLjVsMi41IDMuMDFMMTMuNSA5bDQuNSA2SDV6Ii8+PC9zdmc+`;
-    // --- পরিবর্তন: শিক্ষার্থীর ছবির জন্য ম্যান আইকন ---
     const placeholderUserSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+`;
 
 
@@ -1341,6 +1435,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const preloader = document.getElementById('preloader');
     
+    // পরিবর্তন ১: লগইন পাসওয়ার্ড টগল বাটনের রেফারেন্স
+    const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    const appHeader = document.getElementById('appHeader');
+    
     const imagePreviewModal = document.getElementById('imagePreviewModal');
     const imagePreviewCloseBtn = document.getElementById('imagePreviewCloseBtn');
     const previewImage = document.getElementById('previewImage');
@@ -1361,77 +1461,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeAssignmentModalBtn = document.getElementById('closeAssignmentModalBtn');
     const saveAssignmentBtn = document.getElementById('saveAssignmentBtn');
     
-    const loginGifs = [
-        'https://i.gifer.com/72Iu.gif',
-        'https://i.pinimg.com/originals/39/3a/0d/393a0df470e8a7c2936733221dee7e61.gif',
-        'https://i.pinimg.com/originals/b7/d8/51/b7d8515057b56f8f117f7b3bb697c6d5.gif',
-        'https://i.pinimg.com/originals/44/2c/8b/442c8b87c71e0690184b9f3cd67e588d.gif',
-        'https://i.pinimg.com/originals/a2/5c/4a/a25c4a1e944b1b36a18d3637e6d0a7a3.gif',
-        'https://64.media.tumblr.com/1cecf5781a7b8e5c32b50428d0520610/tumblr_oo0nflG81t1v830keo1_500.gif',
-        'https://giffiles.alphacoders.com/214/214436.gif',
-        'https://giffiles.alphacoders.com/208/208836.gif',
-        'https://i.gifer.com/origin/79/79366d7de07c917f30bf24f2160d2b63_w200.gif',
-        'https://i.pinimg.com/originals/52/68/a2/5268a26227b61f8753a43a137b019623.gif',
-        'https://i.gifer.com/fyrq.gif',
-        'https://i.gifer.com/4l0.gif',
-        'https://giffiles.alphacoders.com/138/13813.gif',
-        'https://www.icegif.com/wp-content/uploads/2023/04/icegif-94.gif',
-        'https://media1.giphy.com/media/l4pTkygrkP3h4Q1mU/giphy.gif',
-        'https://gifdb.com/images/high/mesmerizing-waterfall-over-icelandic-cliffs-ns38992kfeul7jqm.gif',
-        'https://i.pinimg.com/originals/b4/0f/09/b40f09a531b782924a1a6f0278a514d3.gif',
-        'https://giffiles.alphacoders.com/137/13797.gif',
-        'https://media.tenor.com/DQRH8BcFnoAAAAAM/waterfall-view.gif',
-        'https://i.pinimg.com/originals/d4/0b/a4/d40ba405f6e8102a0a2542a275f92265.gif',
-        'https://media.tenor.com/uR4pWpBcsjQAAAAM/waterfall.gif',
-        'https://i.gifer.com/1G66.gif',
-        'https://i.gifer.com/An9u.gif',
-        'https://media.baamboozle.com/uploads/images/303507/1628109315_525940.gif',
-        'https://i.makeagif.com/media/8-18-2017/L1tC3M.gif',
-        'https://gif Abyss.com/wp-content/uploads/2022/04/waterfall-gif-by-gif-abyss.gif',
-        'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXpsbzN5ZTVidHB4dDBsb3J1OGQ4anV6eWhmbGZzcDdnMjVxMG1ocCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L2N2V418AKxgc/giphy.gif',
-        'https://media4.giphy.com/media/4Z1wOi78ZGz28/giphy.gif',
-        'https://i.pinimg.com/originals/6e/c3/8c/6ec38c4c7b8c2d1c68f6d7d6f554072f.gif',
-        'https://i.pinimg.com/originals/7d/5c/8c/7d5c8c1a1b3b5b7b9c9c8c5c4a5c9d9d.gif',
-        'https://i.pinimg.com/originals/c7/b6/d1/c7b6d1c8c5c4a5c9d9d8c8c5c4a5c9d9.gif',
-        'https://giffiles.alphacoders.com/208/208865.gif',
-        'https://media.tenor.com/5VWWiUXJblAAAAAM/waterfall.gif',
-        'https://i.pinimg.com/originals/9f/61/88/9f618841451f50f2f11ec39f1c73a6ca.gif',
-        'https://media.tenor.com/u682A7G8Iq4AAAAM/skogafoss-iceland.gif',
-        'https://gifdb.com/images/high/beautiful-nature-4k-aesthetic-forest-waterfall-swnexr9s0nvafl7l.gif',
-        'https://www.funimada.com/assets/images/cards/big/waterfall-13.gif',
-        'https://media.tenor.com/tHmyG5FmAwEAAAAC/water-waterfall.gif',
-        'https://animesher.com/orig/1/141/1416/14169/animesher.com_nature-gif-waterfall-1416952.gif',
-        'https://64.media.tumblr.com/e2e6c51817452d3a778e7c10b232070e/tumblr_mpy5pddGGO1rlnnpro1_r1_500.gif',
-        'https://64.media.tumblr.com/0d9fb82d1c120a174411130d21659a72/tumblr_nscb0oNlZI1uhpzxoo1_500.gif',
-        'https://media.tenor.com/o3VplwAHRx4AAAAd/waterfall.gif',
-        'https://media1.giphy.com/media/4N1wOi78ZGz28/200.gif',
-        'https://media.tenor.com/dJnBOyX6EScAAAAM/chute-tree.gif',
-        'https://www.icegif.com/wp-content/uploads/waterfall-icegif-2.gif',
-        'https://media2.giphy.com/media/xUPGcm3irK16ev4jMA/giphy.gif',
-        'https://media.tenor.com/Qj4dG002VlwAAAAM/waterfalls-nature.gif',
-        'https://media.tenor.com/M6LcHj5IksYAAAAC/waterfall.gif',
-        'https://media.tenor.com/vHqAAa5ZVUcAAAAM/cascada-de-agua.gif',
-        'https://media.tenor.com/2-I3nKlp11sAAAAC/waterfalls-forest.gif'
-    ];
-    const loginGifElement = document.getElementById('loginGif');
+    const credentialLoginModal = document.getElementById('credentialLoginModal');
+    const credentialModalCloseBtn = document.getElementById('credentialModalCloseBtn');
 
-    function setRandomLoginBackground() {
-        if (loginGifElement) {
-            const randomGifUrl = loginGifs[Math.floor(Math.random() * loginGifs.length)];
-            loginGifElement.src = randomGifUrl;
-        }
-    }
-    setRandomLoginBackground();
-
-    // --- পরিবর্তন: বাংলা সংখ্যায় রূপান্তরের জন্য ফাংশন ---
     function convertToBengaliNumber(num) {
         const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return String(num).replace(/\d/g, d => bengaliDigits[d]);
     }
     
-    // --- রিয়েল-টাইম ডাটা লোডিং ফাংশন ---
-    // এই ফাংশনটি Firestore থেকে রিয়েল-টাইম আপডেট শোনার জন্য সেট আপ করা হয়েছে।
-    // ডাটাবেজে কোনো পরিবর্তন হলে এটি স্বয়ংক্রিয়ভাবে UI আপডেট করে।
     function setupRealtimeListeners() {
         unsubscribeListeners.forEach(unsubscribe => unsubscribe());
         unsubscribeListeners = [];
@@ -1480,7 +1517,6 @@ document.addEventListener('DOMContentLoaded', () => {
         unsubscribeListeners.push(institutionsUnsubscribe);
     }
     
-    // রিয়েল-টাইম আপডেটের পরে বর্তমান ভিউ পুনরায় রেন্ডার করার ফাংশন
     function rerenderCurrentView() {
         if (customModal.classList.contains('active') || downloadModal.classList.contains('active') || assignmentModal.classList.contains('active')) {
             return; 
@@ -1573,6 +1609,13 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggleBtn.addEventListener('click', handleSidebar);
     overlay.addEventListener('click', handleSidebar);
 
+    searchToggleBtn.addEventListener('click', () => {
+        appHeader.classList.toggle('search-active');
+        if (appHeader.classList.contains('search-active')) {
+            globalSearchInput.focus();
+        }
+    });
+
     // --- NAVIGATION & ROUTING ---
     sidebarLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -1609,10 +1652,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 0);
 
         const statCardsHTML = `<div class="stat-card-grid">
-            <div class="stat-card" id="totalUsersCard"><div class="icon"><i class="fas fa-users"></i></div><div class="info"><h3>${totalUsers}</h3><p>মোট ব্যবহারকারী</p></div></div>
-            <div class="stat-card admins" id="totalAdminsCard"><div class="icon"><i class="fas fa-user-shield"></i></div><div class="info"><h3>${totalAdmins}</h3><p>মোট অ্যাডমিন</p></div></div>
-            <div class="stat-card institutions" id="totalInstitutionsCard"><div class="icon"><i class="fas fa-school"></i></div><div class="info"><h3>${totalInstitutions}</h3><p>মোট প্রতিষ্ঠান</p></div></div>
-            <div class="stat-card students" id="totalStudentsCard"><div class="icon"><i class="fas fa-user-graduate"></i></div><div class="info"><h3>${totalStudents}</h3><p>মোট শিক্ষার্থী</p></div></div>
+            <div class="stat-card" id="totalUsersCard"><div class="icon"><i class="fas fa-users"></i></div><div class="info"><h3>${convertToBengaliNumber(totalUsers)}</h3><p>মোট ব্যবহারকারী</p></div></div>
+            <div class="stat-card admins" id="totalAdminsCard"><div class="icon"><i class="fas fa-user-shield"></i></div><div class="info"><h3>${convertToBengaliNumber(totalAdmins)}</h3><p>মোট অ্যাডমিন</p></div></div>
+            <div class="stat-card institutions" id="totalInstitutionsCard"><div class="icon"><i class="fas fa-school"></i></div><div class="info"><h3>${convertToBengaliNumber(totalInstitutions)}</h3><p>মোট প্রতিষ্ঠান</p></div></div>
+            <div class="stat-card students" id="totalStudentsCard"><div class="icon"><i class="fas fa-user-graduate"></i></div><div class="info"><h3>${convertToBengaliNumber(totalStudents)}</h3><p>মোট শিক্ষার্থী</p></div></div>
         </div><hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 30px;">`;
 
         mainContent.innerHTML = `<div class="page-header"></div>${statCardsHTML}<div class="institution-grid" id="institutionGrid"></div>`;
@@ -1626,7 +1669,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = inst.id;
             
             const cardContent = document.createElement('div');
-            cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+            cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${convertToBengaliNumber(totalInstStudents)} জন</span><i class="fas fa-chevron-right"></i></div>`;
             cardContent.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
             
             const deleteBtn = document.createElement('button');
@@ -1672,7 +1715,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        mainContent.innerHTML = `<div class="page-header"><h1>আমার নির্ধারিত ব্যবহারকারীগণ</h1><p>আপনার নির্ধারিত ব্যবহারকারীদের তথ্য দেখুন।</p></div><div class="user-grid" id="userGrid"></div>`;
+        mainContent.innerHTML = `<div class="page-header"></div><div class="user-grid" id="userGrid"></div>`;
         const userGrid = document.getElementById('userGrid');
 
         accessibleUsers.forEach(user => {
@@ -1723,7 +1766,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'institution-card';
             card.dataset.id = inst.id;
-            card.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+            card.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${convertToBengaliNumber(totalInstStudents)} জন</span><i class="fas fa-chevron-right"></i></div>`;
             card.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
             grid.appendChild(card);
         });
@@ -1732,10 +1775,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAllStudentsView() {
         let allStudentsList = [];
         allInstitutions.forEach(inst => {
-            const studentsWithInst = (inst.students || []).map(s => ({ ...s, institutionName: inst.name, className: 'সাধারণ' }));
+            const studentsWithInst = (inst.students || []).map(s => ({ ...s, institutionName: inst.name, className: 'সাধারণ', institutionId: inst.id }));
             allStudentsList.push(...studentsWithInst);
             (inst.classes || []).forEach(cls => {
-                const studentsWithClass = cls.students.map(s => ({ ...s, institutionName: inst.name, className: cls.name }));
+                const studentsWithClass = cls.students.map(s => ({ ...s, institutionName: inst.name, className: cls.name, institutionId: inst.id }));
                 allStudentsList.push(...studentsWithClass);
             });
         });
@@ -1745,7 +1788,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let tableRows = allStudentsList.map((student, index) => {
             const studentNameForFunc = (student.studentName || 'student_photo').replace(/'/g, "\\'");
-            // --- পরিবর্তন: শিক্ষার্থীর ছবি না থাকলে placeholderUserSVG ব্যবহার করা হচ্ছে ---
             const photoSrc = student.studentPhotoUrl || placeholderUserSVG; 
             return `<tr>
                 <td>${convertToBengaliNumber(index + 1)}</td>
@@ -1759,14 +1801,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
 
         const backButtonHTML = `<button id="backToDashboardBtn"><i class="fas fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</button>`;
+        
+        // পরিবর্তন ৩: প্রিন্ট বাটন যোগ করা হলো
+        const printButtonHTML = `<button class="action-btn" id="printAllStudentsBtn"><i class="fas fa-print"></i> তালিকা প্রিন্ট করুন</button>`;
+        const downloadButtonHTML = `<button class="action-btn download-btn" id="downloadAllStudentsBtn"><i class="fas fa-download"></i> তালিকা ডাউনলোড করুন</button>`;
+
         mainContent.innerHTML = `
-            <div class="detail-actions-bar"><div class="back-button">${backButtonHTML}</div></div>
-            <div class="routine-container">
+            <div class="detail-actions-bar">
+                <div class="back-button">${backButtonHTML}</div>
+                <div class="actions-group">${printButtonHTML}${downloadButtonHTML}</div>
+            </div>
+            <div class="routine-container print-area" id="all-students-print-area">
                 <div class="routine-header"><h2>সকল শিক্ষার্থীর তালিকা (${convertToBengaliNumber(allStudentsList.length)} জন)</h2></div>
                 <div class="routine-table-wrapper"><table class="routine-table">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
             </div>`;
         
         document.getElementById('backToDashboardBtn').addEventListener('click', () => navigateTo('dashboard'));
+        
+        // পরিবর্তন ৩: প্রিন্ট বাটনের জন্য ইভেন্ট লিসেনার
+        document.getElementById('printAllStudentsBtn').addEventListener('click', () => {
+            window.print();
+        });
+
+        document.getElementById('downloadAllStudentsBtn').addEventListener('click', () => {
+            const dummyInstitution = {
+                id: 'all',
+                name: 'সকল প্রতিষ্ঠান',
+                students: allStudentsList,
+                classes: [],
+                formConfiguration: allInstitutions.length > 0 ? allInstitutions[0].formConfiguration : getDefaultFormConfig()
+            };
+            openDownloadModal('all', dummyInstitution);
+        });
     }
 
     function renderInstitutionDetails(institutionId) {
@@ -1778,7 +1844,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const backButtonHTML = `<button id="backBtn"><i class="fas fa-arrow-left"></i> ফিরে যান</button>`;
         
-        // --- পরিবর্তন: প্রতিষ্ঠানের লোগো না থাকলে placeholderImageSVG ব্যবহার করা হচ্ছে ---
         const logoSrc = institution.logoUrl || placeholderImageSVG;
         const logoOnClick = `showImagePreview('${institution.logoUrl || ''}', '${(institution.name || 'Logo').replace(/'/g, "\\'")}')`;
         
@@ -1844,7 +1909,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const classDataAttr = isClass ? `data-class-id="${listId}"` : '';
                     
                     const studentNameForFunc = (student.studentName || 'student_photo').replace(/'/g, "\\'");
-                    // --- পরিবর্তন: শিক্ষার্থীর ছবি না থাকলে placeholderUserSVG ব্যবহার করা হচ্ছে ---
                     const photoSrc = student.studentPhotoUrl || placeholderUserSVG;
                     const studentPhotoOnClick = `showImagePreview('${student.studentPhotoUrl || ''}', '${studentNameForFunc}')`;
                     
@@ -1900,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         mainContent.innerHTML = `
             <div class="detail-actions-bar">${backButtonHTML}</div>
-            <div class="page-header"><h1>ব্যবহারকারী: ${user.name}</h1><p>এর অধীনে থাকা সকল প্রতিষ্ঠানসমূহ।</p></div>
+            <div class="page-header"><h1>ইউজার: ${user.name}</h1><p>এর অধীনে থাকা সকল প্রতিষ্ঠানসমূহ।</p></div>
             <div class="institution-grid" id="institutionGrid"></div>`;
         
         const grid = document.getElementById('institutionGrid');
@@ -1920,7 +1984,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.dataset.id = inst.id;
                 
                 const cardContent = document.createElement('div');
-                cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${totalInstStudents} জন</span><i class="fas fa-chevron-right"></i></div>`;
+                cardContent.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${convertToBengaliNumber(totalInstStudents)} জন</span><i class="fas fa-chevron-right"></i></div>`;
                 cardContent.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
                 
                 const deleteBtn = document.createElement('button');
@@ -2299,49 +2363,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function showAdminCredentialsModal(admin) {
-        showModal({
-            type: 'info',
-            title: `"${admin.name}" এর ক্রিডেনশিয়াল এডিট করুন`,
-            message: '',
-            onConfirm: null 
-        });
+        const modal = document.getElementById('credentialLoginModal');
+        const titleEl = document.getElementById('credentialModalTitle');
+        const usernameInput = document.getElementById('adminUsernameInput');
+        const passwordInput = document.getElementById('adminPasswordInput');
+        const updateBtn = document.getElementById('updateCredentialsBtn');
+        const passwordToggle = document.getElementById('credentialPasswordToggle');
+        const form = document.getElementById('credentialUpdateForm');
 
-        const modalBody = document.getElementById('modalBody');
-        const modalFooter = document.getElementById('modalFooter');
+        titleEl.innerHTML = `<i class="fas fa-key"></i> "${admin.name}" এর ক্রেডেনশিয়াল`;
+        usernameInput.value = admin.username;
+        passwordInput.value = admin.password;
         
-        modalBody.innerHTML = `
-            <form class="admin-form" id="credentialUpdateForm" onsubmit="return false;">
-                <p style="text-align: center; color: var(--light-text); margin-bottom: 20px;">এখানে ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করতে পারবেন।</p>
-                <div class="form-group">
-                    <label for="adminUsernameInput">ইউজারনেম</label>
-                    <input type="text" id="adminUsernameInput" value="${admin.username}" required>
-                </div>
-                <div class="form-group">
-                    <label for="adminPasswordInput">পাসওয়ার্ড</label>
-                    <div class="password-input-wrapper">
-                        <input type="password" id="adminPasswordInput" value="${admin.password}" required>
-                        <button type="button" class="password-toggle-btn" id="passwordToggle"><i class="fas fa-eye"></i></button>
-                    </div>
-                </div>
-            </form>
-        `;
-        
-        modalFooter.innerHTML = `<button class="btn-secondary">বাতিল</button><button class="btn-primary" id="updateCredentialsBtn"><i class="fas fa-save"></i> আপডেট করুন</button>`;
-        
-        const usernameInput = modalBody.querySelector('#adminUsernameInput');
-        const passwordInput = modalBody.querySelector('#adminPasswordInput');
-        const passwordToggle = modalBody.querySelector('#passwordToggle');
+        passwordInput.setAttribute('type', 'password');
+        passwordToggle.querySelector('i').className = 'fas fa-eye';
 
-        passwordToggle.addEventListener('click', () => {
+        passwordToggle.onclick = () => {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             passwordToggle.querySelector('i').classList.toggle('fa-eye');
             passwordToggle.querySelector('i').classList.toggle('fa-eye-slash');
-        });
+        };
 
-        modalFooter.querySelector('.btn-secondary').onclick = hideModal;
-
-        modalFooter.querySelector('#updateCredentialsBtn').onclick = async () => {
+        form.onsubmit = async (e) => {
+            e.preventDefault();
             const newUsername = usernameInput.value.trim();
             const newPassword = passwordInput.value;
 
@@ -2365,14 +2410,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     username: newUsername,
                     password: newPassword 
                 });
-                showModal({ type: 'success', title: 'সফল', message: 'ক্রিডেনশিয়াল সফলভাবে আপডেট করা হয়েছে।' });
+                modal.classList.remove('active');
+                showModal({ type: 'success', title: 'সফল', message: 'ক্রিডেনশিয়াল সফলভাবে আপডেট করা হয়েছে।' });
             } catch(error) {
                 console.error("Error updating credentials:", error);
-                showModal({ type: 'danger', title: 'ত্রুটি', message: 'ক্রিডেনশিয়াল আপডেট করা সম্ভব হয়নি।'});
+                showModal({ type: 'danger', title: 'ত্রুটি', message: 'ক্রিডেনশিয়াল আপডেট করা সম্ভব হয়নি।'});
             }
         };
+        
+        modal.classList.add('active');
     }
-    
+
+    credentialModalCloseBtn.addEventListener('click', () => credentialLoginModal.classList.remove('active'));
+    credentialLoginModal.addEventListener('click', (e) => {
+        if (e.target === credentialLoginModal) {
+            credentialLoginModal.classList.remove('active');
+        }
+    });
+
     async function deleteSubAdmin(adminId) {
         try {
             await db.collection('subAdmins').doc(adminId).delete();
@@ -2385,10 +2440,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderSettingsView() { 
         mainContent.innerHTML = `
-            <div class="page-header"><h1>ফর্ম সেটিংস</h1><p>ব্যবহারকারীর অ্যাপের তথ্য সংগ্রহ ফর্ম নিয়ন্ত্রণ করুন।</p></div>
+            <div class="page-header"><h1>ফর্ম সেটিংস</h1></div>
             <div class="routine-container" id="settingsContainer"></div>`;
+        
+        let institutionsForSettings = [];
+        const userRole = sessionStorage.getItem('userRole');
 
-        const institutionOptions = allInstitutions.map(inst => `<option value="${inst.id}">${inst.name}</option>`).join('');
+        if (userRole === 'subAdmin') {
+            const currentSubAdmin = allSubAdmins.find(admin => admin.username === sessionStorage.getItem('username'));
+            if (currentSubAdmin) {
+                const assignedUserIds = new Set(currentSubAdmin.assignedUserIds || []);
+                const assignedUsers = allUsers.filter(user => assignedUserIds.has(user.id));
+                const accessibleInstIds = new Set();
+                assignedUsers.forEach(user => {
+                    (user.accessibleInstitutions || []).forEach(inst => accessibleInstIds.add(inst.id));
+                });
+                institutionsForSettings = allInstitutions.filter(inst => accessibleInstIds.has(inst.id));
+            }
+        } else {
+            institutionsForSettings = allInstitutions;
+        }
+
+        const institutionOptions = institutionsForSettings.map(inst => `<option value="${inst.id}">${inst.name}</option>`).join('');
+
         document.getElementById('settingsContainer').innerHTML = `
             <div class="admin-form">
                 <div class="form-group">
@@ -2576,7 +2650,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (institution.students && institution.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="main">সাধারণ তালিকা</a>`; }
             (institution.classes || []).forEach(cls => { if (cls.students && cls.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="${cls.id}">শ্রেণী: ${cls.name}</a>`; } });
             if (printOptions.innerHTML !== '') { printOptions.innerHTML += `<hr style="margin: 5px 0; border-color: var(--border-color);"><a href="#" data-print-target="all"><b>সকল শ্রেণী প্রিন্ট করুন</b></a>`; }
-            printOptions.querySelectorAll('a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); handlePrint(e.target.dataset.printTarget); }); });
+            
+            // পরিবর্তন ২: 'সকল শ্রেণী' প্রিন্ট সমস্যার সমাধান
+            printOptions.querySelectorAll('a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); handlePrint(e.currentTarget.dataset.printTarget); }); });
         }
 
         const imageDownloadBtn = document.getElementById('imageDownloadBtn');
@@ -2604,8 +2680,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageOptions.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        const target = e.target.dataset.downloadTarget;
-                        const classId = e.target.dataset.classId;
+                        const target = e.currentTarget.dataset.downloadTarget;
+                        const classId = e.currentTarget.dataset.classId;
                         handleImageDownload(institutionId, target, classId);
                     });
                 });
@@ -2713,6 +2789,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PRINT FUNCTION ---
     function handlePrint(targetId) {
+        document.body.classList.add('print-active');
         const allPrintAreas = document.querySelectorAll('.print-area');
         allPrintAreas.forEach(area => area.classList.add('non-printable'));
         
@@ -2728,36 +2805,44 @@ document.addEventListener('DOMContentLoaded', () => {
         window.print();
         
         allPrintAreas.forEach(area => area.classList.remove('non-printable'));
+        document.body.classList.remove('print-active');
     }
 
     // --- EXPORT & DOWNLOAD FUNCTIONS ---
     let currentDownloadHandler = null;
-    function openDownloadModal(institutionId) {
-        const institution = allInstitutions.find(inst => inst.id === institutionId);
+    function openDownloadModal(institutionId, dummyInstitution = null) {
+        const institution = dummyInstitution || allInstitutions.find(inst => inst.id === institutionId);
         if (!institution) return;
 
         downloadClassList.innerHTML = '';
         let hasStudents = false;
 
-        const allOptionLi = document.createElement('li');
-        allOptionLi.innerHTML = `<input type="radio" name="classSelect" id="class_all" value="all" checked><label for="class_all"><strong>All Page Download (সকল তালিকা)</strong></label>`;
-        downloadClassList.appendChild(allOptionLi);
-        
-        if(institution.students && institution.students.length > 0) {
-            hasStudents = true;
-            const generalLi = document.createElement('li');
-            generalLi.innerHTML = `<input type="radio" name="classSelect" id="class_main" value="main"><label for="class_main">সাধারণ তালিকা (${convertToBengaliNumber(institution.students.length)} জন)</label>`;
-            downloadClassList.appendChild(generalLi);
-        }
-        
-        (institution.classes || []).forEach(cls => {
-            if (cls.students && cls.students.length > 0) {
+        if (institution.id === 'all') {
+             hasStudents = true;
+             const allOptionLi = document.createElement('li');
+             allOptionLi.innerHTML = `<input type="radio" name="classSelect" id="class_all_students" value="main" checked><label for="class_all_students"><strong>সকল শিক্ষার্থীর তালিকা (${convertToBengaliNumber(institution.students.length)} জন)</strong></label>`;
+             downloadClassList.appendChild(allOptionLi);
+        } else {
+            const allOptionLi = document.createElement('li');
+            allOptionLi.innerHTML = `<input type="radio" name="classSelect" id="class_all" value="all" checked><label for="class_all"><strong>All Page Download (সকল তালিকা)</strong></label>`;
+            downloadClassList.appendChild(allOptionLi);
+            
+            if(institution.students && institution.students.length > 0) {
                 hasStudents = true;
-                const classLi = document.createElement('li');
-                classLi.innerHTML = `<input type="radio" name="classSelect" id="class_${cls.id}" value="${cls.id}"><label for="class_${cls.id}">শ্রেণী: ${cls.name} (${convertToBengaliNumber(cls.students.length)} জন)</label>`;
-                downloadClassList.appendChild(classLi);
+                const generalLi = document.createElement('li');
+                generalLi.innerHTML = `<input type="radio" name="classSelect" id="class_main" value="main"><label for="class_main">সাধারণ তালিকা (${convertToBengaliNumber(institution.students.length)} জন)</label>`;
+                downloadClassList.appendChild(generalLi);
             }
-        });
+            
+            (institution.classes || []).forEach(cls => {
+                if (cls.students && cls.students.length > 0) {
+                    hasStudents = true;
+                    const classLi = document.createElement('li');
+                    classLi.innerHTML = `<input type="radio" name="classSelect" id="class_${cls.id}" value="${cls.id}"><label for="class_${cls.id}">শ্রেণী: ${cls.name} (${convertToBengaliNumber(cls.students.length)} জন)</label>`;
+                    downloadClassList.appendChild(classLi);
+                }
+            });
+        }
         
         if (!hasStudents) {
             downloadClassList.innerHTML = `<p style='text-align: center; color: var(--light-text);'>ডাউনলোড করার মতো কোনো শিক্ষার্থীর তথ্য নেই।</p>`;
@@ -2820,7 +2905,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let studentsToExport = [];
         let exportTitle = "সকল_শিক্ষার্থী";
 
-        if (selectedClassId === 'all') {
+        if (institution.id === 'all') {
+             studentsToExport = institution.students;
+             exportTitle = "সকল_প্রতিষ্ঠানের_শিক্ষার্থী";
+        } else if (selectedClassId === 'all') {
             if (institution.students) {
                 studentsToExport.push(...institution.students.map(s => ({ ...s, className: 'সাধারণ' })));
             }
@@ -2849,14 +2937,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const formConfig = institution.formConfiguration || getDefaultFormConfig();
         const enabledStudentFields = (formConfig.studentFields || []).filter(f => f.enabled && f.type !== 'file').sort((a, b) => a.order - b.order);
-
-        const headers = ["ক্রমিক", "শ্রেণী", ...enabledStudentFields.map(f => f.label)];
-        const data = students.map((student, i) => [convertToBengaliNumber(i + 1), student.className || '', ...enabledStudentFields.map(field => student[field.id] || '')]);
+        
+        const headers = ["ক্রমিক", "শ্রেণী", ...enabledStudentFields.map(f => f.label), "প্রতিষ্ঠান"];
+        const data = students.map((student, i) => [
+            convertToBengaliNumber(i + 1), 
+            student.className || '', 
+            ...enabledStudentFields.map(field => student[field.id] || ''),
+            student.institutionName || institution.name
+        ]);
         const dataAsObjects = students.map((student, i) => {
             const obj = { 'ক্রমিক': convertToBengaliNumber(i + 1), 'শ্রেণী': student.className || '' };
             enabledStudentFields.forEach(field => {
                 obj[field.label] = student[field.id] || '';
             });
+            obj['প্রতিষ্ঠান'] = student.institutionName || institution.name;
             return obj;
         });
 
@@ -2895,18 +2989,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function exportToPDF(headers, data, title, institutionName, address) { 
         const { jsPDF } = window.jspdf; 
         const doc = new jsPDF(); 
-        doc.addFont('https://fonts.gstatic.com/s/hindsiliguri/v12/ijwOs5juQtsyLLOKSblDOMlXwzh-S-s.ttf', 'HindSiliguri', 'normal'); 
-        doc.setFont('HindSiliguri'); 
+        
+        // jsPDF এর জন্য বাংলা ফন্ট যোগ করা (Bornomala ফন্ট ব্যবহার করা হচ্ছে)
+        // দ্রষ্টব্য: এই ফন্টটি আপনার প্রোজেক্টে থাকতে হবে এবং সঠিকভাবে লিঙ্ক করতে হবে।
+        // বিকল্পভাবে, Google Fonts থেকে একটি Base64 ভার্সন ব্যবহার করা যেতে পারে।
+        // এখানে একটি উদাহরণ দেওয়া হলো।
+        doc.addFont('Bornomala.ttf', 'Bornomala', 'normal'); 
+        doc.setFont('Bornomala'); 
+
         doc.text(`${institutionName}`, 105, 15, { align: 'center' }); 
         doc.text(address || '', 105, 22, { align: 'center' }); 
         doc.text("শিক্ষার্থীদের তালিকা", 105, 30, { align: 'center' }); 
+        
         doc.autoTable({ 
             head: [headers], 
             body: data, 
             startY: 35, 
             theme: 'grid', 
             styles: { 
-                font: 'HindSiliguri', 
+                font: 'Bornomala', // এখানে ফন্টের নাম উল্লেখ করা জরুরি
                 halign: 'center',
                 fontStyle: 'normal'
             }, 
@@ -3128,6 +3229,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LOGIN & INITIALIZATION ---
+    // পরিবর্তন ১: লগইন পাসওয়ার্ড টগল ফাংশনালিটি
+    if(loginPasswordToggle) {
+        loginPasswordToggle.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            loginPasswordToggle.querySelector('i').classList.toggle('fa-eye');
+            loginPasswordToggle.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
+
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMessage.style.display = 'none';
@@ -3198,7 +3309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-home"></i> হোম`;
             if(usersLink) usersLink.parentElement.style.display = 'none';
             if(createAdminLink) createAdminLink.parentElement.style.display = 'none';
-            if(settingsLink) settingsLink.parentElement.style.display = 'none';
+            if(settingsLink) settingsLink.parentElement.style.display = 'block';
         } else {
             if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড`;
             if(usersLink) usersLink.parentElement.style.display = 'block';
