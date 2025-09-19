@@ -162,19 +162,22 @@
             margin-bottom: 25px;
         }
         .login-form .input-group {
-            position: relative;
+            position: relative; /* পাসওয়ার্ড আইকনকে সঠিকভাবে পজিশন করার জন্য এটি আবশ্যক */
             margin-bottom: 20px;
         }
-        .login-form .input-group i {
+        /* সংশোধিত অংশ শুরু */
+        .login-form .input-group > i { /* শুধুমাত্র বাম দিকের আইকনকে টার্গেট করার জন্য '>' ব্যবহার করা হয়েছে */
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: #999;
         }
+        /* সংশোধিত অংশ শেষ */
+        /* পরিবর্তন ১: পাসওয়ার্ড আইকনের জন্য ইনপুট ফিল্ডে ডানদিকে প্যাডিং যোগ করা হলো */
         .login-form input {
             width: 100%;
-            padding: 12px 15px 12px 45px;
+            padding: 12px 45px; /* উভয় পাশের আইকনের জন্য প্যাডিং ঠিক করা হলো */
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--border-radius);
             background: rgba(0, 0, 0, 0.4);
@@ -187,7 +190,7 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
-        /* পরিবর্তন ১: পাসওয়ার্ড টগল বাটনের জন্য নতুন স্টাইল */
+        /* পরিবর্তন ১: পাসওয়ার্ড টগল বাটন আগের মতই থাকবে */
         .login-form .password-toggle-btn {
             position: absolute;
             right: 15px;
@@ -198,6 +201,8 @@
             color: #999;
             cursor: pointer;
             font-size: 1.1rem;
+            padding: 0;
+            line-height: 1;
         }
         .login-form .btn-login {
             width: 100%;
@@ -220,6 +225,34 @@
             font-size: 0.9rem;
             display: none;
         }
+        
+        /* --- পরিবর্তন ১: নতুন স্টাইল যোগ করা হলো --- */
+        .contact-info {
+            margin-top: 25px;
+            text-align: center;
+        }
+        .contact-info p {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+        .social-icons a {
+            color: #a0a0a0;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+        /* --- পরিবর্তন শেষ --- */
+
 
         .admin-layout { 
             display: flex;
@@ -292,18 +325,23 @@
 
         .content-wrapper { width: 100%; transition: margin-left var(--transition); }
         
+        /* পরিবর্তন ২: হেডারকে স্থির (sticky) রাখার জন্য স্টাইল আপডেট করা হলো */
         .app-header {
             background-color: var(--card-background); 
             padding: 20px 30px;
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid var(--border-color); box-shadow: var(--box-shadow);
-            position: sticky;
-            top: 0;
+            position: sticky; /* হেডারকে স্থির করা হলো */
+            top: 0; /* একেবারে উপরে স্থির করা হলো */
             z-index: 1000;
         }
         .menu-toggle { background: transparent; border: none; color: var(--primary-color); font-size: 1.8rem; cursor: pointer; }
         
-        /* পরিবর্তন ২: সার্চবারকে সেন্টারে আনার জন্য বেস স্টাইল পরিবর্তন করা হলো */
+        /* --- পরিবর্তন ২: মেনু টগল আইকনের জন্য ট্রানজিশন যোগ করা হলো --- */
+        .menu-toggle i {
+            transition: transform 0.3s ease;
+        }
+        
         .search-bar {
             position: relative;
             width: 100%;
@@ -336,6 +374,17 @@
         }
         
         .header-actions { display: flex; align-items: center; gap: 20px; }
+        .firebase-switcher-container { position: relative; }
+        .firebase-switcher-container select {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+        }
         
         .main-content { 
             padding: 25px; 
@@ -383,10 +432,11 @@
             }
         }
         
-        /* পরিবর্তন ২: ডেস্কটপ ভিউতে সার্চবারকে সেন্টারে আনা হলো */
+        /* পরিবর্তন ২: ডেস্কটপ ভিউতে হেডারকে স্থির রাখার জন্য position: relative পরিবর্তন করে sticky করা হলো */
         @media (min-width: 769px) {
             .app-header {
-                 position: relative; /* অ্যাবসোলুট চাইল্ডের জন্য */
+                 position: sticky; /* অ্যাবসোলুট চাইল্ডের জন্য এবং হেডার স্থির রাখার জন্য */
+                 top: 0;
             }
             .search-bar {
                 position: absolute;
@@ -516,14 +566,50 @@
             font-size: 0.9rem;
             transition: var(--transition);
         }
+        
+        /* --- পরিবর্তন ১: আইকন হোভার স্টাইল উন্নত করা শুরু --- */
         .card-action-btn:hover {
             background-color: var(--primary-color);
-            color: white;
+            color: white !important; /* assures icon is white on hover */
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+
+        .card-action-btn.action-delete,
+        .table-actions .delete-btn {
+            color: var(--danger-color);
+            background-color: rgba(220, 38, 38, 0.1);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+        
+        .card-action-btn.action-delete:hover,
+        .table-actions .delete-btn:hover {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white !important; /* assures icon is white on hover */
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+        
+        [data-theme="dark"] .card-action-btn {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .card-action-btn:hover {
+            background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
-        [data-theme="dark"] .card-action-btn {
-            background-color: rgba(255, 255, 255, 0.1);
+
+        [data-theme="dark"] .card-action-btn.action-delete {
+            background-color: rgba(220, 38, 38, 0.2);
+            border-color: rgba(220, 38, 38, 0.4);
         }
+
+        [data-theme="dark"] .card-action-btn.action-delete:hover {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        /* --- পরিবর্তন ১: আইকন হোভার স্টাইল উন্নত করা শেষ --- */
         
         .routine-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 25px; margin-bottom: 25px; }
         
@@ -657,7 +743,8 @@
         .routine-table .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin: auto; cursor: pointer; transition: transform 0.2s; }
         .routine-table .student-photo:hover { transform: scale(1.1); }
         .table-actions button { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin: 0 5px; transition: color 0.2s; }
-        .table-actions .edit-btn { color: var(--primary-color); } .table-actions .delete-btn { color: var(--danger-color); } .table-actions .save-btn { color: var(--success-color); }
+        .table-actions .edit-btn { color: var(--primary-color); }
+        .table-actions .save-btn { color: var(--success-color); }
         
         .truncate-text {
             white-space: nowrap;
@@ -703,6 +790,7 @@
         .modal-body .form-group { text-align: left; margin-bottom: 15px; } /* Modal form styles */
         .modal-body label { font-weight: 600; display: block; margin-bottom: 5px; }
         .modal-body input { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+        .modal-body textarea { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); min-height: 100px; font-family: 'Hind Siliguri', sans-serif; }
 
         .modal-footer { display: flex; justify-content: center; gap: 15px; }
         .modal-footer button {
@@ -835,7 +923,7 @@
             font-weight: 600;
             color: var(--text-color);
         }
-        .admin-form input, .admin-form select {
+        .admin-form input, .admin-form select, .admin-form textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
@@ -845,7 +933,8 @@
             font-family: 'Hind Siliguri', sans-serif;
             font-size: 1rem;
         }
-        .admin-form input:focus, .admin-form select:focus {
+        .admin-form textarea { min-height: 120px; }
+        .admin-form input:focus, .admin-form select:focus, .admin-form textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
@@ -866,6 +955,32 @@
             opacity: 0.9;
         }
         
+        /* --- পরিবর্তন ১: পাসওয়ার্ড টগল বাটনের জন্য নতুন CSS রুল --- */
+        .admin-form .form-group {
+            position: relative;
+        }
+        .admin-form .password-toggle-btn {
+            position: absolute;
+            right: 15px;
+            /* লেবেলের উপরের অংশ থেকে ইনপুটের মাঝামাঝি পজিশন গণনা করা হয়েছে */
+            top: calc(50% + 14px); /* 14px is an adjustment for the label height */
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0;
+            line-height: 1;
+        }
+        /* ইনপুট ফিল্ডে ডান দিকে প্যাডিং যোগ করা হয়েছে */
+        .admin-form input[type="password"],
+        .admin-form input[type="text"] {
+             padding-right: 45px;
+        }
+        /* --- পরিবর্তন শেষ --- */
+
+
         .field-settings-container {
             margin-top: 20px;
             border-top: 1px solid var(--border-color);
@@ -1079,11 +1194,13 @@
             border: 1px solid var(--border-color);
             background-color: var(--card-background);
         }
+        /* পরিবর্তন ২: ইউজার লিস্টে স্ক্রল যুক্ত করার জন্য CSS */
         .user-list {
             list-style: none;
             padding: 10px;
             overflow-y: auto;
             flex-grow: 1;
+            max-height: 150px; /* নির্দিষ্ট উচ্চতা দেওয়া হলো */
         }
         .user-list-item {
             padding: 10px 15px;
@@ -1125,6 +1242,51 @@
             background-color: var(--primary-color);
             color: white;
         }
+
+        /* পরিবর্তন ২: সেটিংস পেজের জন্য নতুন স্টাইল */
+        .settings-card {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .settings-card-list {
+            list-style: none;
+        }
+        .settings-list-item {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .settings-list-item.active {
+            border-left: 5px solid var(--success-color);
+        }
+        .settings-list-item .info {
+            flex-grow: 1;
+        }
+        .settings-list-item h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        .settings-list-item p {
+            margin: 5px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--light-text);
+        }
+        .settings-list-item .actions {
+            display: flex;
+            gap: 10px;
+        }
+
         @media (max-width: 768px) {
             .assignment-modal-body {
                 flex-direction: column;
@@ -1238,7 +1400,7 @@
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
-                    <!-- পরিবর্তন ১: পাসওয়ার্ড টগল বাটন যোগ করা হলো -->
+                    <!-- পাসওয়ার্ড টগল বাটন আগের মতই থাকবে -->
                     <button type="button" class="password-toggle-btn" id="loginPasswordToggle">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -1246,6 +1408,16 @@
                 <button type="submit" class="btn-login">লগইন করুন</button>
                 <p class="error-message" id="errorMessage">ভুল ইউজারনেম অথবা পাসওয়ার্ড</p>
             </form>
+            <!-- পরিবর্তন ১: নতুন অংশ যোগ করা হলো -->
+            <div class="contact-info">
+                <p>বিস্তারিত জানতে</p>
+                <div class="social-icons">
+                    <a href="https://wa.me/8801305359691" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://m.me/Ebrahim.khalil.Jessore" target="_blank" title="Messenger"><i class="fab fa-facebook-messenger"></i></a>
+                    <a href="tel:01305359691" title="Call"><i class="fas fa-phone"></i></a>
+                </div>
+            </div>
+            <!-- পরিবর্তন শেষ -->
         </div>
     </div>
 
@@ -1253,12 +1425,16 @@
     <div class="admin-layout" id="adminLayout">
         <aside class="sidebar" id="sidebar">
              <div class="sidebar-header"><h2><i class="fas fa-user-shield"></i> অ্যাডমিন প্যানেল</h2></div>
+             <!-- পরিবর্তন ৩: সাইডবার মেনু ইংরেজিতে পরিবর্তন করা শুরু -->
              <ul class="sidebar-nav">
-                <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড</a></li>
-                <li><a href="#users" data-view="users"><i class="fas fa-users"></i> ব্যবহারকারী</a></li>
-                <li><a href="#create-admin" data-view="create-admin"><i class="fas fa-user-plus"></i> অ্যাডমিন তৈরি করুন</a></li>
-                <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> ফর্ম সেটিংস</a></li>
+                <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#users" data-view="users"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="#create-admin" data-view="create-admin"><i class="fas fa-user-plus"></i> Create Admin</a></li>
+                <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> Form Settings</a></li>
+                <li><a href="#cloudinary-settings" data-view="cloudinary-settings"><i class="fas fa-cloud-upload-alt"></i> Cloudinary Settings</a></li>
+                <li><a href="#firebase-settings" data-view="firebase-settings"><i class="fas fa-database"></i> Firebase Settings</a></li>
              </ul>
+             <!-- পরিবর্তন ৩: সাইডবার মেনু ইংরেজিতে পরিবর্তন করা শেষ -->
              <div class="sidebar-footer">
                 <div class="theme-switch-wrapper">
                     <i class="fas fa-sun" style="color: var(--light-text);"></i>
@@ -1278,6 +1454,12 @@
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" id="globalSearchInput" placeholder="এখানে সার্চ করুন...">
+                </div>
+                <!-- পরিবর্তন ২: হেডার অ্যাকশনস এবং ফায়ারবেস সুইচার যোগ করা হলো -->
+                <div class="header-actions">
+                    <div class="firebase-switcher-container" id="firebaseSwitcherContainer">
+                        <!-- Firebase project switcher will be dynamically inserted here -->
+                    </div>
                 </div>
                  <button class="search-toggle-btn" id="searchToggleBtn"><i class="fas fa-search"></i></button>
             </header>
@@ -1391,20 +1573,43 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // --- Firebase Initialization ---
-    const firebaseConfig = {
+    // পরিবর্তন ২: ডাইনামিক ফায়ারবেস কনফিগারেশন
+    let db;
+
+    // ডিফল্ট কনফিগারেশন
+    const defaultConfig = {
         apiKey: "AIzaSyD9BwVMQy5lX63-Lnsy_8oBw4rfoROp4Ec",
         authDomain: "data-collection-app-c055e.firebaseapp.com",
         projectId: "data-collection-app-c055e",
         storageBucket: "data-collection-app-c055e.appspot.com",
         messagingSenderId: "856960918481",
-        appId: "1:856960918481:web:053c011242460f16d7b6f0"
+        appId: "1:856960918481:web:053c011242460f16d7b6f0",
+        projectName: "Default Project" // একটি নাম যোগ করা হলো
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    async function initializeFirebase() {
+        if (firebase.apps.length) {
+            await firebase.app().delete();
+        }
 
+        let selectedConfig = defaultConfig;
+        const storedConfig = sessionStorage.getItem('selectedFirebaseConfig');
+        if (storedConfig) {
+            try {
+                selectedConfig = JSON.parse(storedConfig);
+            } catch (e) {
+                console.error("Failed to parse stored Firebase config, using default.", e);
+            }
+        }
+        
+        firebase.initializeApp(selectedConfig);
+        db = firebase.firestore();
+    }
+
+    await initializeFirebase();
+    
     // --- Global State Variables ---
     let allInstitutions = [];
     let allUsers = [];
@@ -1435,7 +1640,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const preloader = document.getElementById('preloader');
     
-    // পরিবর্তন ১: লগইন পাসওয়ার্ড টগল বাটনের রেফারেন্স
     const loginPasswordToggle = document.getElementById('loginPasswordToggle');
 
     const searchToggleBtn = document.getElementById('searchToggleBtn');
@@ -1570,6 +1774,13 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'settings':
                 renderSettingsView();
                 break;
+            // পরিবর্তন ২: নতুন ভিউ রেন্ডারার যোগ করা হলো
+            case 'cloudinary-settings':
+                renderCloudinarySettingsView();
+                break;
+            case 'firebase-settings':
+                renderFirebaseSettingsView();
+                break;
             case 'institutionDetails':
                 renderInstitutionDetails(id);
                 break;
@@ -1602,10 +1813,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- THEME & SIDEBAR ---
     function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); nightModeToggle.checked = theme === 'dark'; }
     nightModeToggle.addEventListener('change', () => { const theme = nightModeToggle.checked ? 'dark' : 'light'; localStorage.setItem('theme', theme); applyTheme(theme); });
+    
+    // --- পরিবর্তন ২: সাইডবার টগল ফাংশন আপডেট করা হলো ---
     function handleSidebar() {
-        if (window.innerWidth < 1024) { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); } 
-        else { sidebar.classList.toggle('collapsed'); }
+        const toggleIcon = menuToggleBtn.querySelector('i');
+        if (window.innerWidth < 1024) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            // আইকন পরিবর্তন
+            if (sidebar.classList.contains('collapsed')) {
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-bars');
+            } else {
+                toggleIcon.classList.remove('fa-bars');
+                toggleIcon.classList.add('fa-chevron-left');
+            }
+        }
     }
+    
     menuToggleBtn.addEventListener('click', handleSidebar);
     overlay.addEventListener('click', handleSidebar);
 
@@ -1725,7 +1952,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
-            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+             // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            const formattedDate = joinedDate.toLocaleString('en-US', options);
+            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
+            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
             cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
             
             card.appendChild(cardContent);
@@ -1802,7 +2033,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const backButtonHTML = `<button id="backToDashboardBtn"><i class="fas fa-arrow-left"></i> ড্যাশবোর্ডে ফিরে যান</button>`;
         
-        // পরিবর্তন ৩: প্রিন্ট বাটন যোগ করা হলো
         const printButtonHTML = `<button class="action-btn" id="printAllStudentsBtn"><i class="fas fa-print"></i> তালিকা প্রিন্ট করুন</button>`;
         const downloadButtonHTML = `<button class="action-btn download-btn" id="downloadAllStudentsBtn"><i class="fas fa-download"></i> তালিকা ডাউনলোড করুন</button>`;
 
@@ -1818,7 +2048,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('backToDashboardBtn').addEventListener('click', () => navigateTo('dashboard'));
         
-        // পরিবর্তন ৩: প্রিন্ট বাটনের জন্য ইভেন্ট লিসেনার
         document.getElementById('printAllStudentsBtn').addEventListener('click', () => {
             window.print();
         });
@@ -2027,14 +2256,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
-            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+
+            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            const formattedDate = joinedDate.toLocaleString('en-US', options);
+            cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
+            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
+
             cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
             
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'card-actions';
             actionsDiv.innerHTML = `
                 <button class="card-action-btn" title="ইউজার আইডি দেখুন"><i class="fas fa-key"></i></button>
-                <button class="card-action-btn" title="ব্যবহারকারী মুছুন" style="color: var(--danger-color);"><i class="fas fa-user-times"></i></button>
+                <button class="card-action-btn action-delete" title="ব্যবহারকারী মুছুন"><i class="fas fa-user-times"></i></button>
             `;
 
             actionsDiv.querySelector('.fa-key').parentElement.addEventListener('click', (e) => {
@@ -2088,7 +2323,6 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.innerHTML = `
             <div class="page-header">
                 <h1>সাব-অ্যাডমিন ম্যানেজমেন্ট</h1>
-                <p>এখানে ব্যবহারকারীদের পরিচালনার জন্য সীমিত ক্ষমতার অ্যাডমিন তৈরি এবং পরিচালনা করুন।</p>
             </div>
             <div class="routine-container">
                 <form class="admin-form sub-admin-creator" id="createSubAdminForm">
@@ -2104,6 +2338,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="form-group">
                             <label for="newPassword">পাসওয়ার্ড</label>
                             <input type="password" id="newPassword" placeholder="পাসওয়ার্ড দিন" required>
+                            <button type="button" class="password-toggle-btn" id="newPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                          <div class="form-group">
                             <label>ব্যবহারকারী নির্ধারণ</label>
@@ -2122,6 +2359,20 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
 
         renderSubAdminCards();
+
+        // --- পরিবর্তন ১: নতুন পাসওয়ার্ড টগল বাটনের জন্য ইভেন্ট লিসেনার ---
+        const newPasswordInput = document.getElementById('newPassword');
+        const newPasswordToggle = document.getElementById('newPasswordToggle');
+        if(newPasswordToggle) {
+            newPasswordToggle.addEventListener('click', () => {
+                const type = newPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPasswordInput.setAttribute('type', type);
+                newPasswordToggle.querySelector('i').classList.toggle('fa-eye');
+                newPasswordToggle.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+        // --- পরিবর্তন শেষ ---
+
 
         document.getElementById('openAssignUserModalBtn').addEventListener('click', () => {
             const assignedIds = document.getElementById('assignedUserIdsInput').value.split(',').filter(Boolean);
@@ -2187,11 +2438,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
+            
+            // --- পরিবর্তন ২: সাব-অ্যাডমিন কার্ডে তারিখ যোগ করা শুরু ---
+            const createdDate = admin.createdAt && admin.createdAt.toDate ? admin.createdAt.toDate() : new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            const formattedDate = createdDate.toLocaleString('en-US', options);
+
             cardContent.innerHTML = `
                 <div class="info">
                     <h4>${admin.name}</h4>
                     <p><i class="fas fa-users"></i> পরিচালনা করে: ${convertToBengaliNumber(assignedIds.length)} জন ব্যবহারকারী</p>
+                    <p><i class="fas fa-clock"></i> Created: ${formattedDate}</p>
                 </div>`;
+            // --- পরিবর্তন ২: সাব-অ্যাডমিন কার্ডে তারিখ যোগ করা শেষ ---
             
             cardContent.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -2203,7 +2462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             actionsDiv.innerHTML = `
                 <button class="card-action-btn" title="ব্যবহারকারী নির্ধারণ করুন"><i class="fas fa-user-plus"></i></button>
                 <button class="card-action-btn" title="ক্রিডেনশিয়াল দেখুন/রিসেট করুন"><i class="fas fa-key"></i></button>
-                <button class="card-action-btn" title="অ্যাডমিন মুছুন" style="color: var(--danger-color);"><i class="fas fa-trash-alt"></i></button>
+                <button class="card-action-btn action-delete" title="অ্যাডমিন মুছুন"><i class="fas fa-trash-alt"></i></button>
             `;
 
             actionsDiv.querySelector('.fa-user-plus').parentElement.addEventListener('click', (e) => { 
@@ -2259,7 +2518,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cardContent = document.createElement('div');
                 cardContent.className = 'card-content';
                 const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
-                cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> যোগ দিয়েছেন: ${joinedDate.toLocaleDateString('bn-BD')} ${joinedDate.toLocaleTimeString('bn-BD')}</p>`;
+                
+                 // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+                const formattedDate = joinedDate.toLocaleString('en-US', options);
+                cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
+                // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
+                
                 cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
                 
                 card.appendChild(cardContent);
@@ -2593,6 +2858,253 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
+    // পরিবর্তন ২: নতুন রেন্ডার ফাংশন
+    async function renderCloudinarySettingsView() {
+        mainContent.innerHTML = `
+            <div class="page-header">
+                <h1>Cloudinary সেটিংস</h1>
+                <p>এখানে Cloudinary অ্যাকাউন্ট যোগ, পরিবর্তন বা সক্রিয় করুন।</p>
+            </div>
+            <div class="routine-container">
+                <form class="admin-form settings-card" id="cloudinarySettingsForm">
+                    <h4>নতুন Cloudinary অ্যাকাউন্ট যোগ করুন</h4>
+                    <div class="form-group">
+                        <label for="cloudinaryName">অ্যাকাউন্টের নাম (শনাক্তকরণের জন্য)</label>
+                        <input type="text" id="cloudinaryName" placeholder="e.g., Personal Account" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cloudinaryCloudName">Cloud Name</label>
+                        <input type="text" id="cloudinaryCloudName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cloudinaryApiKey">API Key</label>
+                        <input type="text" id="cloudinaryApiKey" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cloudinaryApiSecret">API Secret</label>
+                        <input type="password" id="cloudinaryApiSecret" required>
+                    </div>
+                    <button type="submit" class="btn-submit"><i class="fas fa-plus-circle"></i> অ্যাকাউন্ট যোগ করুন</button>
+                </form>
+                <div class="settings-list-container">
+                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                    <h3 style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">সংরক্ষিত অ্যাকাউন্ট তালিকা</h3>
+                    <ul class="settings-card-list" id="cloudinaryAccountsList"></ul>
+                </div>
+            </div>`;
+
+        await loadAndDisplayCloudinaryAccounts();
+
+        document.getElementById('cloudinarySettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newAccount = {
+                id: `cloudinary_${Date.now()}`,
+                name: document.getElementById('cloudinaryName').value,
+                cloudName: document.getElementById('cloudinaryCloudName').value,
+                apiKey: document.getElementById('cloudinaryApiKey').value,
+                apiSecret: document.getElementById('cloudinaryApiSecret').value,
+                isActive: false
+            };
+            
+            try {
+                const docRef = db.collection('_configs').doc('cloudinary');
+                const doc = await docRef.get();
+                let accounts = doc.exists ? doc.data().accounts || [] : [];
+                
+                if (accounts.length === 0) {
+                    newAccount.isActive = true; // প্রথম অ্যাকাউন্টটি স্বয়ংক্রিয়ভাবে সক্রিয় হবে
+                }
+
+                accounts.push(newAccount);
+                await docRef.set({ accounts });
+
+                showModal({type: 'success', title: 'সফল', message: 'Cloudinary অ্যাকাউন্ট সফলভাবে যোগ করা হয়েছে।'});
+                e.target.reset();
+                await loadAndDisplayCloudinaryAccounts();
+            } catch (error) {
+                console.error("Error adding Cloudinary account:", error);
+                showModal({type: 'danger', title: 'ত্রুটি', message: 'অ্যাকাউন্ট যোগ করতে সমস্যা হয়েছে।'});
+            }
+        });
+    }
+
+    async function loadAndDisplayCloudinaryAccounts() {
+        const listEl = document.getElementById('cloudinaryAccountsList');
+        listEl.innerHTML = `<div class="spinner"></div>`;
+        try {
+            const doc = await db.collection('_configs').doc('cloudinary').get();
+            if (!doc.exists || !doc.data().accounts || doc.data().accounts.length === 0) {
+                listEl.innerHTML = `<div class="no-data-container" style="padding: 20px 0;"><h3>কোনো Cloudinary অ্যাকাউন্ট যোগ করা হয়নি।</h3></div>`;
+                return;
+            }
+            const accounts = doc.data().accounts;
+            listEl.innerHTML = '';
+            accounts.forEach(acc => {
+                const item = document.createElement('li');
+                item.className = `settings-list-item ${acc.isActive ? 'active' : ''}`;
+                item.innerHTML = `
+                    <div class="info">
+                        <h4>${acc.name} ${acc.isActive ? '(সক্রিয়)' : ''}</h4>
+                        <p>Cloud Name: ${acc.cloudName}</p>
+                    </div>
+                    <div class="actions">
+                        ${!acc.isActive ? `<button class="modal-footer button btn-primary setActiveBtn" data-id="${acc.id}">সক্রিয় করুন</button>` : ''}
+                        <button class="modal-footer button btn-danger deleteBtn" data-id="${acc.id}"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+                listEl.appendChild(item);
+            });
+
+            listEl.querySelectorAll('.setActiveBtn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const accountId = e.currentTarget.dataset.id;
+                    await updateCloudinaryStatus(accountId, accounts, true);
+                });
+            });
+            listEl.querySelectorAll('.deleteBtn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                     const accountId = e.currentTarget.dataset.id;
+                     showModal({
+                        type: 'delete',
+                        title: 'আপনি কি নিশ্চিত?',
+                        message: `আপনি এই Cloudinary অ্যাকাউন্টটি মুছে ফেলতে চলেছেন।`,
+                        onConfirm: () => updateCloudinaryStatus(accountId, accounts, false)
+                    });
+                });
+            });
+        } catch (error) {
+            console.error("Error loading Cloudinary accounts:", error);
+            listEl.innerHTML = `<p style="color: var(--danger-color); text-align: center;">অ্যাকাউন্ট তালিকা লোড করা যায়নি।</p>`;
+        }
+    }
+
+    async function updateCloudinaryStatus(accountId, accounts, isActivation) {
+        let updatedAccounts;
+        if (isActivation) {
+            updatedAccounts = accounts.map(acc => ({...acc, isActive: acc.id === accountId }));
+        } else {
+            const accountToDelete = accounts.find(acc => acc.id === accountId);
+            updatedAccounts = accounts.filter(acc => acc.id !== accountId);
+            if (accountToDelete.isActive && updatedAccounts.length > 0) {
+                updatedAccounts[0].isActive = true; // অন্য একটিকে সক্রিয় করুন
+            }
+        }
+        
+        try {
+            await db.collection('_configs').doc('cloudinary').set({ accounts: updatedAccounts });
+            showModal({type: 'success', title: 'সফল', message: `অ্যাকাউন্ট তালিকা সফলভাবে আপডেট করা হয়েছে।`});
+            await loadAndDisplayCloudinaryAccounts();
+        } catch(error) {
+            console.error("Error updating Cloudinary accounts:", error);
+            showModal({type: 'danger', title: 'ত্রুটি', message: 'অ্যাকাউন্ট তালিকা আপডেট করতে সমস্যা হয়েছে।'});
+        }
+    }
+    
+    async function renderFirebaseSettingsView() {
+        mainContent.innerHTML = `
+            <div class="page-header">
+                <h1>Firebase সেটিংস</h1>
+                <p>এখানে নতুন Firebase প্রোজেক্টের কনফিগারেশন যোগ করুন। প্যানেলটি কোন প্রোজেক্টের ডেটা দেখাবে তা উপরের ডানদিকের ড্রপডাউন থেকে পরিবর্তন করা যাবে।</p>
+            </div>
+            <div class="routine-container">
+                <form class="admin-form settings-card" id="firebaseSettingsForm">
+                    <h4>নতুন Firebase প্রোজেক্ট যোগ করুন</h4>
+                    <div class="form-group">
+                        <label for="firebaseProjectName">প্রোজেক্টের নাম (শনাক্তকরণের জন্য)</label>
+                        <input type="text" id="firebaseProjectName" placeholder="e.g., New Client Project" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebaseConfigJson">Firebase কনফিগারেশন (JSON অবজেক্ট)</label>
+                        <textarea id="firebaseConfigJson" placeholder='{\n  "apiKey": "...",\n  "authDomain": "...",\n  ...\n}' required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit"><i class="fas fa-plus-circle"></i> প্রোজেক্ট যোগ করুন</button>
+                </form>
+
+                <div class="settings-list-container">
+                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                    <h3 style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">সংরক্ষিত প্রোজেক্ট তালিকা</h3>
+                    <ul class="settings-card-list" id="firebaseProjectsList"></ul>
+                </div>
+            </div>`;
+        
+        await loadAndDisplayFirebaseProjects();
+
+        document.getElementById('firebaseSettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const projectName = document.getElementById('firebaseProjectName').value;
+            const configJson = document.getElementById('firebaseConfigJson').value;
+
+            try {
+                const configObject = JSON.parse(configJson);
+                configObject.projectName = projectName; // নামটি অবজেক্টের মধ্যে সংরক্ষণ করুন
+                configObject.id = `firebase_${Date.now()}`;
+
+                const docRef = db.collection('_configs').doc('firebase');
+                const doc = await docRef.get();
+                let projects = doc.exists ? doc.data().projects || [] : [];
+                projects.push(configObject);
+                await docRef.set({ projects });
+
+                showModal({type: 'success', title: 'সফল', message: 'Firebase প্রোজেক্ট সফলভাবে যোগ করা হয়েছে।'});
+                e.target.reset();
+                await loadAndDisplayFirebaseProjects();
+                await populateFirebaseSwitcher(); // ড্রপডাউন আপডেট করুন
+            } catch (error) {
+                console.error("Error adding Firebase project:", error);
+                showModal({type: 'danger', title: 'ত্রুটি', message: 'প্রোজেক্ট যোগ করতে সমস্যা হয়েছে। নিশ্চিত করুন যে কনফিগারেশনটি একটি বৈধ JSON।'});
+            }
+        });
+    }
+
+    async function loadAndDisplayFirebaseProjects() {
+        const listEl = document.getElementById('firebaseProjectsList');
+        listEl.innerHTML = `<div class="spinner"></div>`;
+        try {
+            const doc = await db.collection('_configs').doc('firebase').get();
+            const projects = (doc.exists && doc.data().projects) ? doc.data().projects : [];
+            const allProjects = [defaultConfig, ...projects];
+
+            listEl.innerHTML = '';
+            allProjects.forEach(proj => {
+                const isDefault = proj.projectId === defaultConfig.projectId;
+                const item = document.createElement('li');
+                item.className = 'settings-list-item';
+                item.innerHTML = `
+                    <div class="info">
+                        <h4>${proj.projectName} ${isDefault ? '(ডিফল্ট)' : ''}</h4>
+                        <p>Project ID: ${proj.projectId}</p>
+                    </div>
+                    <div class="actions">
+                        ${!isDefault ? `<button class="modal-footer button btn-danger deleteBtn" data-id="${proj.id}"><i class="fas fa-trash-alt"></i></button>` : ''}
+                    </div>`;
+                listEl.appendChild(item);
+            });
+
+            listEl.querySelectorAll('.deleteBtn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const projectId = e.currentTarget.dataset.id;
+                    showModal({
+                        type: 'delete',
+                        title: 'আপনি কি নিশ্চিত?',
+                        message: 'আপনি এই Firebase প্রোজেক্ট কনফিগারেশনটি মুছে ফেলছেন।',
+                        onConfirm: async () => {
+                            const docRef = db.collection('_configs').doc('firebase');
+                            const doc = await docRef.get();
+                            let currentProjects = doc.data().projects || [];
+                            const updatedProjects = currentProjects.filter(p => p.id !== projectId);
+                            await docRef.set({ projects: updatedProjects });
+                            showModal({type: 'success', title: 'সফল', message: 'প্রোজেক্ট মুছে ফেলা হয়েছে।'});
+                            await loadAndDisplayFirebaseProjects();
+                            await populateFirebaseSwitcher();
+                        }
+                    });
+                });
+            });
+        } catch (error) {
+            console.error("Error loading Firebase projects:", error);
+            listEl.innerHTML = `<p style="color: var(--danger-color); text-align: center;">প্রোজেক্ট তালিকা লোড করা যায়নি।</p>`;
+        }
+    }
+
     // --- MODAL ---
     function showModal({ type, title, message, onConfirm }) {
         const modalHeader = document.getElementById('modalHeader'); const modalBody = document.getElementById('modalBody'); const modalFooter = document.getElementById('modalFooter');
@@ -2651,7 +3163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             (institution.classes || []).forEach(cls => { if (cls.students && cls.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="${cls.id}">শ্রেণী: ${cls.name}</a>`; } });
             if (printOptions.innerHTML !== '') { printOptions.innerHTML += `<hr style="margin: 5px 0; border-color: var(--border-color);"><a href="#" data-print-target="all"><b>সকল শ্রেণী প্রিন্ট করুন</b></a>`; }
             
-            // পরিবর্তন ২: 'সকল শ্রেণী' প্রিন্ট সমস্যার সমাধান
             printOptions.querySelectorAll('a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); handlePrint(e.currentTarget.dataset.printTarget); }); });
         }
 
@@ -2989,11 +3500,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function exportToPDF(headers, data, title, institutionName, address) { 
         const { jsPDF } = window.jspdf; 
         const doc = new jsPDF(); 
-        
-        // jsPDF এর জন্য বাংলা ফন্ট যোগ করা (Bornomala ফন্ট ব্যবহার করা হচ্ছে)
-        // দ্রষ্টব্য: এই ফন্টটি আপনার প্রোজেক্টে থাকতে হবে এবং সঠিকভাবে লিঙ্ক করতে হবে।
-        // বিকল্পভাবে, Google Fonts থেকে একটি Base64 ভার্সন ব্যবহার করা যেতে পারে।
-        // এখানে একটি উদাহরণ দেওয়া হলো।
         doc.addFont('Bornomala.ttf', 'Bornomala', 'normal'); 
         doc.setFont('Bornomala'); 
 
@@ -3007,7 +3513,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startY: 35, 
             theme: 'grid', 
             styles: { 
-                font: 'Bornomala', // এখানে ফন্টের নাম উল্লেখ করা জরুরি
+                font: 'Bornomala',
                 halign: 'center',
                 fontStyle: 'normal'
             }, 
@@ -3229,7 +3735,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LOGIN & INITIALIZATION ---
-    // পরিবর্তন ১: লগইন পাসওয়ার্ড টগল ফাংশনালিটি
     if(loginPasswordToggle) {
         loginPasswordToggle.addEventListener('click', () => {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -3299,28 +3804,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }); 
     });
 
+    async function populateFirebaseSwitcher() {
+        const container = document.getElementById('firebaseSwitcherContainer');
+        if (!container) return;
+        
+        try {
+            const doc = await db.collection('_configs').doc('firebase').get();
+            const projects = (doc.exists && doc.data().projects) ? doc.data().projects : [];
+            const allProjects = [defaultConfig, ...projects];
+            
+            let storedConfig = sessionStorage.getItem('selectedFirebaseConfig');
+            let currentProjectId = storedConfig ? JSON.parse(storedConfig).projectId : defaultConfig.projectId;
+
+            let optionsHTML = allProjects.map(proj => 
+                `<option value='${proj.projectId}' ${proj.projectId === currentProjectId ? 'selected' : ''}>
+                    ${proj.projectName}
+                </option>`
+            ).join('');
+
+            container.innerHTML = `<select id="firebaseProjectSwitcher">${optionsHTML}</select>`;
+
+            document.getElementById('firebaseProjectSwitcher').addEventListener('change', (e) => {
+                const selectedProjectId = e.target.value;
+                const selectedProjectConfig = allProjects.find(p => p.projectId === selectedProjectId);
+                sessionStorage.setItem('selectedFirebaseConfig', JSON.stringify(selectedProjectConfig));
+                location.reload();
+            });
+
+        } catch (error) {
+            console.error("Could not populate Firebase switcher:", error);
+            container.innerHTML = '';
+        }
+    }
+
+
     function setupUIForRole(role) {
         const dashboardLink = document.querySelector('.sidebar-nav a[data-view="dashboard"]');
         const usersLink = document.querySelector('.sidebar-nav a[data-view="users"]');
         const createAdminLink = document.querySelector('.sidebar-nav a[data-view="create-admin"]');
         const settingsLink = document.querySelector('.sidebar-nav a[data-view="settings"]');
+        const cloudinaryLink = document.querySelector('.sidebar-nav a[data-view="cloudinary-settings"]');
+        const firebaseLink = document.querySelector('.sidebar-nav a[data-view="firebase-settings"]');
+        const firebaseSwitcher = document.getElementById('firebaseSwitcherContainer');
         
         if (role === 'subAdmin') {
-            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-home"></i> হোম`;
+            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-home"></i> Home`;
             if(usersLink) usersLink.parentElement.style.display = 'none';
             if(createAdminLink) createAdminLink.parentElement.style.display = 'none';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
-        } else {
-            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড`;
+            if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'none';
+            if(firebaseLink) firebaseLink.parentElement.style.display = 'none';
+            if(firebaseSwitcher) firebaseSwitcher.style.display = 'none';
+        } else { // mainAdmin
+             // The menu is already in English from the HTML change, so no JS modification is needed here.
             if(usersLink) usersLink.parentElement.style.display = 'block';
             if(createAdminLink) createAdminLink.parentElement.style.display = 'block';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
+            if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'block';
+            if(firebaseLink) firebaseLink.parentElement.style.display = 'block';
+            if(firebaseSwitcher) firebaseSwitcher.style.display = 'block';
+            populateFirebaseSwitcher();
         }
     }
 
     function initApp() {
         applyTheme(localStorage.getItem('theme') || 'light');
-        if (window.innerWidth >= 1024) { sidebar.classList.remove('collapsed'); } else { sidebar.classList.add('collapsed'); }
+        
+        // --- পরিবর্তন ২: অ্যাপ শুরু হওয়ার সময় আইকন সেট করা ---
+        const toggleIcon = menuToggleBtn.querySelector('i');
+        if (window.innerWidth >= 1024) {
+            sidebar.classList.remove('collapsed');
+            toggleIcon.classList.remove('fa-bars');
+            toggleIcon.classList.add('fa-chevron-left');
+        } else {
+            sidebar.classList.add('collapsed');
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-bars');
+        }
         
         const userRole = sessionStorage.getItem('userRole');
         setupUIForRole(userRole);
