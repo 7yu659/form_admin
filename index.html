@@ -1575,10 +1575,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Firebase Initialization ---
-    // পরিবর্তন ২: ডাইনামিক ফায়ারবেস কনফিগারেশন
     let db;
 
-    // ডিফল্ট কনফিগারেশন
     const defaultConfig = {
         apiKey: "AIzaSyD9BwVMQy5lX63-Lnsy_8oBw4rfoROp4Ec",
         authDomain: "data-collection-app-c055e.firebaseapp.com",
@@ -1586,24 +1584,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         storageBucket: "data-collection-app-c055e.appspot.com",
         messagingSenderId: "856960918481",
         appId: "1:856960918481:web:053c011242460f16d7b6f0",
-        projectName: "Default Project" // একটি নাম যোগ করা হলো
+        projectName: "Default Project"
     };
 
     async function initializeFirebase() {
         if (firebase.apps.length) {
             await firebase.app().delete();
         }
-
         let selectedConfig = defaultConfig;
         const storedConfig = sessionStorage.getItem('selectedFirebaseConfig');
         if (storedConfig) {
-            try {
-                selectedConfig = JSON.parse(storedConfig);
-            } catch (e) {
-                console.error("Failed to parse stored Firebase config, using default.", e);
-            }
+            try { selectedConfig = JSON.parse(storedConfig); } catch (e) { console.error("Failed to parse stored Firebase config.", e); }
         }
-        
         firebase.initializeApp(selectedConfig);
         db = firebase.firestore();
     }
@@ -1615,8 +1607,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allUsers = [];
     let allSubAdmins = [];
     let currentView = 'dashboard';
-    let currentViewId = null; // Used for institution ID, user ID etc.
-    let unsubscribeListeners = []; // To store realtime listener functions
+    let currentViewId = null; 
+    // --- পরিবর্তন: রিয়েল-টাইম লিসেনার আনসাবস্ক্রাইব করার জন্য অ্যারে ---
+    let unsubscribeListeners = []; 
     
     const placeholderImageSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTIxIDE5VjVjMC0xLjEtLjktMi0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnpNOC41IDEyLjVsMi41IDMuMDFMMTMuNSA5bDQuNSA2SDV6Ii8+PC9zdmc+`;
     const placeholderUserSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+`;
@@ -1639,19 +1632,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errorMessage = document.getElementById('errorMessage');
     const logoutBtn = document.getElementById('logoutBtn');
     const preloader = document.getElementById('preloader');
-    
     const loginPasswordToggle = document.getElementById('loginPasswordToggle');
-
     const searchToggleBtn = document.getElementById('searchToggleBtn');
     const appHeader = document.getElementById('appHeader');
-    
     const imagePreviewModal = document.getElementById('imagePreviewModal');
     const imagePreviewCloseBtn = document.getElementById('imagePreviewCloseBtn');
     const previewImage = document.getElementById('previewImage');
     const previewCaption = document.getElementById('previewCaption');
     const shareBtn = document.getElementById('shareBtn');
     const downloadImageBtn = document.getElementById('downloadImageBtn');
-
     const downloadModal = document.getElementById('downloadModal');
     const downloadModalCloseBtn = document.getElementById('downloadModalCloseBtn');
     const downloadModalNextBtn = document.getElementById('downloadModalNextBtn');
@@ -1660,11 +1649,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const downloadStep2 = document.getElementById('downloadStep2');
     const downloadClassList = document.getElementById('downloadClassList');
     const downloadFormatGrid = document.getElementById('downloadFormatGrid');
-
     const assignmentModal = document.getElementById('assignmentModal');
     const closeAssignmentModalBtn = document.getElementById('closeAssignmentModalBtn');
     const saveAssignmentBtn = document.getElementById('saveAssignmentBtn');
-    
     const credentialLoginModal = document.getElementById('credentialLoginModal');
     const credentialModalCloseBtn = document.getElementById('credentialModalCloseBtn');
 
@@ -1673,7 +1660,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return String(num).replace(/\d/g, d => bengaliDigits[d]);
     }
     
+    // --- পরিবর্তন: রিয়েল-টাইম ডেটা লোড করার নতুন ফাংশন ---
     function setupRealtimeListeners() {
+        // আগের লিসেনারগুলো মুছে ফেলা হচ্ছে
         unsubscribeListeners.forEach(unsubscribe => unsubscribe());
         unsubscribeListeners = [];
 
@@ -1721,7 +1710,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         unsubscribeListeners.push(institutionsUnsubscribe);
     }
     
+    // --- পরিবর্তন: বর্তমান ভিউ পুনরায় রেন্ডার করার জন্য নতুন ফাংশন ---
     function rerenderCurrentView() {
+        // যদি কোনো মডাল খোলা থাকে, তবে ভিউ রিরেন্ডার হবে না
         if (customModal.classList.contains('active') || downloadModal.classList.contains('active') || assignmentModal.classList.contains('active')) {
             return; 
         }
@@ -1774,7 +1765,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'settings':
                 renderSettingsView();
                 break;
-            // পরিবর্তন ২: নতুন ভিউ রেন্ডারার যোগ করা হলো
             case 'cloudinary-settings':
                 renderCloudinarySettingsView();
                 break;
@@ -1814,7 +1804,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); nightModeToggle.checked = theme === 'dark'; }
     nightModeToggle.addEventListener('change', () => { const theme = nightModeToggle.checked ? 'dark' : 'light'; localStorage.setItem('theme', theme); applyTheme(theme); });
     
-    // --- পরিবর্তন ২: সাইডবার টগল ফাংশন আপডেট করা হলো ---
     function handleSidebar() {
         const toggleIcon = menuToggleBtn.querySelector('i');
         if (window.innerWidth < 1024) {
@@ -1822,7 +1811,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             overlay.classList.toggle('active');
         } else {
             sidebar.classList.toggle('collapsed');
-            // আইকন পরিবর্তন
             if (sidebar.classList.contains('collapsed')) {
                 toggleIcon.classList.remove('fa-chevron-left');
                 toggleIcon.classList.add('fa-bars');
@@ -1952,11 +1940,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
-             // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
             const formattedDate = joinedDate.toLocaleString('en-US', options);
             cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
-            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
             cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
             
             card.appendChild(cardContent);
@@ -2257,11 +2243,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
 
-            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
             const formattedDate = joinedDate.toLocaleString('en-US', options);
             cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
-            // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
 
             cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
             
@@ -2360,7 +2344,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         renderSubAdminCards();
 
-        // --- পরিবর্তন ১: নতুন পাসওয়ার্ড টগল বাটনের জন্য ইভেন্ট লিসেনার ---
         const newPasswordInput = document.getElementById('newPassword');
         const newPasswordToggle = document.getElementById('newPasswordToggle');
         if(newPasswordToggle) {
@@ -2371,8 +2354,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 newPasswordToggle.querySelector('i').classList.toggle('fa-eye-slash');
             });
         }
-        // --- পরিবর্তন শেষ ---
-
 
         document.getElementById('openAssignUserModalBtn').addEventListener('click', () => {
             const assignedIds = document.getElementById('assignedUserIdsInput').value.split(',').filter(Boolean);
@@ -2439,7 +2420,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             
-            // --- পরিবর্তন ২: সাব-অ্যাডমিন কার্ডে তারিখ যোগ করা শুরু ---
             const createdDate = admin.createdAt && admin.createdAt.toDate ? admin.createdAt.toDate() : new Date();
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
             const formattedDate = createdDate.toLocaleString('en-US', options);
@@ -2450,7 +2430,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <p><i class="fas fa-users"></i> পরিচালনা করে: ${convertToBengaliNumber(assignedIds.length)} জন ব্যবহারকারী</p>
                     <p><i class="fas fa-clock"></i> Created: ${formattedDate}</p>
                 </div>`;
-            // --- পরিবর্তন ২: সাব-অ্যাডমিন কার্ডে তারিখ যোগ করা শেষ ---
             
             cardContent.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -2519,11 +2498,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cardContent.className = 'card-content';
                 const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
                 
-                 // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শুরু ---
                 const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
                 const formattedDate = joinedDate.toLocaleString('en-US', options);
                 cardContent.innerHTML = `<h3><i class="fas fa-user-circle"></i> ${user.name}</h3><p><i class="fas fa-phone-alt"></i> ${user.id}</p><p><i class="fas fa-clock"></i> Joined: ${formattedDate}</p>`;
-                // --- পরিবর্তন ২: তারিখ ফরম্যাট পরিবর্তন শেষ ---
                 
                 cardContent.addEventListener('click', () => navigateTo('userDashboard', user.id));
                 
@@ -2752,6 +2729,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const formConfig = institution.formConfiguration || getDefaultFormConfig();
         const settingsContainer = document.getElementById('fieldSettingsContainer');
 
+        // --- পরিবর্তন: সেটিংস কনটেইনারের নতুন গঠন ---
         settingsContainer.innerHTML = `
             <div class="field-settings-container">
                 <h4>প্রতিষ্ঠান সম্পর্কিত ফিল্ড</h4>
@@ -2781,6 +2759,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    // --- পরিবর্তন: renderFieldEditorList ফাংশনে institutions এর জন্য কাস্টমাইজেশন ---
     function renderFieldEditorList(fields, containerId, type) {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -2794,20 +2773,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const isStudentField = type === 'student';
             const isCustomField = isStudentField && field.id.startsWith('customField');
+            
+            // প্রতিষ্ঠানের ফিল্ড ডিলিট বা রি-অর্ডার করা যাবে না
             const deleteBtnHtml = isCustomField ? `<button class="delete-field-btn"><i class="fas fa-trash-alt"></i></button>` : '';
-            const requiredCheckboxDisabled = field.type === 'file';
-
-            listItem.innerHTML = `
-                <i class="fas fa-grip-vertical drag-handle"></i>
-                <input type="text" class="field-label-input" value="${field.label}">
-                <div class="field-controls">
-                    <label><input type="checkbox" class="field-enabled" ${field.enabled ? 'checked' : ''}> চালু</label>
-                    <label><input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} ${requiredCheckboxDisabled ? 'disabled' : ''}> আবশ্যক</label>
-                </div>
+            const orderButtonsHtml = isStudentField ? `
                 <div class="order-buttons">
                     <button class="order-up" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
                     <button class="order-down" ${index === fields.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                </div>` : '';
+            const dragHandleHtml = isStudentField ? `<i class="fas fa-grip-vertical drag-handle"></i>` : '';
+
+
+            listItem.innerHTML = `
+                ${dragHandleHtml}
+                <input type="text" class="field-label-input" value="${field.label}" ${!isStudentField ? 'readonly' : ''}>
+                <div class="field-controls">
+                    <label><input type="checkbox" class="field-enabled" ${field.enabled ? 'checked' : ''}> চালু</label>
+                    <label><input type="checkbox" class="field-required" ${field.required ? 'checked' : ''} ${field.type === 'file' ? 'disabled' : ''}> আবশ্যক</label>
                 </div>
+                ${orderButtonsHtml}
                 ${deleteBtnHtml}
             `;
             listContainer.appendChild(listItem);
@@ -2828,19 +2812,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
     async function saveAndReRenderFields(institutionId) { 
         await saveFormSettings(institutionId, true); 
         const institution = allInstitutions.find(inst => inst.id === institutionId);
         renderFieldsForEditing(institution); 
     }
+
+    // --- পরিবর্তন: saveFormSettings ফাংশন উভয় প্রকার ফিল্ড সেভ করার জন্য আপডেট করা হলো ---
     async function saveFormSettings(institutionId, silent = false) { 
         const newFormConfig = { institutionFields: [], studentFields: [] };
         
         document.querySelectorAll('#institutionFieldsList .field-list-item').forEach((item, index) => {
-            newFormConfig.institutionFields.push({ id: item.dataset.id, type: item.dataset.type, label: item.querySelector('.field-label-input').value, enabled: item.querySelector('.field-enabled').checked, required: item.querySelector('.field-required').checked, order: index + 1 });
+            newFormConfig.institutionFields.push({ 
+                id: item.dataset.id, 
+                type: item.dataset.type, 
+                label: item.querySelector('.field-label-input').value, 
+                enabled: item.querySelector('.field-enabled').checked, 
+                required: item.querySelector('.field-required').checked, 
+                order: index + 1 
+            });
         });
         document.querySelectorAll('#studentFieldsList .field-list-item').forEach((item, index) => {
-            newFormConfig.studentFields.push({ id: item.dataset.id, type: item.dataset.type, label: item.querySelector('.field-label-input').value, enabled: item.querySelector('.field-enabled').checked, required: item.querySelector('.field-required').checked, order: index + 1 });
+            newFormConfig.studentFields.push({ 
+                id: item.dataset.id, 
+                type: item.dataset.type, 
+                label: item.querySelector('.field-label-input').value, 
+                enabled: item.querySelector('.field-enabled').checked, 
+                required: item.querySelector('.field-required').checked, 
+                order: index + 1 
+            });
         });
 
         try {
@@ -2851,14 +2852,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!silent) showModal({ type: 'danger', title: 'ত্রুটি', message: 'সেটিংস সেভ করা সম্ভব হয়নি।' });
         }
     }
+
+    // --- পরিবর্তন: User App এর সাথে মিল রেখে ডিফল্ট কনফিগারেশন আপডেট করা হলো ---
     function getDefaultFormConfig() { 
         return {
-            institutionFields: [ { id: "institutionName", label: "প্রতিষ্ঠানের নাম", type: "text", enabled: true, required: true, order: 1 }, { id: "institutionAddress", label: "প্রতিষ্ঠানের ঠিকানা", type: "text", enabled: true, required: false, order: 2 }, { id: "institutionNumber", label: "প্রতিষ্ঠানের ফোন নম্বর", type: "tel", enabled: true, required: false, order: 3 }, { id: "institutionLogo", label: "প্রতিষ্ঠানের লোগো", type: "file", enabled: true, required: false, order: 4 }, { id: "institutionAdvice", label: "উপদেশ বা বাণী", type: "textarea", enabled: true, required: false, order: 5 }, { id: "institutionConclusion", label: "কি সমাপনী", type: "textarea", enabled: true, required: false, order: 6 } ],
-            studentFields: [ { id: "studentName", label: "শিক্ষার্থীর নাম", type: "text", enabled: true, required: true, order: 1 }, { id: "fatherName", label: "পিতার নাম", type: "text", enabled: true, required: true, order: 2 }, { id: "studentAddress", label: "ঠিকানা", type: "text", enabled: true, required: true, order: 3 }, { id: "studentMobile", label: "মোবাইল নম্বর", type: "tel", enabled: true, required: false, order: 4 }, { id: "studentPhoto", label: "শিক্ষার্থীর ছবি", type: "file", enabled: true, required: false, order: 5 } ]
+            institutionFields: [ 
+                { id: "institutionName", label: "প্রতিষ্ঠানের নাম", type: "text", enabled: true, required: true, order: 1 }, 
+                { id: "institutionAddress", label: "প্রতিষ্ঠানের ঠিকানা", type: "text", enabled: true, required: false, order: 2 }, 
+                { id: "institutionNumber", label: "প্রতিষ্ঠানের ফোন নম্বর", type: "tel", enabled: true, required: false, order: 3 }, 
+                { id: "institutionLogo", label: "প্রতিষ্ঠানের লোগো", type: "file", enabled: true, required: false, order: 4 }, 
+                { id: "institutionAdvice", label: "উপদেশ বা বাণী", type: "textarea", enabled: true, required: false, order: 5 }, 
+                { id: "institutionConclusion", label: "কি সমাপনী", type: "textarea", enabled: true, required: false, order: 6 } 
+            ],
+            studentFields: [ 
+                { id: "studentName", label: "শিক্ষার্থীর নাম", type: "text", enabled: true, required: true, order: 1 }, 
+                { id: "fatherName", label: "পিতার নাম", type: "text", enabled: true, required: true, order: 2 }, 
+                { id: "studentAddress", label: "ঠিকানা", type: "text", enabled: true, required: true, order: 3 }, 
+                { id: "dateOfBirth", label: "জন্ম তারিখ", type: "text", enabled: true, required: false, order: 4 }, 
+                { id: "bloodGroup", label: "রক্তের গ্রুপ", type: "text", enabled: true, required: false, order: 5 },
+                { id: "studentMobile", label: "মোবাইল নম্বর", type: "tel", enabled: true, required: false, order: 6 }, 
+                { id: "studentPhoto", label: "শিক্ষার্থীর ছবি", type: "file", enabled: true, required: false, order: 7 } 
+            ]
         };
     }
     
-    // পরিবর্তন ২: নতুন রেন্ডার ফাংশন
     async function renderCloudinarySettingsView() {
         mainContent.innerHTML = `
             <div class="page-header">
@@ -2912,7 +2929,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let accounts = doc.exists ? doc.data().accounts || [] : [];
                 
                 if (accounts.length === 0) {
-                    newAccount.isActive = true; // প্রথম অ্যাকাউন্টটি স্বয়ংক্রিয়ভাবে সক্রিয় হবে
+                    newAccount.isActive = true; 
                 }
 
                 accounts.push(newAccount);
@@ -2985,7 +3002,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const accountToDelete = accounts.find(acc => acc.id === accountId);
             updatedAccounts = accounts.filter(acc => acc.id !== accountId);
             if (accountToDelete.isActive && updatedAccounts.length > 0) {
-                updatedAccounts[0].isActive = true; // অন্য একটিকে সক্রিয় করুন
+                updatedAccounts[0].isActive = true; 
             }
         }
         
@@ -3035,7 +3052,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 const configObject = JSON.parse(configJson);
-                configObject.projectName = projectName; // নামটি অবজেক্টের মধ্যে সংরক্ষণ করুন
+                configObject.projectName = projectName; 
                 configObject.id = `firebase_${Date.now()}`;
 
                 const docRef = db.collection('_configs').doc('firebase');
@@ -3047,7 +3064,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showModal({type: 'success', title: 'সফল', message: 'Firebase প্রোজেক্ট সফলভাবে যোগ করা হয়েছে।'});
                 e.target.reset();
                 await loadAndDisplayFirebaseProjects();
-                await populateFirebaseSwitcher(); // ড্রপডাউন আপডেট করুন
+                await populateFirebaseSwitcher(); 
             } catch (error) {
                 console.error("Error adding Firebase project:", error);
                 showModal({type: 'danger', title: 'ত্রুটি', message: 'প্রোজেক্ট যোগ করতে সমস্যা হয়েছে। নিশ্চিত করুন যে কনফিগারেশনটি একটি বৈধ JSON।'});
@@ -3796,6 +3813,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: 'আপনি কি নিশ্চিতভাবে লগ আউট করতে চান?', 
             onConfirm: () => { 
                 sessionStorage.clear();
+                // --- পরিবর্তন: রিয়েল-টাইম লিসেনার বন্ধ করা ---
                 unsubscribeListeners.forEach(unsubscribe => unsubscribe()); 
                 unsubscribeListeners = [];
                 window.location.hash = '';
@@ -3855,8 +3873,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'none';
             if(firebaseLink) firebaseLink.parentElement.style.display = 'none';
             if(firebaseSwitcher) firebaseSwitcher.style.display = 'none';
-        } else { // mainAdmin
-             // The menu is already in English from the HTML change, so no JS modification is needed here.
+        } else { 
             if(usersLink) usersLink.parentElement.style.display = 'block';
             if(createAdminLink) createAdminLink.parentElement.style.display = 'block';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
@@ -3870,7 +3887,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function initApp() {
         applyTheme(localStorage.getItem('theme') || 'light');
         
-        // --- পরিবর্তন ২: অ্যাপ শুরু হওয়ার সময় আইকন সেট করা ---
         const toggleIcon = menuToggleBtn.querySelector('i');
         if (window.innerWidth >= 1024) {
             sidebar.classList.remove('collapsed');
@@ -3886,9 +3902,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupUIForRole(userRole);
         
         const initialRoute = parseUrl();
-        renderView(initialRoute.view, initialRoute.id);
-
+        // --- পরিবর্তন: রিয়েল-টাইম লিসেনার চালু করা ---
         setupRealtimeListeners();
+        // প্রথমবার ভিউ রেন্ডার করার জন্য অপেক্ষা করার প্রয়োজন নেই, কারণ লিসেনার ডেটা নিয়ে আসবে
+        // renderView(initialRoute.view, initialRoute.id);
     }
     
     function checkLoginStatus() {
