@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -24,12 +25,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <style>
-        /* পরিবর্তন ২: বর্ণমালা ফন্টের জন্য @font-face নিয়ম */
-        /* Bornomala.ttf বা Bornomala.woff2 ফাইলটি এই HTML ফাইলের সাথে একই ফোল্ডারে রাখুন */
+        /* Bornomala font setup */
         @font-face {
             font-family: 'Bornomala';
-            src: url('Bornomala.woff2') format('woff2'), /* আধুনিক ব্রাউজার */
-                 url('Bornomala.ttf') format('truetype'); /* Safari, Android, iOS */
+            src: url('Bornomala.woff2') format('woff2'),
+                 url('Bornomala.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
@@ -43,7 +43,7 @@
             --light-text: #64748b;
             --success-color: #16a34a;
             --danger-color: #dc2626; 
-            --admin-color: #6d28d9; /* New color for admin card */
+            --admin-color: #6d28d9;
             --border-radius: 10px;
             --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
             --box-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -68,7 +68,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Hind Siliguri', sans-serif;
+           font-family: 'Hind Siliguri', sans-serif;
             background: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -118,9 +118,9 @@
             justify-content: center;
             opacity: 1;
             visibility: visible;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            transition: opacity 0.5s ease;
         }
-        .login-screen .video-background { /* পরিবর্তন ১: GIF থেকে video তে পরিবর্তন */
+        .login-screen .video-background {
             position: absolute;
             top: 0;
             left: 0;
@@ -129,7 +129,7 @@
             overflow: hidden;
             z-index: 1;
         }
-        .login-screen video { /* পরিবর্তন ১: GIF থেকে video তে পরিবর্তন */
+        .login-screen video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -162,22 +162,19 @@
             margin-bottom: 25px;
         }
         .login-form .input-group {
-            position: relative; /* পাসওয়ার্ড আইকনকে সঠিকভাবে পজিশন করার জন্য এটি আবশ্যক */
+            position: relative;
             margin-bottom: 20px;
         }
-        /* সংশোধিত অংশ শুরু */
-        .login-form .input-group > i { /* শুধুমাত্র বাম দিকের আইকনকে টার্গেট করার জন্য '>' ব্যবহার করা হয়েছে */
+        .login-form .input-group > i {
             position: absolute;
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: #999;
         }
-        /* সংশোধিত অংশ শেষ */
-        /* পরিবর্তন ১: পাসওয়ার্ড আইকনের জন্য ইনপুট ফিল্ডে ডানদিকে প্যাডিং যোগ করা হলো */
         .login-form input {
             width: 100%;
-            padding: 12px 45px; /* উভয় পাশের আইকনের জন্য প্যাডিং ঠিক করা হলো */
+            padding: 12px 45px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--border-radius);
             background: rgba(0, 0, 0, 0.4);
@@ -190,7 +187,6 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
-        /* পরিবর্তন ১: পাসওয়ার্ড টগল বাটন আগের মতই থাকবে */
         .login-form .password-toggle-btn {
             position: absolute;
             right: 15px;
@@ -226,7 +222,6 @@
             display: none;
         }
         
-        /* --- পরিবর্তন ১: নতুন স্টাইল যোগ করা হলো --- */
         .contact-info {
             margin-top: 25px;
             text-align: center;
@@ -251,7 +246,6 @@
             color: #ffffff;
             transform: scale(1.1);
         }
-        /* --- পরিবর্তন শেষ --- */
 
 
         .admin-layout { 
@@ -325,19 +319,17 @@
 
         .content-wrapper { width: 100%; transition: margin-left var(--transition); }
         
-        /* পরিবর্তন ২: হেডারকে স্থির (sticky) রাখার জন্য স্টাইল আপডেট করা হলো */
         .app-header {
             background-color: var(--card-background); 
             padding: 20px 30px;
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid var(--border-color); box-shadow: var(--box-shadow);
-            position: sticky; /* হেডারকে স্থির করা হলো */
-            top: 0; /* একেবারে উপরে স্থির করা হলো */
+            position: sticky;
+            top: 0;
             z-index: 1000;
         }
         .menu-toggle { background: transparent; border: none; color: var(--primary-color); font-size: 1.8rem; cursor: pointer; }
         
-        /* --- পরিবর্তন ২: মেনু টগল আইকনের জন্য ট্রানজিশন যোগ করা হলো --- */
         .menu-toggle i {
             transition: transform 0.3s ease;
         }
@@ -432,10 +424,9 @@
             }
         }
         
-        /* পরিবর্তন ২: ডেস্কটপ ভিউতে হেডারকে স্থির রাখার জন্য position: relative পরিবর্তন করে sticky করা হলো */
         @media (min-width: 769px) {
             .app-header {
-                 position: sticky; /* অ্যাবসোলুট চাইল্ডের জন্য এবং হেডার স্থির রাখার জন্য */
+                 position: sticky;
                  top: 0;
             }
             .search-bar {
@@ -567,26 +558,23 @@
             transition: var(--transition);
         }
         
-        /* --- পরিবর্তন ১: আইকন হোভার স্টাইল উন্নত করা শুরু --- */
         .card-action-btn:hover {
             background-color: var(--primary-color);
-            color: white !important; /* assures icon is white on hover */
+            color: white !important;
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
         }
 
-        .card-action-btn.action-delete,
-        .table-actions .delete-btn {
+        .card-action-btn.action-delete {
             color: var(--danger-color);
             background-color: rgba(220, 38, 38, 0.1);
             border-color: rgba(220, 38, 38, 0.2);
         }
         
-        .card-action-btn.action-delete:hover,
-        .table-actions .delete-btn:hover {
+        .card-action-btn.action-delete:hover {
             background-color: var(--danger-color);
             border-color: var(--danger-color);
-            color: white !important; /* assures icon is white on hover */
+            color: white !important;
             box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
         }
         
@@ -609,7 +597,6 @@
             background-color: var(--danger-color);
             border-color: var(--danger-color);
         }
-        /* --- পরিবর্তন ১: আইকন হোভার স্টাইল উন্নত করা শেষ --- */
         
         .routine-container { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 25px; margin-bottom: 25px; }
         
@@ -635,6 +622,9 @@
             justify-content: center;
             position: relative;
             padding: 0 70px;
+        }
+        .routine-header .header-content.no-logo {
+            padding: 0;
         }
         .routine-header .institution-logo {
             position: absolute;
@@ -720,12 +710,9 @@
         .dropdown-menu a:hover { background-color: var(--light-bg); color: var(--primary-color); }
 
         .routine-table-wrapper { overflow-x: auto; }
-        .routine-table { width: 100%; border-collapse: collapse; text-align: center; table-layout: fixed; }
+        .routine-table { width: 100%; border-collapse: collapse; text-align: center; }
         .routine-table {
             font-family: 'Bornomala', 'Hind Siliguri', sans-serif;
-        }
-        .routine-table th:first-child, .routine-table td:first-child {
-            width: 60px;
         }
         
         .routine-table th, .routine-table td { border: 1px solid var(--border-color); padding: 12px; }
@@ -740,11 +727,76 @@
             max-width: none;
         }
 
+        .resizable-table th {
+            position: relative;
+        }
+        .resizer {
+            position: absolute;
+            top: 0;
+            right: -2.5px;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            user-select: none;
+            z-index: 1;
+        }
+        .resizer:hover, .resizing {
+            background-color: var(--primary-color);
+        }
+
+        /* রিসাইজিং গাইডের জন্য নতুন স্টাইল */
+        .resizing-guide {
+            position: fixed;
+            width: 2px;
+            background-color: var(--primary-color);
+            opacity: 0.7;
+            z-index: 9999;
+        }
+
+
         .routine-table .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin: auto; cursor: pointer; transition: transform 0.2s; }
         .routine-table .student-photo:hover { transform: scale(1.1); }
-        .table-actions button { background: transparent; border: none; cursor: pointer; font-size: 1rem; margin: 0 5px; transition: color 0.2s; }
+        
+        /* পরিবর্তন ২: টেবিল অ্যাকশন বাটনের স্টাইল আপডেট */
+        .table-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .table-actions button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0;
+            transition: color 0.2s, transform 0.2s;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-actions button:hover {
+            transform: scale(1.1);
+            background-color: var(--light-bg);
+        }
         .table-actions .edit-btn { color: var(--primary-color); }
         .table-actions .save-btn { color: var(--success-color); }
+
+        .table-actions .up-btn, .table-actions .down-btn {
+            color: var(--light-text);
+        }
+        .table-actions button:disabled {
+            color: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+            background-color: transparent;
+        }
+        [data-theme="dark"] .table-actions button:disabled {
+            color: #4a4a4a;
+        }
         
         .truncate-text {
             white-space: nowrap;
@@ -787,7 +839,7 @@
         .modal-header .icon.info { color: var(--primary-color); }
         .modal-header h3 { font-size: 1.4rem; color: var(--text-color); }
         .modal-body { text-align: center; color: var(--light-text); margin-bottom: 25px; line-height: 1.7; white-space: pre-wrap; }
-        .modal-body .form-group { text-align: left; margin-bottom: 15px; } /* Modal form styles */
+        .modal-body .form-group { text-align: left; margin-bottom: 15px; }
         .modal-body label { font-weight: 600; display: block; margin-bottom: 5px; }
         .modal-body input { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .modal-body textarea { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); min-height: 100px; font-family: 'Hind Siliguri', sans-serif; }
@@ -804,7 +856,6 @@
         .modal-footer .btn-secondary { background-color: var(--light-bg); color: var(--text-color); border: 1px solid var(--border-color); }
         .modal-footer button:hover { opacity: 0.85; }
 
-        /* পরিবর্তন ৩: সাব-অ্যাডমিন ক্রেডেনশিয়াল মডালের জন্য নতুন স্টাইল */
         .credential-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8);
@@ -916,6 +967,7 @@
         .admin-form .form-group {
             margin-bottom: 20px;
             text-align: left;
+            position: relative;
         }
         .admin-form label {
             display: block;
@@ -955,15 +1007,10 @@
             opacity: 0.9;
         }
         
-        /* --- পরিবর্তন ১: পাসওয়ার্ড টগল বাটনের জন্য নতুন CSS রুল --- */
-        .admin-form .form-group {
-            position: relative;
-        }
         .admin-form .password-toggle-btn {
             position: absolute;
             right: 15px;
-            /* লেবেলের উপরের অংশ থেকে ইনপুটের মাঝামাঝি পজিশন গণনা করা হয়েছে */
-            top: calc(50% + 14px); /* 14px is an adjustment for the label height */
+            top: calc(50% + 14px);
             transform: translateY(-50%);
             background: none;
             border: none;
@@ -973,12 +1020,9 @@
             padding: 0;
             line-height: 1;
         }
-        /* ইনপুট ফিল্ডে ডান দিকে প্যাডিং যোগ করা হয়েছে */
-        .admin-form input[type="password"],
-        .admin-form input[type="text"] {
+        .admin-form .form-group input[type="password"] {
              padding-right: 45px;
         }
-        /* --- পরিবর্তন শেষ --- */
 
 
         .field-settings-container {
@@ -1194,13 +1238,11 @@
             border: 1px solid var(--border-color);
             background-color: var(--card-background);
         }
-        /* পরিবর্তন ২: ইউজার লিস্টে স্ক্রল যুক্ত করার জন্য CSS */
         .user-list {
             list-style: none;
             padding: 10px;
             overflow-y: auto;
             flex-grow: 1;
-            max-height: 150px; /* নির্দিষ্ট উচ্চতা দেওয়া হলো */
         }
         .user-list-item {
             padding: 10px 15px;
@@ -1243,7 +1285,6 @@
             color: white;
         }
 
-        /* পরিবর্তন ২: সেটিংস পেজের জন্য নতুন স্টাইল */
         .settings-card {
             background-color: var(--light-bg);
             padding: 20px;
@@ -1303,18 +1344,18 @@
                 padding: 15px;
             }
             .sub-admin-creator .form-grid {
-                grid-template-columns: 1fr; /* Stack everything in one column */
+                grid-template-columns: 1fr;
             }
             .modal-container, .download-modal-container {
                 padding: 15px;
             }
             .routine-header .header-content {
-                padding: 0 10px; /* Reduce padding to give more space */
-                flex-direction: column; /* Stack logo and text */
+                padding: 0 10px;
+                flex-direction: column;
                 gap: 10px;
             }
             .routine-header .institution-logo {
-                position: static; /* Remove absolute positioning */
+                position: static;
                 transform: none;
             }
             .detail-actions-bar {
@@ -1349,7 +1390,6 @@
                 margin-bottom: 0;
                 page-break-after: always;
             }
-            /* পরিবর্তন ৩: 'সকল শিক্ষার্থী' তালিকার প্রিন্ট স্টাইল নিশ্চিত করা */
             #all-students-print-area.print-area {
                  page-break-after: auto;
             }
@@ -1375,6 +1415,7 @@
                 overflow: visible;
                 text-overflow: clip;
             }
+            .resizer { display: none !important; }
         }
     </style>
 </head>
@@ -1384,9 +1425,7 @@
     </div>
 
     <div class="login-screen" id="loginScreen">
-        <!-- পরিবর্তন ১: img এর পরিবর্তে video ট্যাগ ব্যবহার করা হলো -->
         <div class="video-background">
-            <!-- নিচের src অংশে আপনার ডাউনলোড করা ভিডিও ফাইলের সঠিক পাথ বা লিংক দিন -->
             <video src="login-background.mp4" autoplay loop muted playsinline></video>
         </div>
         <div class="login-box">
@@ -1400,7 +1439,6 @@
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
-                    <!-- পাসওয়ার্ড টগল বাটন আগের মতই থাকবে -->
                     <button type="button" class="password-toggle-btn" id="loginPasswordToggle">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -1408,7 +1446,6 @@
                 <button type="submit" class="btn-login">লগইন করুন</button>
                 <p class="error-message" id="errorMessage">ভুল ইউজারনেম অথবা পাসওয়ার্ড</p>
             </form>
-            <!-- পরিবর্তন ১: নতুন অংশ যোগ করা হলো -->
             <div class="contact-info">
                 <p>বিস্তারিত জানতে</p>
                 <div class="social-icons">
@@ -1417,7 +1454,6 @@
                     <a href="tel:01305359691" title="Call"><i class="fas fa-phone"></i></a>
                 </div>
             </div>
-            <!-- পরিবর্তন শেষ -->
         </div>
     </div>
 
@@ -1425,7 +1461,6 @@
     <div class="admin-layout" id="adminLayout">
         <aside class="sidebar" id="sidebar">
              <div class="sidebar-header"><h2><i class="fas fa-user-shield"></i> অ্যাডমিন প্যানেল</h2></div>
-             <!-- পরিবর্তন ৩: সাইডবার মেনু ইংরেজিতে পরিবর্তন করা শুরু -->
              <ul class="sidebar-nav">
                 <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li><a href="#users" data-view="users"><i class="fas fa-users"></i> Users</a></li>
@@ -1434,7 +1469,6 @@
                 <li><a href="#cloudinary-settings" data-view="cloudinary-settings"><i class="fas fa-cloud-upload-alt"></i> Cloudinary Settings</a></li>
                 <li><a href="#firebase-settings" data-view="firebase-settings"><i class="fas fa-database"></i> Firebase Settings</a></li>
              </ul>
-             <!-- পরিবর্তন ৩: সাইডবার মেনু ইংরেজিতে পরিবর্তন করা শেষ -->
              <div class="sidebar-footer">
                 <div class="theme-switch-wrapper">
                     <i class="fas fa-sun" style="color: var(--light-text);"></i>
@@ -1455,16 +1489,13 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="globalSearchInput" placeholder="এখানে সার্চ করুন...">
                 </div>
-                <!-- পরিবর্তন ২: হেডার অ্যাকশনস এবং ফায়ারবেস সুইচার যোগ করা হলো -->
                 <div class="header-actions">
                     <div class="firebase-switcher-container" id="firebaseSwitcherContainer">
-                        <!-- Firebase project switcher will be dynamically inserted here -->
                     </div>
                 </div>
                  <button class="search-toggle-btn" id="searchToggleBtn"><i class="fas fa-search"></i></button>
             </header>
             <main class="main-content" id="mainContent">
-                <!-- Dynamic Content Goes Here -->
             </main>
         </div>
     </div>
@@ -1477,7 +1508,6 @@
         </div>
     </div>
     
-    <!-- পরিবর্তন ৩: সাব-অ্যাডমিন ক্রেডেনশিয়াল মডালের জন্য নতুন HTML -->
     <div class="credential-modal-overlay" id="credentialLoginModal">
         <div class="credential-modal-box">
             <span class="close-btn" id="credentialModalCloseBtn">&times;</span>
@@ -1563,7 +1593,6 @@
                     </div>
                 </div>
             </div>
-             <!-- পরিবর্তন ২: ডাউনলোড পপ-আপ বাটন উন্নত করা হলো -->
             <div class="download-modal-footer">
                 <button class="modal-footer button btn-secondary" id="downloadModalBackBtn"><i class="fas fa-arrow-left"></i> পূর্ববর্তী</button>
                 <button class="modal-footer button btn-primary" id="downloadModalNextBtn">পরবর্তী <i class="fas fa-arrow-right"></i></button>
@@ -1592,7 +1621,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await firebase.app().delete();
         }
         let selectedConfig = defaultConfig;
-        const storedConfig = sessionStorage.getItem('selectedFirebaseConfig');
+        const storedConfig = localStorage.getItem('selectedFirebaseConfig');
         if (storedConfig) {
             try { selectedConfig = JSON.parse(storedConfig); } catch (e) { console.error("Failed to parse stored Firebase config.", e); }
         }
@@ -1608,7 +1637,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let allSubAdmins = [];
     let currentView = 'dashboard';
     let currentViewId = null; 
-    // --- পরিবর্তন: রিয়েল-টাইম লিসেনার আনসাবস্ক্রাইব করার জন্য অ্যারে ---
     let unsubscribeListeners = []; 
     
     const placeholderImageSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTIxIDE5VjVjMC0xLjEtLjktMi0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnpNOC41IDEyLjVsMi41IDMuMDFMMTMuNSA5bDQuNSA2SDV6Ii8+PC9zdmc+`;
@@ -1660,9 +1688,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return String(num).replace(/\d/g, d => bengaliDigits[d]);
     }
     
-    // --- পরিবর্তন: রিয়েল-টাইম ডেটা লোড করার নতুন ফাংশন ---
     function setupRealtimeListeners() {
-        // আগের লিসেনারগুলো মুছে ফেলা হচ্ছে
         unsubscribeListeners.forEach(unsubscribe => unsubscribe());
         unsubscribeListeners = [];
 
@@ -1710,9 +1736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         unsubscribeListeners.push(institutionsUnsubscribe);
     }
     
-    // --- পরিবর্তন: বর্তমান ভিউ পুনরায় রেন্ডার করার জন্য নতুন ফাংশন ---
     function rerenderCurrentView() {
-        // যদি কোনো মডাল খোলা থাকে, তবে ভিউ রিরেন্ডার হবে না
         if (customModal.classList.contains('active') || downloadModal.classList.contains('active') || assignmentModal.classList.contains('active')) {
             return; 
         }
@@ -1749,7 +1773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         switch (view) {
             case 'dashboard':
-                const userRole = sessionStorage.getItem('userRole');
+                const userRole = localStorage.getItem('userRole');
                 if (userRole === 'subAdmin') {
                     renderSubAdminUserDashboard();
                 } else {
@@ -1913,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     function renderSubAdminUserDashboard() {
-        const loggedInSubAdmin = allSubAdmins.find(admin => admin.username === sessionStorage.getItem('username'));
+        const loggedInSubAdmin = allSubAdmins.find(admin => admin.username === localStorage.getItem('username'));
         if (!loggedInSubAdmin) return;
 
         const assignedUserIds = loggedInSubAdmin.assignedUserIds || [];
@@ -2029,7 +2053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="routine-container print-area" id="all-students-print-area">
                 <div class="routine-header"><h2>সকল শিক্ষার্থীর তালিকা (${convertToBengaliNumber(allStudentsList.length)} জন)</h2></div>
-                <div class="routine-table-wrapper"><table class="routine-table">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
+                <div class="routine-table-wrapper"><table class="routine-table resizable-table">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
             </div>`;
         
         document.getElementById('backToDashboardBtn').addEventListener('click', () => navigateTo('dashboard'));
@@ -2048,6 +2072,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             openDownloadModal('all', dummyInstitution);
         });
+
+        document.querySelectorAll('.resizable-table').forEach(makeTableResizable);
     }
 
     function renderInstitutionDetails(institutionId) {
@@ -2062,6 +2088,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const logoSrc = institution.logoUrl || placeholderImageSVG;
         const logoOnClick = `showImagePreview('${institution.logoUrl || ''}', '${(institution.name || 'Logo').replace(/'/g, "\\'")}')`;
         
+        const formConfig = institution.formConfiguration || getDefaultFormConfig();
+        const logoField = (formConfig.institutionFields || []).find(f => f.id === 'institutionLogo');
+        const showLogo = logoField && logoField.enabled;
+
+        const logoHTML = showLogo ? `<img src="${logoSrc}" alt="Institution Logo" class="institution-logo" onclick="${logoOnClick}">` : '';
+
         const institutionDetailsHTML = `
             <div class="institution-details">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
@@ -2082,8 +2114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <div class="routine-container">
                     <div class="routine-header">
-                        <div class="header-content">
-                            <img src="${logoSrc}" alt="Institution Logo" class="institution-logo" onclick="${logoOnClick}">
+                        <div class="header-content ${!showLogo ? 'no-logo' : ''}">
+                            ${logoHTML}
                             ${institutionDetailsHTML}
                         </div>
                     </div>
@@ -2098,55 +2130,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             const createStudentListHTML = (studentList, title, listId, isClass = false) => {
                 if (!studentList || studentList.length === 0) return '';
                 
-                const formConfig = institution.formConfiguration || getDefaultFormConfig();
-                
-                const enabledStudentFields = (formConfig.studentFields || [])
-                    .filter(f => f.enabled && f.type !== 'file')
-                    .sort((a, b) => a.order - b.order);
+                studentList.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-                const photoFieldEnabled = (formConfig.studentFields || []).some(f => f.id === 'studentPhoto' && f.enabled);
+                const currentFormConfig = institution.formConfiguration || getDefaultFormConfig();
+                const enabledStudentFields = (currentFormConfig.studentFields || []).filter(f => f.enabled && f.type !== 'file').sort((a, b) => a.order - b.order);
+                const photoFieldEnabled = (currentFormConfig.studentFields || []).some(f => f.id === 'studentPhoto' && f.enabled);
 
                 const tableHeaders = ['ক্রমিক'];
-                if (photoFieldEnabled) {
-                    tableHeaders.push('ছবি');
-                }
+                if (photoFieldEnabled) tableHeaders.push('ছবি');
                 tableHeaders.push(...enabledStudentFields.map(f => f.label), 'অ্যাকশন');
                 
-                const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th class=${h === 'অ্যাকশন' ? 'table-actions-col' : ''}>${h}</th>`).join('')}</tr></thead>`;
+                const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
                 
                 let tableRows = studentList.map((student, index) => {
                     const cells = enabledStudentFields.map(field => {
                         const value = student[field.id] || '';
-                        const cellClass = (field.type === 'text' || field.type === 'textarea') ? 'truncate-text' : '';
-                        return `<td data-field="${field.id}" class="${cellClass}" title="${value}">${value}</td>`;
+                        return `<td data-field="${field.id}" class="truncate-text" title="${value}">${value}</td>`;
                     }).join('');
-
                     const classDataAttr = isClass ? `data-class-id="${listId}"` : '';
-                    
                     const studentNameForFunc = (student.studentName || 'student_photo').replace(/'/g, "\\'");
                     const photoSrc = student.studentPhotoUrl || placeholderUserSVG;
                     const studentPhotoOnClick = `showImagePreview('${student.studentPhotoUrl || ''}', '${studentNameForFunc}')`;
-                    
                     const photoCell = photoFieldEnabled ? `<td><img src="${photoSrc}" alt="Photo" class="student-photo" onclick="${studentPhotoOnClick}"></td>` : '';
+                    
+                    const isFirst = index === 0;
+                    const isLast = index === studentList.length - 1;
 
                     return `<tr data-student-id="${student.id}" data-institution-id="${institution.id}" ${classDataAttr}>
                         <td>${convertToBengaliNumber(index + 1)}</td>
                         ${photoCell}
                         ${cells}
-                        <td class="table-actions-col"><div class="table-actions"><button class="edit-btn" title="সম্পাদনা"><i class="fas fa-pencil-alt"></i></button><button class="save-btn hidden" title="সেভ"><i class="fas fa-check"></i></button><button class="delete-btn" title="মুছে ফেলুন"><i class="fas fa-trash-alt"></i></button></div></td>
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button class="up-btn" title="উপরে তুলুন" ${isFirst ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
+                                <button class="down-btn" title="নিচে নামান" ${isLast ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
+                                <button class="edit-btn" title="সম্পাদনা"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="save-btn hidden" title="সেভ"><i class="fas fa-check"></i></button>
+                                <button class="delete-btn" title="মুছে ফেলুন"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
                     </tr>`;
                 }).join('');
 
                 return `
                 <div class="routine-container print-area" id="print-area-${listId}">
                     <div class="routine-header">
-                        <div class="header-content">
-                            <img src="${logoSrc}" alt="Institution Logo" class="institution-logo" onclick="${logoOnClick}">
+                        <div class="header-content ${!showLogo ? 'no-logo' : ''}">
+                            ${logoHTML}
                             ${institutionDetailsHTML}
                         </div>
                         <h2>${title}</h2>
                     </div>
-                    <div class="routine-table-wrapper"><table class="routine-table" id="studentTable-${listId}">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
+                    <div class="routine-table-wrapper"><table class="routine-table resizable-table" id="studentTable-${listId}">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
                 </div>`;
             };
             contentHTML += createStudentListHTML(institution.students, 'শিক্ষার্থীদের তালিকা (সাধারণ)', 'main');
@@ -2165,8 +2200,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div id="student-lists-container">${contentHTML}</div>`;
         }
         attachDetailViewEventListeners(institutionId);
+        document.querySelectorAll('.resizable-table').forEach(makeTableResizable);
     }
     
+    function makeTableResizable(table) {
+        const row = table.querySelector('thead tr');
+        if (!row) return;
+        
+        const cols = Array.from(row.children);
+        table.style.overflow = 'hidden';
+        let tableHeight = table.offsetHeight;
+
+        for (let i = 0; i < cols.length; i++) {
+            const resizer = document.createElement('div');
+            resizer.className = 'resizer';
+            cols[i].appendChild(resizer);
+            
+            let pageX, curCol, nxtCol, curColWidth, nxtColWidth;
+
+            resizer.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+                curCol = e.target.parentElement;
+                nxtCol = curCol.nextElementSibling;
+                pageX = e.pageX;
+                
+                const padding = (parseFloat(getComputedStyle(curCol).paddingLeft) + parseFloat(getComputedStyle(curCol).paddingRight));
+
+                curColWidth = curCol.offsetWidth - padding;
+                if (nxtCol) nxtColWidth = nxtCol.offsetWidth - padding;
+
+                const guide = document.createElement('div');
+                guide.className = 'resizing-guide';
+                guide.style.height = `${table.offsetHeight}px`;
+                guide.style.top = `${table.getBoundingClientRect().top}px`;
+                guide.style.left = `${e.pageX}px`;
+                document.body.appendChild(guide);
+
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+
+                function mouseMoveHandler(e) {
+                    guide.style.left = `${e.pageX}px`;
+                }
+
+                function mouseUpHandler(e) {
+                    document.body.removeChild(guide);
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+
+                    const diffX = e.pageX - pageX;
+                    if (curCol) curCol.style.width = `${curColWidth + diffX}px`;
+                    if (nxtCol) nxtCol.style.width = `${nxtColWidth - diffX}px`;
+                }
+            });
+        }
+    }
+
+
     function renderUserDashboard(userId) {
         if (!userId) { navigateTo('users'); return; }
         const user = allUsers.find(u => u.id === userId);
@@ -2223,7 +2313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         document.getElementById('backBtn').addEventListener('click', () => {
-             const userRole = sessionStorage.getItem('userRole');
+             const userRole = localStorage.getItem('userRole');
              if (userRole === 'subAdmin') {
                 navigateTo('dashboard');
              } else {
@@ -2686,10 +2776,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="routine-container" id="settingsContainer"></div>`;
         
         let institutionsForSettings = [];
-        const userRole = sessionStorage.getItem('userRole');
+        const userRole = localStorage.getItem('userRole');
 
         if (userRole === 'subAdmin') {
-            const currentSubAdmin = allSubAdmins.find(admin => admin.username === sessionStorage.getItem('username'));
+            const currentSubAdmin = allSubAdmins.find(admin => admin.username === localStorage.getItem('username'));
             if (currentSubAdmin) {
                 const assignedUserIds = new Set(currentSubAdmin.assignedUserIds || []);
                 const assignedUsers = allUsers.filter(user => assignedUserIds.has(user.id));
@@ -2729,7 +2819,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const formConfig = institution.formConfiguration || getDefaultFormConfig();
         const settingsContainer = document.getElementById('fieldSettingsContainer');
 
-        // --- পরিবর্তন: সেটিংস কনটেইনারের নতুন গঠন ---
         settingsContainer.innerHTML = `
             <div class="field-settings-container">
                 <h4>প্রতিষ্ঠান সম্পর্কিত ফিল্ড</h4>
@@ -2759,7 +2848,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    // --- পরিবর্তন: renderFieldEditorList ফাংশনে institutions এর জন্য কাস্টমাইজেশন ---
     function renderFieldEditorList(fields, containerId, type) {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -2774,7 +2862,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isStudentField = type === 'student';
             const isCustomField = isStudentField && field.id.startsWith('customField');
             
-            // প্রতিষ্ঠানের ফিল্ড ডিলিট বা রি-অর্ডার করা যাবে না
             const deleteBtnHtml = isCustomField ? `<button class="delete-field-btn"><i class="fas fa-trash-alt"></i></button>` : '';
             const orderButtonsHtml = isStudentField ? `
                 <div class="order-buttons">
@@ -2819,7 +2906,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderFieldsForEditing(institution); 
     }
 
-    // --- পরিবর্তন: saveFormSettings ফাংশন উভয় প্রকার ফিল্ড সেভ করার জন্য আপডেট করা হলো ---
     async function saveFormSettings(institutionId, silent = false) { 
         const newFormConfig = { institutionFields: [], studentFields: [] };
         
@@ -2853,7 +2939,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- পরিবর্তন: User App এর সাথে মিল রেখে ডিফল্ট কনফিগারেশন আপডেট করা হলো ---
     function getDefaultFormConfig() { 
         return {
             institutionFields: [ 
@@ -3122,7 +3207,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- MODAL ---
     function showModal({ type, title, message, onConfirm }) {
         const modalHeader = document.getElementById('modalHeader'); const modalBody = document.getElementById('modalBody'); const modalFooter = document.getElementById('modalFooter');
         modalHeader.innerHTML = ''; modalFooter.innerHTML = '';
@@ -3151,7 +3235,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function hideModal() { customModal.classList.remove('active'); }
     customModal.addEventListener('click', (e) => { if (e.target === customModal) hideModal(); });
 
-    // --- EVENT LISTENERS & HANDLERS ---
     function attachDetailViewEventListeners(institutionId) {
         const backBtn = document.getElementById('backBtn');
         if (backBtn) {
@@ -3315,7 +3398,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- PRINT FUNCTION ---
     function handlePrint(targetId) {
         document.body.classList.add('print-active');
         const allPrintAreas = document.querySelectorAll('.print-area');
@@ -3336,7 +3418,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.remove('print-active');
     }
 
-    // --- EXPORT & DOWNLOAD FUNCTIONS ---
     let currentDownloadHandler = null;
     function openDownloadModal(institutionId, dummyInstitution = null) {
         const institution = dummyInstitution || allInstitutions.find(inst => inst.id === institutionId);
@@ -3768,9 +3849,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const passVal = passwordInput.value;
 
         if (userVal === 'Ebrahim' && passVal === '424311') {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userRole', 'mainAdmin');
-            sessionStorage.setItem('username', userVal);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', 'mainAdmin');
+            localStorage.setItem('username', userVal);
             loginSuccess();
             return;
         }
@@ -3784,10 +3865,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!querySnapshot.empty) {
                 const subAdminData = querySnapshot.docs[0].data();
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userRole', 'subAdmin');
-                sessionStorage.setItem('username', userVal);
-                sessionStorage.setItem('assignedUserIds', (subAdminData.assignedUserIds || []).join(','));
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userRole', 'subAdmin');
+                localStorage.setItem('username', userVal);
+                localStorage.setItem('assignedUserIds', (subAdminData.assignedUserIds || []).join(','));
                 loginSuccess();
             } else {
                 errorMessage.style.display = 'block';
@@ -3812,8 +3893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'লগ আউট নিশ্চিত করুন', 
             message: 'আপনি কি নিশ্চিতভাবে লগ আউট করতে চান?', 
             onConfirm: () => { 
-                sessionStorage.clear();
-                // --- পরিবর্তন: রিয়েল-টাইম লিসেনার বন্ধ করা ---
+                localStorage.clear();
                 unsubscribeListeners.forEach(unsubscribe => unsubscribe()); 
                 unsubscribeListeners = [];
                 window.location.hash = '';
@@ -3831,7 +3911,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const projects = (doc.exists && doc.data().projects) ? doc.data().projects : [];
             const allProjects = [defaultConfig, ...projects];
             
-            let storedConfig = sessionStorage.getItem('selectedFirebaseConfig');
+            let storedConfig = localStorage.getItem('selectedFirebaseConfig');
             let currentProjectId = storedConfig ? JSON.parse(storedConfig).projectId : defaultConfig.projectId;
 
             let optionsHTML = allProjects.map(proj => 
@@ -3845,7 +3925,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('firebaseProjectSwitcher').addEventListener('change', (e) => {
                 const selectedProjectId = e.target.value;
                 const selectedProjectConfig = allProjects.find(p => p.projectId === selectedProjectId);
-                sessionStorage.setItem('selectedFirebaseConfig', JSON.stringify(selectedProjectConfig));
+                localStorage.setItem('selectedFirebaseConfig', JSON.stringify(selectedProjectConfig));
                 location.reload();
             });
 
@@ -3898,18 +3978,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleIcon.classList.add('fa-bars');
         }
         
-        const userRole = sessionStorage.getItem('userRole');
+        const userRole = localStorage.getItem('userRole');
         setupUIForRole(userRole);
         
-        const initialRoute = parseUrl();
-        // --- পরিবর্তন: রিয়েল-টাইম লিসেনার চালু করা ---
         setupRealtimeListeners();
-        // প্রথমবার ভিউ রেন্ডার করার জন্য অপেক্ষা করার প্রয়োজন নেই, কারণ লিসেনার ডেটা নিয়ে আসবে
-        // renderView(initialRoute.view, initialRoute.id);
     }
     
     function checkLoginStatus() {
-        if (sessionStorage.getItem('isLoggedIn') === 'true') { 
+        if (localStorage.getItem('isLoggedIn') === 'true') { 
             loginScreen.classList.add('hidden'); 
             adminLayout.classList.add('visible'); 
             initApp();
