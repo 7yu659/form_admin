@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -55,7 +54,7 @@
             --border-color: #e2e8f0;
         }
         
-        [data-theme="dark"] {
+       [data-theme="dark"] {
             --primary-color: #3b82f6;
             --secondary-color: #2563eb;
             --background-color: #121212;
@@ -744,7 +743,6 @@
             background-color: var(--primary-color);
         }
 
-        /* রিসাইজিং গাইডের জন্য নতুন স্টাইল */
         .resizing-guide {
             position: fixed;
             width: 2px;
@@ -757,7 +755,6 @@
         .routine-table .student-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin: auto; cursor: pointer; transition: transform 0.2s; }
         .routine-table .student-photo:hover { transform: scale(1.1); }
         
-        /* পরিবর্তন ২: টেবিল অ্যাকশন বাটনের স্টাইল আপডেট */
         .table-actions {
             display: flex;
             align-items: center;
@@ -1408,7 +1405,7 @@
             .routine-table th, .routine-table td { border: 1px solid #ccc !important; }
             .routine-table thead { background-color: #f2f2f2 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact;}
             .student-photo { max-width: 40px; max-height: 40px; }
-            .table-actions-col { display: none; }
+            .table-actions-col { display: none !important; }
             .truncate-text {
                 max-width: none;
                 white-space: normal;
@@ -2185,7 +2182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>`;
             };
             contentHTML += createStudentListHTML(institution.students, 'শিক্ষার্থীদের তালিকা (সাধারণ)', 'main');
-            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `শ্রেণী: ${cls.name}`, cls.id, true); });
+            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `${cls.name}`, cls.id, true); });
             const printButtonHTML = `<div style="position: relative;"><button class="action-btn" id="printBtn"><i class="fas fa-print"></i> প্রিন্ট</button><div class="dropdown-menu" id="printOptions" style="right: auto; left: 0; width: 200px;"></div></div>`;
             const imageDownloadButtonHTML = `<div style="position: relative;"><button class="action-btn" id="imageDownloadBtn"><i class="fas fa-images"></i> ছবি ডাউনলোড</button><div class="dropdown-menu" id="imageDownloadOptions"></div></div>`;
             mainContent.innerHTML = `
@@ -2206,53 +2203,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     function makeTableResizable(table) {
         const row = table.querySelector('thead tr');
         if (!row) return;
-        
+
         const cols = Array.from(row.children);
         table.style.overflow = 'hidden';
-        let tableHeight = table.offsetHeight;
 
         for (let i = 0; i < cols.length; i++) {
             const resizer = document.createElement('div');
             resizer.className = 'resizer';
             cols[i].appendChild(resizer);
             
-            let pageX, curCol, nxtCol, curColWidth, nxtColWidth;
+            let pageX, curCol, curColWidth;
 
-            resizer.addEventListener('mousedown', function (e) {
+            const onMouseDown = (e) => {
                 e.preventDefault();
                 curCol = e.target.parentElement;
-                nxtCol = curCol.nextElementSibling;
-                pageX = e.pageX;
-                
-                const padding = (parseFloat(getComputedStyle(curCol).paddingLeft) + parseFloat(getComputedStyle(curCol).paddingRight));
-
-                curColWidth = curCol.offsetWidth - padding;
-                if (nxtCol) nxtColWidth = nxtCol.offsetWidth - padding;
+                pageX = e.type === 'touchstart' ? e.touches[0].pageX : e.pageX;
+                curColWidth = curCol.offsetWidth;
 
                 const guide = document.createElement('div');
                 guide.className = 'resizing-guide';
                 guide.style.height = `${table.offsetHeight}px`;
                 guide.style.top = `${table.getBoundingClientRect().top}px`;
-                guide.style.left = `${e.pageX}px`;
+                guide.style.left = `${(e.type === 'touchstart' ? e.touches[0].pageX : e.pageX)}px`;
                 document.body.appendChild(guide);
 
-                document.addEventListener('mousemove', mouseMoveHandler);
-                document.addEventListener('mouseup', mouseUpHandler);
+                const onMouseMove = (e) => {
+                    const currentX = e.type === 'touchmove' ? e.touches[0].pageX : e.pageX;
+                    guide.style.left = `${currentX}px`;
+                };
 
-                function mouseMoveHandler(e) {
-                    guide.style.left = `${e.pageX}px`;
-                }
-
-                function mouseUpHandler(e) {
+                const onMouseUp = (e) => {
                     document.body.removeChild(guide);
-                    document.removeEventListener('mousemove', mouseMoveHandler);
-                    document.removeEventListener('mouseup', mouseUpHandler);
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    document.removeEventListener('touchmove', onMouseMove);
+                    document.removeEventListener('touchend', onMouseUp);
 
-                    const diffX = e.pageX - pageX;
-                    if (curCol) curCol.style.width = `${curColWidth + diffX}px`;
-                    if (nxtCol) nxtCol.style.width = `${nxtColWidth - diffX}px`;
-                }
-            });
+                    const finalX = e.type === 'touchend' ? e.changedTouches[0].pageX : e.pageX;
+                    const diffX = finalX - pageX;
+                    
+                    if (curCol) {
+                        const newWidth = curColWidth + diffX;
+                        if (newWidth > 30) { // Minimum width
+                            curCol.style.width = `${newWidth}px`;
+                        }
+                    }
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                document.addEventListener('touchmove', onMouseMove, { passive: false });
+                document.addEventListener('touchend', onMouseUp);
+            };
+            
+            resizer.addEventListener('mousedown', onMouseDown);
+            resizer.addEventListener('touchstart', onMouseDown, { passive: false });
         }
     }
 
@@ -3260,7 +3265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const printOptions = document.getElementById('printOptions');
             printOptions.innerHTML = '';
             if (institution.students && institution.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="main">সাধারণ তালিকা</a>`; }
-            (institution.classes || []).forEach(cls => { if (cls.students && cls.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="${cls.id}">শ্রেণী: ${cls.name}</a>`; } });
+            (institution.classes || []).forEach(cls => { if (cls.students && cls.students.length > 0) { printOptions.innerHTML += `<a href="#" data-print-target="${cls.id}">${cls.name}</a>`; } });
             if (printOptions.innerHTML !== '') { printOptions.innerHTML += `<hr style="margin: 5px 0; border-color: var(--border-color);"><a href="#" data-print-target="all"><b>সকল শ্রেণী প্রিন্ট করুন</b></a>`; }
             
             printOptions.querySelectorAll('a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); handlePrint(e.currentTarget.dataset.printTarget); }); });
@@ -3393,10 +3398,52 @@ document.addEventListener('DOMContentLoaded', async () => {
                             } 
                         } 
                     });
+                } else if (e.target.closest('.up-btn')) {
+                    if (row.previousElementSibling) {
+                        row.parentNode.insertBefore(row, row.previousElementSibling);
+                        updateStudentOrder(row.closest('tbody'));
+                    }
+                } else if (e.target.closest('.down-btn')) {
+                    if (row.nextElementSibling) {
+                        row.parentNode.insertBefore(row.nextElementSibling, row);
+                        updateStudentOrder(row.closest('tbody'));
+                    }
                 }
             });
         }
     }
+
+    async function updateStudentOrder(tbody) {
+        const rows = tbody.querySelectorAll('tr');
+        const batch = db.batch();
+
+        rows.forEach((row, index) => {
+            const studentId = row.dataset.studentId;
+            const instId = row.dataset.institutionId;
+            const classId = row.dataset.classId;
+
+            let studentRef;
+            if (classId) {
+                studentRef = db.collection('institutions').doc(instId).collection('classes').doc(classId).collection('students').doc(studentId);
+            } else {
+                studentRef = db.collection('institutions').doc(instId).collection('students').doc(studentId);
+            }
+            batch.update(studentRef, { order: index });
+
+            row.cells[0].textContent = convertToBengaliNumber(index + 1);
+
+            row.querySelector('.up-btn').disabled = (index === 0);
+            row.querySelector('.down-btn').disabled = (index === rows.length - 1);
+        });
+
+        try {
+            await batch.commit();
+        } catch (error) {
+            console.error("Error updating student order: ", error);
+            showModal({ type: 'danger', title: 'ত্রুটি', message: 'শিক্ষার্থীদের ক্রম পরিবর্তন সেভ করা সম্ভব হয়নি।' });
+        }
+    }
+
 
     function handlePrint(targetId) {
         document.body.classList.add('print-active');
@@ -3534,6 +3581,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 exportTitle = `শ্রেণী_${selectedClass.name}`;
             }
         }
+        
+        studentsToExport.sort((a, b) => (a.order || 0) - (b.order || 0));
         return { students: studentsToExport, title: exportTitle };
     }
 
