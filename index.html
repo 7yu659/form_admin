@@ -54,7 +54,7 @@
             --border-color: #e2e8f0;
         }
         
-       [data-theme="dark"] {
+        [data-theme="dark"] {
             --primary-color: #3b82f6;
             --secondary-color: #2563eb;
             --background-color: #121212;
@@ -564,13 +564,15 @@
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
         }
 
-        .card-action-btn.action-delete {
+        .card-action-btn.action-delete,
+        .table-actions .delete-btn {
             color: var(--danger-color);
             background-color: rgba(220, 38, 38, 0.1);
             border-color: rgba(220, 38, 38, 0.2);
         }
         
-        .card-action-btn.action-delete:hover {
+        .card-action-btn.action-delete:hover,
+        .table-actions .delete-btn:hover {
             background-color: var(--danger-color);
             border-color: var(--danger-color);
             color: white !important;
@@ -743,6 +745,7 @@
             background-color: var(--primary-color);
         }
 
+        /* রিসাইজিং গাইডের জন্য নতুন স্টাইল */
         .resizing-guide {
             position: fixed;
             width: 2px;
@@ -1393,7 +1396,7 @@
             .routine-container.print-area:last-of-type {
                 page-break-after: auto;
             }
-            .non-printable { display: none !important; }
+            .non-printable, .print-hidden { display: none !important; }
             
             #editInstDetailsBtn, #saveInstDetailsBtn {
                 display: none !important;
@@ -2137,7 +2140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (photoFieldEnabled) tableHeaders.push('ছবি');
                 tableHeaders.push(...enabledStudentFields.map(f => f.label), 'অ্যাকশন');
                 
-                const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
+                const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th class="${h === 'অ্যাকশন' ? 'table-actions-col non-printable' : ''}">${h}</th>`).join('')}</tr></thead>`;
                 
                 let tableRows = studentList.map((student, index) => {
                     const cells = enabledStudentFields.map(field => {
@@ -2157,7 +2160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <td>${convertToBengaliNumber(index + 1)}</td>
                         ${photoCell}
                         ${cells}
-                        <td class="table-actions-col">
+                        <td class="table-actions-col non-printable">
                             <div class="table-actions">
                                 <button class="up-btn" title="উপরে তুলুন" ${isFirst ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
                                 <button class="down-btn" title="নিচে নামান" ${isLast ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
@@ -2182,7 +2185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>`;
             };
             contentHTML += createStudentListHTML(institution.students, 'শিক্ষার্থীদের তালিকা (সাধারণ)', 'main');
-            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `${cls.name}`, cls.id, true); });
+            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `<span class="print-hidden">শ্রেণী: </span>${cls.name}`, cls.id, true); });
             const printButtonHTML = `<div style="position: relative;"><button class="action-btn" id="printBtn"><i class="fas fa-print"></i> প্রিন্ট</button><div class="dropdown-menu" id="printOptions" style="right: auto; left: 0; width: 200px;"></div></div>`;
             const imageDownloadButtonHTML = `<div style="position: relative;"><button class="action-btn" id="imageDownloadBtn"><i class="fas fa-images"></i> ছবি ডাউনলোড</button><div class="dropdown-menu" id="imageDownloadOptions"></div></div>`;
             mainContent.innerHTML = `
