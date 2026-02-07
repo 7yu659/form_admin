@@ -495,7 +495,20 @@
         }
         .institution-card:hover { transform: translateY(-5px); box-shadow: var(--box-shadow-hover); }
         .institution-card h3 { color: var(--text-color); margin-bottom: 8px; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .institution-card p { font-size: 0.9rem; color: var(--light-text); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        .institution-card p { 
+            font-size: 0.9rem; 
+            color: var(--light-text); 
+            margin-bottom: 15px; 
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+            min-height: 1.4em;
+        }
+        
         .institution-card .student-count { font-weight: 600; color: var(--primary-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; border-top: 1px solid var(--border-color); padding-top: 10px; }
         
         .institution-card-delete-btn {
@@ -745,7 +758,6 @@
             background-color: var(--primary-color);
         }
 
-        /* রিসাইজিং গাইডের জন্য নতুন স্টাইল */
         .resizing-guide {
             position: fixed;
             width: 2px;
@@ -812,6 +824,27 @@
         .user-card h3 { color: var(--text-color); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .user-card p { color: var(--light-text); margin-bottom: 5px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
         
+        /* Presence Badge Style - Real-time Change 1 */
+        .presence-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .user-card:hover .presence-badge {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .presence-badge.new { background-color: var(--accent-color); }
+        .presence-badge.timing { background-color: var(--primary-color); }
+
         .hidden { display: none !important; }
 
         .modal-overlay {
@@ -831,6 +864,59 @@
             transform: scale(0.9);
             transition: transform 0.3s ease;
         }
+        
+        /* UPDATED: Add User Modal Styling - Compact & Professional */
+        .modal-container.modal-small {
+            max-width: 360px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .modal-small .modal-header {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .modal-small .modal-header .icon {
+             font-size: 2rem;
+             margin-bottom: 5px;
+        }
+        .modal-small .modal-header h3 {
+             font-size: 1.25rem;
+             font-weight: 700;
+        }
+        .modal-small .modal-body {
+             margin-bottom: 15px;
+             padding: 0;
+        }
+        .modal-small .form-group {
+             margin-bottom: 0;
+             text-align: left;
+        }
+        .modal-small .form-group label {
+             font-size: 0.9rem;
+             margin-bottom: 8px;
+             color: var(--light-text);
+             display: block;
+        }
+        .modal-small .form-group input {
+             padding: 10px 14px;
+             font-size: 1rem;
+             border: 1px solid var(--border-color);
+             border-radius: 8px;
+             width: 100%;
+             background: var(--light-bg);
+             color: var(--text-color);
+        }
+        .modal-small .modal-footer {
+             gap: 10px;
+             padding-top: 10px;
+        }
+        .modal-small .modal-footer button {
+             padding: 10px;
+             font-size: 0.95rem;
+             border-radius: 6px;
+        }
+
         .modal-overlay.active .modal-container { transform: scale(1); }
         .modal-header { text-align: center; margin-bottom: 15px; }
         .modal-header .icon { font-size: 2.5rem; margin-bottom: 10px; }
@@ -844,7 +930,7 @@
         .modal-body input { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .modal-body textarea { width: 100%; padding: 10px; border-radius: var(--border-radius); border: 1px solid var(--border-color); min-height: 100px; font-family: 'Hind Siliguri', sans-serif; }
 
-        .modal-footer { display: flex; justify-content: center; gap: 15px; }
+        .modal-footer { display: flex; justify: center; gap: 15px; }
         .modal-footer button {
             border: none; border-radius: var(--border-radius);
             padding: 10px 20px; font-weight: 600; cursor: pointer;
@@ -1238,11 +1324,13 @@
             border: 1px solid var(--border-color);
             background-color: var(--card-background);
         }
+        /* User List 3-User Display Logic - Change 1 */
         .user-list {
             list-style: none;
             padding: 10px;
             overflow-y: auto;
             flex-grow: 1;
+            max-height: 150px; /* Approximately 3-4 users visible */
         }
         .user-list-item {
             padding: 10px 15px;
@@ -1253,6 +1341,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            height: 42px; /* Fixed height for consistent measurement */
         }
         .user-list-item:hover {
             background-color: var(--light-bg);
@@ -1326,6 +1415,60 @@
         .settings-list-item .actions {
             display: flex;
             gap: 10px;
+        }
+
+        /* NEW: Searchable Select Styling for Form Settings */
+        .searchable-select-container {
+            position: relative;
+            width: 100%;
+        }
+        .searchable-select-input-wrapper {
+            position: relative;
+        }
+        .searchable-select-input-wrapper input {
+            padding-right: 40px;
+        }
+        .searchable-select-input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        .searchable-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--box-shadow-hover);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+        .searchable-select-dropdown.active {
+            display: block;
+        }
+        .searchable-select-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .searchable-select-item:last-child {
+            border-bottom: none;
+        }
+        .searchable-select-item:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+        .searchable-select-item.no-results {
+            color: var(--danger-color);
+            text-align: center;
+            cursor: default;
         }
 
         @media (max-width: 768px) {
@@ -1464,6 +1607,7 @@
              <ul class="sidebar-nav">
                 <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li><a href="#users" data-view="users"><i class="fas fa-users"></i> Users</a></li>
+                <li id="addUserSidebarLi" class="hidden"><a href="#add-user" id="addUserMenuBtn"><i class="fas fa-plus-circle"></i> Add User</a></li>
                 <li><a href="#create-admin" data-view="create-admin"><i class="fas fa-user-plus"></i> Create Admin</a></li>
                 <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> Form Settings</a></li>
                 <li><a href="#cloudinary-settings" data-view="cloudinary-settings"><i class="fas fa-cloud-upload-alt"></i> Cloudinary Settings</a></li>
@@ -1643,51 +1787,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     const placeholderUserSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+`;
 
 
-    // --- DOM Element References ---
-    const mainContent = document.getElementById('mainContent');
-    const nightModeToggle = document.getElementById('nightModeToggle');
-    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-    const sidebar = document.getElementById('sidebar');
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const overlay = document.getElementById('overlay');
-    const globalSearchInput = document.getElementById('globalSearchInput');
-    const customModal = document.getElementById('customModal');
-    const loginScreen = document.getElementById('loginScreen');
-    const adminLayout = document.getElementById('adminLayout');
-    const loginForm = document.getElementById('loginForm');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const errorMessage = document.getElementById('errorMessage');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const preloader = document.getElementById('preloader');
-    const loginPasswordToggle = document.getElementById('loginPasswordToggle');
-    const searchToggleBtn = document.getElementById('searchToggleBtn');
-    const appHeader = document.getElementById('appHeader');
-    const imagePreviewModal = document.getElementById('imagePreviewModal');
-    const imagePreviewCloseBtn = document.getElementById('imagePreviewCloseBtn');
-    const previewImage = document.getElementById('previewImage');
-    const previewCaption = document.getElementById('previewCaption');
-    const shareBtn = document.getElementById('shareBtn');
-    const downloadImageBtn = document.getElementById('downloadImageBtn');
-    const downloadModal = document.getElementById('downloadModal');
-    const downloadModalCloseBtn = document.getElementById('downloadModalCloseBtn');
-    const downloadModalNextBtn = document.getElementById('downloadModalNextBtn');
-    const downloadModalBackBtn = document.getElementById('downloadModalBackBtn');
-    const downloadStep1 = document.getElementById('downloadStep1');
-    const downloadStep2 = document.getElementById('downloadStep2');
-    const downloadClassList = document.getElementById('downloadClassList');
-    const downloadFormatGrid = document.getElementById('downloadFormatGrid');
-    const assignmentModal = document.getElementById('assignmentModal');
-    const closeAssignmentModalBtn = document.getElementById('closeAssignmentModalBtn');
-    const saveAssignmentBtn = document.getElementById('saveAssignmentBtn');
-    const credentialLoginModal = document.getElementById('credentialLoginModal');
-    const credentialModalCloseBtn = document.getElementById('credentialModalCloseBtn');
-
     function convertToBengaliNumber(num) {
         const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return String(num).replace(/\d/g, d => bengaliDigits[d]);
     }
     
+    // Presence Badge Logic Update - Change 2 (Real-time update logic)
+    function getPresenceInfo(timestamp) {
+        if (!timestamp) return { text: "New", class: "new" };
+        
+        const now = new Date();
+        const created = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const diffMs = now - created;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 2) {
+            return { text: "New", class: "new" };
+        } else if (diffMins < 300) { 
+            if (diffMins < 60) {
+                return { text: diffMins + "m", class: "timing" };
+            } else {
+                const hours = Math.floor(diffMins / 60);
+                return { text: hours + "h", class: "timing" };
+            }
+        }
+        return null;
+    }
+
+    // Function to update all timing badges in real-time
+    function updateAllPresenceBadges() {
+        const badges = document.querySelectorAll('.presence-badge[data-timestamp]');
+        badges.forEach(badge => {
+            const timestampVal = badge.dataset.timestamp;
+            if (!timestampVal) return;
+            
+            const info = getPresenceInfo(parseInt(timestampVal));
+            if (info) {
+                badge.textContent = info.text;
+                badge.className = `presence-badge ${info.class}`;
+            } else {
+                badge.remove();
+            }
+        });
+    }
+
+    // Interval for real-time timing (Change 2)
+    setInterval(updateAllPresenceBadges, 60000); // Every 60 seconds
+
     function setupRealtimeListeners() {
         unsubscribeListeners.forEach(unsubscribe => unsubscribe());
         unsubscribeListeners = [];
@@ -1781,7 +1927,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 break;
             case 'users':
-                renderUsersView();
+                const uRole = localStorage.getItem('userRole');
+                if (uRole === 'subAdmin') {
+                    renderSubAdminUserDashboard(); 
+                } else {
+                    renderUsersView();
+                }
                 break;
             case 'create-admin':
                 renderCreateAdminView();
@@ -1824,6 +1975,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // --- DOM Element References ---
+    const mainContent = document.getElementById('mainContent');
+    const nightModeToggle = document.getElementById('nightModeToggle');
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+    const sidebar = document.getElementById('sidebar');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const overlay = document.getElementById('overlay');
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const customModal = document.getElementById('customModal');
+    const loginScreen = document.getElementById('loginScreen');
+    const adminLayout = document.getElementById('adminLayout');
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('errorMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const preloader = document.getElementById('preloader');
+    const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    const appHeader = document.getElementById('appHeader');
+    const imagePreviewModal = document.getElementById('imagePreviewModal');
+    const imagePreviewCloseBtn = document.getElementById('imagePreviewCloseBtn');
+    const previewImage = document.getElementById('previewImage');
+    const previewCaption = document.getElementById('previewCaption');
+    const shareBtn = document.getElementById('shareBtn');
+    const downloadImageBtn = document.getElementById('downloadImageBtn');
+    const downloadModal = document.getElementById('downloadModal');
+    const downloadModalCloseBtn = document.getElementById('downloadModalCloseBtn');
+    const downloadModalNextBtn = document.getElementById('downloadModalNextBtn');
+    const downloadModalBackBtn = document.getElementById('downloadModalBackBtn');
+    const downloadStep1 = document.getElementById('downloadStep1');
+    const downloadStep2 = document.getElementById('downloadStep2');
+    const downloadClassList = document.getElementById('downloadClassList');
+    const downloadFormatGrid = document.getElementById('downloadFormatGrid');
+    const assignmentModal = document.getElementById('assignmentModal');
+    const closeAssignmentModalBtn = document.getElementById('closeAssignmentModalBtn');
+    const saveAssignmentBtn = document.getElementById('saveAssignmentBtn');
+    const credentialLoginModal = document.getElementById('credentialLoginModal');
+    const credentialModalCloseBtn = document.getElementById('credentialModalCloseBtn');
+    const addUserMenuBtn = document.getElementById('addUserMenuBtn');
+
+
     // --- THEME & SIDEBAR ---
     function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); nightModeToggle.checked = theme === 'dark'; }
     nightModeToggle.addEventListener('change', () => { const theme = nightModeToggle.checked ? 'dark' : 'light'; localStorage.setItem('theme', theme); applyTheme(theme); });
@@ -1855,31 +2048,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- NAVIGATION & ROUTING ---
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const view = link.dataset.view;
-            if (window.innerWidth < 1024 && sidebar.classList.contains('open')) { handleSidebar(); }
-            navigateTo(view);
-        });
-    });
-
-    // --- SEARCH ---
-    globalSearchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        
-        if (['dashboard', 'userDashboard', 'allInstitutions', 'subAdminUserDashboard'].includes(currentView)) { 
-            document.querySelectorAll('.institution-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none'); 
-        } else if (['institutionDetails', 'allStudents'].includes(currentView)) { 
-            document.querySelectorAll('.routine-table tbody tr').forEach(row => row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none'); 
-        } else if (['users', 'subAdminDetails'].includes(currentView)) { 
-            document.querySelectorAll('.user-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none'); 
-        } else if (currentView === 'create-admin') {
-            document.querySelectorAll('.sub-admin-card').forEach(card => card.style.display = card.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none');
-        }
-    });
-    
     // --- RENDER FUNCTIONS ---
     function renderDashboard() {
         const totalUsers = allUsers.length;
@@ -1961,6 +2129,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const card = document.createElement('div');
             card.className = 'user-card';
             
+            // Presence Badge with timestamp data
+            const lastActiveTime = user.lastLogin || user.createdAt;
+            const presence = getPresenceInfo(lastActiveTime);
+            if (presence) {
+                const badge = document.createElement('div');
+                badge.className = `presence-badge ${presence.class}`;
+                badge.dataset.timestamp = lastActiveTime ? (lastActiveTime.toDate ? lastActiveTime.toDate().getTime() : new Date(lastActiveTime).getTime()) : '';
+                badge.textContent = presence.text;
+                card.appendChild(badge);
+            }
+
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
@@ -2247,7 +2426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     if (curCol) {
                         const newWidth = curColWidth + diffX;
-                        if (newWidth > 30) { // Minimum width
+                        if (newWidth > 30) { 
                             curCol.style.width = `${newWidth}px`;
                         }
                     }
@@ -2323,7 +2502,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('backBtn').addEventListener('click', () => {
              const userRole = localStorage.getItem('userRole');
              if (userRole === 'subAdmin') {
-                navigateTo('dashboard');
+                navigateTo('users');
              } else {
                 history.back(); 
              }
@@ -2337,6 +2516,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const card = document.createElement('div');
             card.className = 'user-card';
             
+            // Presence Badge with timestamp for real-time update
+            const lastActiveTime = user.lastLogin || user.createdAt;
+            const presence = getPresenceInfo(lastActiveTime);
+            if (presence) {
+                const badge = document.createElement('div');
+                badge.className = `presence-badge ${presence.class}`;
+                badge.dataset.timestamp = lastActiveTime ? (lastActiveTime.toDate ? lastActiveTime.toDate().getTime() : new Date(lastActiveTime).getTime()) : '';
+                badge.textContent = presence.text;
+                card.appendChild(badge);
+            }
+
             const cardContent = document.createElement('div');
             cardContent.className = 'card-content';
             const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
@@ -2475,7 +2665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const existingAdmin = allSubAdmins.find(admin => admin.username === username);
             if (existingAdmin) {
-                 showModal({ type: 'danger', title: 'ত্রুটি', message: 'এই ইউজারনেমটি bereits vorhanden। অনুগ্রহ করে একটি ইউনিক ইউজারনেম ব্যবহার করুন।' });
+                 showModal({ type: 'danger', title: 'ত্রুটি', message: 'এই ইউজারনেমটি ইতিমধ্যে আছে। অনুগ্রহ করে একটি ইউনিক ইউজারনেম ব্যবহার করুন।' });
                  return;
             }
 
@@ -2592,6 +2782,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 
+                // Presence Badge
+                const lastActiveTime = user.lastLogin || user.createdAt;
+                const presence = getPresenceInfo(lastActiveTime);
+                if (presence) {
+                    const badge = document.createElement('div');
+                    badge.className = `presence-badge ${presence.class}`;
+                    badge.dataset.timestamp = lastActiveTime ? (lastActiveTime.toDate ? lastActiveTime.toDate().getTime() : new Date(lastActiveTime).getTime()) : '';
+                    badge.textContent = presence.text;
+                    card.appendChild(badge);
+                }
+
                 const cardContent = document.createElement('div');
                 cardContent.className = 'card-content';
                 const joinedDate = user.lastLogin && user.lastLogin.toDate ? user.lastLogin.toDate() : new Date();
@@ -2679,7 +2880,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveAssignmentBtn.onclick = async () => {
             const newAssignedIds = Array.from(assignedUsersList.querySelectorAll('li')).map(li => li.dataset.userId);
 
-            if (admin) { // Existing admin
+            if (admin) { 
                 try {
                     await db.collection('subAdmins').doc(admin.id).update({ assignedUserIds: newAssignedIds });
                     assignmentModal.classList.remove('active');
@@ -2688,7 +2889,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Error updating assigned users:", error);
                     showModal({ type: 'danger', title: 'ত্রুটি', message: 'আপডেট করা সম্ভব হয়নি।'});
                 }
-            } else if (callback) { // New admin
+            } else if (callback) { 
                 callback(newAssignedIds);
                 assignmentModal.classList.remove('active');
             }
@@ -2778,6 +2979,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // UPDATED: Form Settings View with Searchable Institution Select
     function renderSettingsView() { 
         mainContent.innerHTML = `
             <div class="page-header"><h1>ফর্ম সেটিংস</h1></div>
@@ -2801,25 +3003,59 @@ document.addEventListener('DOMContentLoaded', async () => {
             institutionsForSettings = allInstitutions;
         }
 
-        const institutionOptions = institutionsForSettings.map(inst => `<option value="${inst.id}">${inst.name}</option>`).join('');
-
         document.getElementById('settingsContainer').innerHTML = `
             <div class="admin-form">
                 <div class="form-group">
-                    <label for="institutionSelectForSettings">কোন প্রতিষ্ঠানের ফর্ম পরিবর্তন করতে চান?</label>
-                    <select id="institutionSelectForSettings">
-                        <option value="" disabled selected>একটি প্রতিষ্ঠান নির্বাচন করুন...</option>
-                        ${institutionOptions}
-                    </select>
+                    <label>প্রতিষ্ঠান নির্বাচন করুন</label>
+                    <div class="searchable-select-container">
+                        <div class="searchable-select-input-wrapper">
+                            <input type="text" id="instSearchInput" placeholder="প্রতিষ্ঠানের নাম লিখে সার্চ করুন..." autocomplete="off">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="searchable-select-dropdown" id="instDropdown">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="fieldSettingsContainer" class="hidden"></div>`;
         
-        document.getElementById('institutionSelectForSettings').addEventListener('change', (e) => {
-            const institutionId = e.target.value;
-            const institution = allInstitutions.find(inst => inst.id === institutionId);
-            document.getElementById('fieldSettingsContainer').classList.remove('hidden');
-            renderFieldsForEditing(institution);
+        const searchInput = document.getElementById('instSearchInput');
+        const dropdown = document.getElementById('instDropdown');
+
+        const filterInstitutions = (query) => {
+            const filtered = institutionsForSettings.filter(inst => inst.name.toLowerCase().includes(query.toLowerCase()));
+            dropdown.innerHTML = '';
+            if (filtered.length > 0) {
+                filtered.forEach(inst => {
+                    const item = document.createElement('div');
+                    item.className = 'searchable-select-item';
+                    item.textContent = inst.name;
+                    item.onclick = () => {
+                        searchInput.value = inst.name;
+                        dropdown.classList.remove('active');
+                        document.getElementById('fieldSettingsContainer').classList.remove('hidden');
+                        renderFieldsForEditing(inst);
+                    };
+                    dropdown.appendChild(item);
+                });
+            } else {
+                dropdown.innerHTML = '<div class="searchable-select-item no-results">কোনো প্রতিষ্ঠান পাওয়া যায়নি</div>';
+            }
+        };
+
+        searchInput.onfocus = () => {
+            filterInstitutions(searchInput.value);
+            dropdown.classList.add('active');
+        };
+
+        searchInput.oninput = () => {
+            filterInstitutions(searchInput.value);
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.searchable-select-container')) {
+                dropdown.classList.remove('active');
+            }
         });
     }
     
@@ -2902,8 +3138,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listContainer.insertBefore(li.nextElementSibling, li);
                 }
                 
-                const institutionId = document.getElementById('institutionSelectForSettings').value;
-                if(institutionId) saveAndReRenderFields(institutionId);
+                // Keep selected institution context
+                const searchInput = document.getElementById('instSearchInput');
+                if(searchInput && searchInput.value) {
+                    const inst = allInstitutions.find(i => i.name === searchInput.value);
+                    if(inst) saveAndReRenderFields(inst.id);
+                }
             }
         });
     }
@@ -3240,7 +3480,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         customModal.classList.add('active');
     }
 
-    function hideModal() { customModal.classList.remove('active'); }
+    function hideModal() { 
+        customModal.classList.remove('active'); 
+        customModal.querySelector('.modal-container').classList.remove('modal-small');
+    }
     customModal.addEventListener('click', (e) => { if (e.target === customModal) hideModal(); });
 
     function attachDetailViewEventListeners(institutionId) {
@@ -3884,6 +4127,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // --- ADD USER MODAL (FOR SUB-ADMIN) - Design Improvements ---
+    if(addUserMenuBtn) {
+        addUserMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAddUserModal();
+        });
+    }
+
+    function showAddUserModal() {
+        const modalHeader = document.getElementById('modalHeader');
+        const modalBody = document.getElementById('modalBody');
+        const modalFooter = document.getElementById('modalFooter');
+        const container = customModal.querySelector('.modal-container');
+        
+        container.classList.add('modal-small');
+
+        modalHeader.innerHTML = `<div class="icon info"><i class="fas fa-user-plus"></i></div><h3>ইউজার যুক্ত করুন</h3>`;
+        modalBody.innerHTML = `
+            <div class="form-group">
+                <label for="addUserMobile">ইউজারের মোবাইল নম্বর</label>
+                <input type="tel" id="addUserMobile" placeholder="01XXXXXXXXX" maxlength="11" required>
+                <p id="addUserMsg" style="margin-top: 10px; font-size: 0.85rem; font-weight: 500; height: 1.2em;"></p>
+            </div>
+        `;
+        modalFooter.innerHTML = `<button class="btn-secondary" id="closeAddUserModal">বাতিল</button><button class="btn-primary" id="confirmAddUser">নিশ্চিত করুন</button>`;
+        
+        document.getElementById('closeAddUserModal').onclick = hideModal;
+        document.getElementById('confirmAddUser').onclick = async () => {
+            const mobile = document.getElementById('addUserMobile').value.trim();
+            const msgEl = document.getElementById('addUserMsg');
+            
+            if (!mobile || mobile.length < 11) {
+                msgEl.style.color = 'var(--danger-color)';
+                msgEl.textContent = 'সঠিক মোবাইল নম্বর প্রদান করুন।';
+                return;
+            }
+
+            const foundUser = allUsers.find(u => u.id === mobile);
+            if (!foundUser) {
+                msgEl.style.color = 'var(--danger-color)';
+                msgEl.textContent = 'এই নম্বর দিয়ে কোনো ইউজার পাওয়া যায়নি।';
+                return;
+            }
+
+            const currentSubAdmin = allSubAdmins.find(admin => admin.username === localStorage.getItem('username'));
+            const assignedIds = currentSubAdmin.assignedUserIds || [];
+            
+            if (assignedIds.includes(mobile)) {
+                msgEl.style.color = 'var(--accent-color)';
+                msgEl.textContent = 'ইউজারটি ইতিপূর্বেই তালিকায় রয়েছে।';
+                return;
+            }
+
+            assignedIds.push(mobile);
+            try {
+                await db.collection('subAdmins').doc(currentSubAdmin.id).update({ assignedUserIds: assignedIds });
+                hideModal();
+                showModal({ type: 'success', title: 'সফল', message: `"${foundUser.name}" সফলভাবে আপনার লিস্টে এড হয়েছে।` });
+            } catch (err) {
+                console.error(err);
+                msgEl.style.color = 'var(--danger-color)';
+                msgEl.textContent = 'সার্ভার ত্রুটি, পুনরায় চেষ্টা করুন।';
+            }
+        };
+        
+        customModal.classList.add('active');
+    }
+
     // --- LOGIN & INITIALIZATION ---
     if(loginPasswordToggle) {
         loginPasswordToggle.addEventListener('click', () => {
@@ -3989,8 +4300,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     function setupUIForRole(role) {
-        const dashboardLink = document.querySelector('.sidebar-nav a[data-view="dashboard"]');
         const usersLink = document.querySelector('.sidebar-nav a[data-view="users"]');
+        const addUserLi = document.getElementById('addUserSidebarLi');
         const createAdminLink = document.querySelector('.sidebar-nav a[data-view="create-admin"]');
         const settingsLink = document.querySelector('.sidebar-nav a[data-view="settings"]');
         const cloudinaryLink = document.querySelector('.sidebar-nav a[data-view="cloudinary-settings"]');
@@ -3998,8 +4309,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const firebaseSwitcher = document.getElementById('firebaseSwitcherContainer');
         
         if (role === 'subAdmin') {
-            if(dashboardLink) dashboardLink.innerHTML = `<i class="fas fa-home"></i> Home`;
-            if(usersLink) usersLink.parentElement.style.display = 'none';
+            if(usersLink) usersLink.parentElement.style.display = 'block';
+            if(addUserLi) addUserLi.classList.remove('hidden');
             if(createAdminLink) createAdminLink.parentElement.style.display = 'none';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
             if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'none';
@@ -4007,6 +4318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(firebaseSwitcher) firebaseSwitcher.style.display = 'none';
         } else { 
             if(usersLink) usersLink.parentElement.style.display = 'block';
+            if(addUserLi) addUserLi.classList.add('hidden');
             if(createAdminLink) createAdminLink.parentElement.style.display = 'block';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
             if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'block';
