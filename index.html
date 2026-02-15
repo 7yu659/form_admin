@@ -283,7 +283,7 @@
         .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border-color); }
         .sidebar-header h2 { color: var(--primary-color); font-size: 1.5rem; }
         .sidebar-nav { flex-grow: 1; list-style: none; padding: 20px 0; }
-        .sidebar-nav a { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--light-text); text-decoration: none; font-weight: 500; transition: var(--transition); border-left: 4px solid transparent; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--light-text); text-decoration: none; font-weight: 500; transition: var(--transition); border-left: 4px solid transparent; position: relative; }
         .sidebar-nav a:hover { background-color: var(--light-bg); color: var(--primary-color); }
         .sidebar-nav a.active { background-color: var(--light-bg); color: var(--primary-color); border-left-color: var(--primary-color); font-weight: 600; }
         .sidebar-nav a i { width: 20px; text-align: center; }
@@ -395,20 +395,24 @@
                 top: 100%;
                 left: 0;
                 width: 100%;
-                padding: 10px 20px;
+                padding: 12px 20px; 
                 background-color: var(--card-background);
                 border-bottom: 1px solid var(--border-color);
                 margin: 0;
-                z-index: -1;
+                z-index: 5; 
                 transform: translateY(-100%);
                 opacity: 0;
                 visibility: hidden;
                 transition: var(--transition);
+                box-sizing: border-box; 
             }
             .app-header.search-active .search-bar {
                 transform: translateY(0);
                 opacity: 1;
                 visibility: visible;
+            }
+            .search-bar i {
+                left: 35px; 
             }
             .search-toggle-btn {
                 background: transparent;
@@ -417,6 +421,7 @@
                 font-size: 1.4rem;
                 cursor: pointer;
                 display: block;
+                padding: 5px;
             }
             .header-actions {
                 display: none;
@@ -824,7 +829,6 @@
         .user-card h3 { color: var(--text-color); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .user-card p { color: var(--light-text); margin-bottom: 5px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
         
-        /* Presence Badge Style - Real-time Change 1 */
         .presence-badge {
             position: absolute;
             top: 10px;
@@ -844,6 +848,17 @@
         }
         .presence-badge.new { background-color: var(--accent-color); }
         .presence-badge.timing { background-color: var(--primary-color); }
+
+        /* Highlight Animation for newly added user */
+        @keyframes highlightNewCard {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0); border-color: var(--border-color); }
+            50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); border-color: var(--primary-color); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(37, 99, 235, 0); border-color: var(--border-color); }
+        }
+        .user-card.highlight-added {
+            animation: highlightNewCard 2s ease-in-out;
+            border: 2px solid var(--primary-color) !important;
+        }
 
         .hidden { display: none !important; }
 
@@ -865,57 +880,150 @@
             transition: transform 0.3s ease;
         }
         
-        /* UPDATED: Add User Modal Styling - Compact & Professional */
-        .modal-container.modal-small {
-            max-width: 360px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
+        /* --- NEW PROFESSIONAL ADD USER MODAL DESIGN --- */
+        .modal-container.login-style-modal {
+            background-color: var(--card-background) !important;
+            width: 100% !important;
+            max-width: 400px !important;
+            padding: 35px !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid var(--border-color) !important;
+            text-align: center !important;
+            height: auto !important; /* উচ্চতা কন্টেন্ট অনুযায়ী হবে */
+
         }
-        .modal-small .modal-header {
+        
+        .login-style-modal .modal-header {
+            margin-bottom: 25px;
+            border-bottom: none;
+            display: block;
+        }
+        
+        .login-style-modal .icon-box {
+            background: rgba(37, 99, 235, 0.1);
+            width: 65px;
+            height: 65px;
+            line-height: 65px;
+            border-radius: 50%;
+            display: inline-block;
             margin-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
         }
-        .modal-small .modal-header .icon {
-             font-size: 2rem;
-             margin-bottom: 5px;
+        
+        .login-style-modal .icon-box i {
+            font-size: 26px;
+            color: var(--primary-color);
+            margin: 0;
+            line-height: 65px;
         }
-        .modal-small .modal-header h3 {
-             font-size: 1.25rem;
-             font-weight: 700;
+        
+        .login-style-modal .modal-header h3 {
+            color: var(--text-color);
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
         }
-        .modal-small .modal-body {
-             margin-bottom: 15px;
-             padding: 0;
+        
+        .login-style-modal .modal-body {
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    white-space: normal !important; /* এটি গ্যাপ তৈরি হওয়া বন্ধ করবে */
         }
-        .modal-small .form-group {
-             margin-bottom: 0;
-             text-align: left;
+        
+        .login-style-modal .modal-body p {
+            color: var(--light-text);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
         }
-        .modal-small .form-group label {
-             font-size: 0.9rem;
-             margin-bottom: 8px;
-             color: var(--light-text);
-             display: block;
+        
+        .login-style-modal .form-group {
+            margin-bottom: 20px;
         }
-        .modal-small .form-group input {
-             padding: 10px 14px;
-             font-size: 1rem;
-             border: 1px solid var(--border-color);
-             border-radius: 8px;
-             width: 100%;
-             background: var(--light-bg);
-             color: var(--text-color);
+        
+        .login-style-modal .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
         }
-        .modal-small .modal-footer {
-             gap: 10px;
-             padding-top: 10px;
+        
+        .login-style-modal .input-wrapper {
+            position: relative;
         }
-        .modal-small .modal-footer button {
-             padding: 10px;
-             font-size: 0.95rem;
-             border-radius: 6px;
+        
+        .login-style-modal .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+            font-size: 18px;
         }
+        
+        .login-style-modal .input-wrapper input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: var(--text-color);
+            background: var(--background-color);
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        
+        .login-style-modal .input-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        .login-style-modal .modal-footer {
+            padding: 0;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .login-style-modal .btn-submit-user {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .login-style-modal .btn-submit-user:hover {
+            opacity: 0.95;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .login-style-modal .btn-cancel-user {
+            display: block;
+            text-align: center;
+            color: var(--light-text);
+            text-decoration: none;
+            font-size: 13px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .login-style-modal .btn-cancel-user:hover {
+            color: var(--danger-color);
+        }
+        /* --- END OF NEW MODAL DESIGN --- */
 
         .modal-overlay.active .modal-container { transform: scale(1); }
         .modal-header { text-align: center; margin-bottom: 15px; }
@@ -1123,6 +1231,9 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
         }
+        .field-settings-container h4:not(:first-child) {
+            margin-top: 30px;
+        }
         .field-settings-list {
             list-style: none;
         }
@@ -1324,13 +1435,12 @@
             border: 1px solid var(--border-color);
             background-color: var(--card-background);
         }
-        /* User List 3-User Display Logic - Change 1 */
         .user-list {
             list-style: none;
             padding: 10px;
             overflow-y: auto;
             flex-grow: 1;
-            max-height: 150px; /* Approximately 3-4 users visible */
+            max-height: 250px; 
         }
         .user-list-item {
             padding: 10px 15px;
@@ -1341,7 +1451,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            height: 42px; /* Fixed height for consistent measurement */
+            height: 42px; 
         }
         .user-list-item:hover {
             background-color: var(--light-bg);
@@ -1417,7 +1527,6 @@
             gap: 10px;
         }
 
-        /* NEW: Searchable Select Styling for Form Settings */
         .searchable-select-container {
             position: relative;
             width: 100%;
@@ -1471,94 +1580,272 @@
             cursor: default;
         }
 
-        @media (max-width: 768px) {
-            .assignment-modal-body {
-                flex-direction: column;
-            }
-            .user-transfer-actions {
-                flex-direction: row;
-                transform: rotate(90deg);
-                margin: 10px 0;
-            }
+        /* --- MESSENGER SYSTEM STYLES --- */
+        .msg-badge {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            background: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
         }
 
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 15px;
-            }
-            .sub-admin-creator .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .modal-container, .download-modal-container {
-                padding: 15px;
-            }
-            .routine-header .header-content {
-                padding: 0 10px;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .routine-header .institution-logo {
-                position: static;
-                transform: none;
-            }
-            .detail-actions-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .field-list-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .field-list-item .field-label-input {
-                width: 100%;
-            }
+        /* Floating Button for Sub-Admin */
+        #floatingMsgBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 999;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #floatingMsgBtn:hover { transform: scale(1.1); }
+        #floatingMsgBtn .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger-color);
+            color: white;
+            font-size: 0.8rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Chat Modal Container */
+        .chat-modal {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            transform-origin: bottom right;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .chat-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Chat Header */
+        .chat-header {
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-header .user-info { display: flex; align-items: center; gap: 10px; }
+        .chat-header .user-info .status-dot { width: 10px; height: 10px; background: #4ade80; border-radius: 50%; border: 1.5px solid white; }
+        .chat-header .close-chat { cursor: pointer; opacity: 0.8; transition: 0.2s; }
+        .chat-header .close-chat:hover { opacity: 1; transform: scale(1.1); }
+
+        /* Chat Body */
+        .chat-body {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* Chat Bubbles */
+        .msg-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            position: relative;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .msg-bubble.sent {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .msg-bubble.received {
+            align-self: flex-start;
+            background: var(--card-background);
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .msg-bubble img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .msg-time {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.7;
+            display: block;
+            text-align: right;
+        }
+        .received .msg-time { text-align: left; }
+        .msg-status { font-size: 0.7rem; position: absolute; right: 5px; bottom: -18px; color: var(--light-text); }
+
+        /* Chat Input */
+        .chat-footer {
+            padding: 12px;
+            background: var(--card-background);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-footer input {
+            flex-grow: 1;
+            border: none;
+            background: var(--light-bg);
+            padding: 10px 15px;
+            border-radius: 20px;
+            outline: none;
+            font-family: 'Hind Siliguri', sans-serif;
+            color: var(--text-color);
+        }
+        .chat-footer button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .chat-footer button:hover { transform: scale(1.1); }
+        .chat-footer .attach-btn { color: var(--light-text); }
+
+        /* Admin Messenger View */
+        .admin-messenger {
+            display: flex;
+            height: calc(100vh - 120px);
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .messenger-sidebar {
+            width: 300px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .messenger-sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .messenger-user-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .msg-user-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+        }
+        .msg-user-item:hover { background: var(--light-bg); }
+        .msg-user-item.active { background: rgba(37, 99, 235, 0.1); border-left: 4px solid var(--primary-color); }
+        .msg-user-item .avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--light-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+        .msg-user-item .avatar .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border-radius: 50%;
+            border: 2px solid var(--card-background);
+        }
+        .msg-user-item .user-details h4 { font-size: 1rem; margin: 0; color: var(--text-color); }
+        .msg-user-item .user-details p { font-size: 0.85rem; color: var(--light-text); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+        .msg-user-item .unread-badge {
+            position: absolute;
+            right: 20px;
+            background: var(--danger-color);
+            color: white;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .messenger-chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .no-chat-selected {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+        }
+        .no-chat-selected i { font-size: 4rem; margin-bottom: 20px; opacity: 0.2; }
+
+        @media (max-width: 768px) {
+            .chat-modal { width: calc(100vw - 40px); right: 20px; bottom: 90px; height: 70vh; }
+            .admin-messenger { flex-direction: column; height: calc(100vh - 100px); }
+            .messenger-sidebar { width: 100%; height: 200px; border-right: none; border-bottom: 1px solid var(--border-color); }
         }
 
         @media print {
-            @page { size: auto; margin: 20px; }
-            body, .admin-layout, .content-wrapper, .routine-container { 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                background-color: #fff !important; 
-                color: #000 !important;
-                font-family: 'Bornomala', 'Hind Siliguri', sans-serif !important;
-            }
-            .sidebar, .app-header, .detail-actions-bar, .sidebar-footer, .modal-overlay, .info-buttons-container, .download-modal-overlay { display: none !important; }
-            .main-content { padding: 0 !important; }
-            .routine-container.print-area {
-                visibility: visible;
-                position: static;
-                box-shadow: none;
-                border: none;
-                margin-bottom: 0;
-                page-break-after: always;
-            }
-            #all-students-print-area.print-area {
-                 page-break-after: auto;
-            }
-            .routine-container.print-area:last-of-type {
-                page-break-after: auto;
-            }
-            .non-printable, .print-hidden { display: none !important; }
-            
-            #editInstDetailsBtn, #saveInstDetailsBtn {
-                display: none !important;
-            }
-
-            .routine-header h1, .routine-header h2, .routine-table th, .routine-table td, .routine-header p { 
-                color: #000 !important; 
-            }
-            .routine-table th, .routine-table td { border: 1px solid #ccc !important; }
-            .routine-table thead { background-color: #f2f2f2 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact;}
-            .student-photo { max-width: 40px; max-height: 40px; }
-            .table-actions-col { display: none !important; }
-            .truncate-text {
-                max-width: none;
-                white-space: normal;
-                overflow: visible;
-                text-overflow: clip;
-            }
-            .resizer { display: none !important; }
+            #floatingMsgBtn, .chat-modal, .admin-messenger { display: none !important; }
         }
     </style>
 </head>
@@ -1606,12 +1893,12 @@
              <div class="sidebar-header"><h2><i class="fas fa-user-shield"></i> অ্যাডমিন প্যানেল</h2></div>
              <ul class="sidebar-nav">
                 <li><a href="#dashboard" class="active" data-view="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li id="adminMsgSidebar" class="hidden"><a href="#messages" data-view="messages"><i class="fas fa-comment-dots"></i> Messages <span id="sidebarMsgBadge" class="msg-badge hidden">0</span></a></li>
                 <li><a href="#users" data-view="users"><i class="fas fa-users"></i> Users</a></li>
                 <li id="addUserSidebarLi" class="hidden"><a href="#add-user" id="addUserMenuBtn"><i class="fas fa-plus-circle"></i> Add User</a></li>
                 <li><a href="#create-admin" data-view="create-admin"><i class="fas fa-user-plus"></i> Create Admin</a></li>
                 <li><a href="#settings" data-view="settings"><i class="fas fa-cog"></i> Form Settings</a></li>
                 <li><a href="#cloudinary-settings" data-view="cloudinary-settings"><i class="fas fa-cloud-upload-alt"></i> Cloudinary Settings</a></li>
-                <li><a href="#firebase-settings" data-view="firebase-settings"><i class="fas fa-database"></i> Firebase Settings</a></li>
              </ul>
              <div class="sidebar-footer">
                 <div class="theme-switch-wrapper">
@@ -1641,6 +1928,36 @@
             </header>
             <main class="main-content" id="mainContent">
             </main>
+        </div>
+    </div>
+
+    <!-- Sub-Admin Floating Messenger -->
+    <div id="subAdminMessenger" class="hidden">
+        <div id="floatingMsgBtn">
+            <i class="fas fa-comment-dots"></i>
+            <span class="badge hidden" id="floatMsgBadge">0</span>
+        </div>
+        <div class="chat-modal" id="chatModal">
+            <div class="chat-header">
+                <div class="user-info">
+                    <i class="fas fa-user-shield"></i>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Ask For AI</div>
+                        <div style="font-size: 0.7rem; opacity: 0.8;">Active Now</div>
+                    </div>
+                    <div class="status-dot"></div>
+                </div>
+                <div class="close-chat" id="closeChatBtn"><i class="fas fa-times"></i></div>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <!-- Messages will appear here -->
+            </div>
+            <div class="chat-footer">
+                <button class="attach-btn" id="chatAttachBtn"><i class="fas fa-image"></i></button>
+                <input type="file" id="chatFileInput" accept="image/*" class="hidden">
+                <input type="text" id="chatInput" placeholder="এখানে লিখুন...">
+                <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 
@@ -1782,7 +2099,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentView = 'dashboard';
     let currentViewId = null; 
     let unsubscribeListeners = []; 
-    
+    let lastAddedUserId = null; // New variable to track highlighted user
+
     const placeholderImageSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTIxIDE5VjVjMC0xLjEtLjktMi0yLTJINWMtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMnpNOC41IDEyLjVsMi41IDMuMDFMMTMuNSA5bDQuNSA2SDV6Ii8+PC9zdmc+`;
     const placeholderUserSVG = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+`;
 
@@ -1792,7 +2110,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return String(num).replace(/\d/g, d => bengaliDigits[d]);
     }
     
-    // Presence Badge Logic Update - Change 2 (Real-time update logic)
+    function convertToEnglishNumber(str) {
+        const bengaliDigits = {'০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9'};
+        return parseInt(String(str).replace(/[০-৯]/g, d => bengaliDigits[d]));
+    }
+
     function getPresenceInfo(timestamp) {
         if (!timestamp) return { text: "New", class: "new" };
         
@@ -1814,7 +2136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return null;
     }
 
-    // Function to update all timing badges in real-time
     function updateAllPresenceBadges() {
         const badges = document.querySelectorAll('.presence-badge[data-timestamp]');
         badges.forEach(badge => {
@@ -1831,8 +2152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Interval for real-time timing (Change 2)
-    setInterval(updateAllPresenceBadges, 60000); // Every 60 seconds
+    setInterval(updateAllPresenceBadges, 60000); 
 
     function setupRealtimeListeners() {
         unsubscribeListeners.forEach(unsubscribe => unsubscribe());
@@ -1852,6 +2172,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const subAdminsUnsubscribe = db.collection('subAdmins').onSnapshot(snapshot => {
             allSubAdmins = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             rerenderCurrentView();
+            // Sync badges for Admin Sidebar
+            if (localStorage.getItem('userRole') === 'mainAdmin') {
+                syncAdminMessageBadges();
+            }
         }, error => handleError(error, 'subAdmins'));
         unsubscribeListeners.push(subAdminsUnsubscribe);
 
@@ -1880,6 +2204,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             rerenderCurrentView();
         }, error => handleError(error, 'institutions'));
         unsubscribeListeners.push(institutionsUnsubscribe);
+
+        // Messaging Realtime Listener
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            const currentUser = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            // Sub-Admin badge syncing
+            if (role === 'subAdmin') {
+                const msgUnsubscribe = db.collection('messages')
+                    .where('to', '==', currentUser)
+                    .where('read', '==', false)
+                    .onSnapshot(snap => {
+                        const badge = document.getElementById('floatMsgBadge');
+                        if (snap.size > 0) {
+                            badge.textContent = snap.size;
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    });
+                unsubscribeListeners.push(msgUnsubscribe);
+            }
+        }
     }
     
     function rerenderCurrentView() {
@@ -1921,7 +2268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'dashboard':
                 const userRole = localStorage.getItem('userRole');
                 if (userRole === 'subAdmin') {
-                    renderSubAdminUserDashboard();
+                    renderSubAdminInstitutionDashboard(); 
                 } else {
                     renderDashboard();
                 }
@@ -1929,10 +2276,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'users':
                 const uRole = localStorage.getItem('userRole');
                 if (uRole === 'subAdmin') {
-                    renderSubAdminUserDashboard(); 
+                    renderSubAdminUserList(); 
                 } else {
                     renderUsersView();
                 }
+                break;
+            case 'messages':
+                renderAdminMessengerView();
                 break;
             case 'create-admin':
                 renderCreateAdminView();
@@ -1942,9 +2292,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 break;
             case 'cloudinary-settings':
                 renderCloudinarySettingsView();
-                break;
-            case 'firebase-settings':
-                renderFirebaseSettingsView();
                 break;
             case 'institutionDetails':
                 renderInstitutionDetails(id);
@@ -1975,7 +2322,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- DOM Element References ---
     const mainContent = document.getElementById('mainContent');
     const nightModeToggle = document.getElementById('nightModeToggle');
     const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
@@ -2016,8 +2362,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const credentialModalCloseBtn = document.getElementById('credentialModalCloseBtn');
     const addUserMenuBtn = document.getElementById('addUserMenuBtn');
 
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (appHeader.classList.contains('search-active')) {
+                if (!e.target.closest('.app-header')) {
+                    appHeader.classList.remove('search-active');
+                }
+            }
+            if (sidebar.classList.contains('open')) {
+                if (!e.target.closest('.sidebar') && !e.target.closest('.menu-toggle')) {
+                    handleSidebar();
+                } else if (e.target.closest('.sidebar-nav a') || e.target.closest('#logoutBtn')) {
+                    handleSidebar();
+                }
+            }
+        }
+    });
 
-    // --- THEME & SIDEBAR ---
     function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); nightModeToggle.checked = theme === 'dark'; }
     nightModeToggle.addEventListener('change', () => { const theme = nightModeToggle.checked ? 'dark' : 'light'; localStorage.setItem('theme', theme); applyTheme(theme); });
     
@@ -2048,7 +2409,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- RENDER FUNCTIONS ---
+    globalSearchInput.addEventListener('input', () => {
+        const query = globalSearchInput.value.toLowerCase().trim();
+        
+        if (currentView === 'dashboard' || currentView === 'allInstitutions' || currentView === 'userDashboard') {
+            const cards = document.querySelectorAll('.institution-card');
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const address = card.querySelector('p').textContent.toLowerCase();
+                if (name.includes(query) || address.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        } 
+        else if (currentView === 'users' || currentView === 'subAdminDetails') {
+            const cards = document.querySelectorAll('.user-card');
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const id = card.querySelector('p').textContent.toLowerCase();
+                if (name.includes(query) || id.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        else if (currentView === 'create-admin') {
+            const cards = document.querySelectorAll('.sub-admin-card');
+            cards.forEach(card => {
+                const name = card.querySelector('h4').textContent.toLowerCase();
+                if (name.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        else if (currentView === 'institutionDetails' || currentView === 'allStudents') {
+            const tables = document.querySelectorAll('.routine-table');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const match = cells.some(cell => cell.textContent.toLowerCase().includes(query));
+                    if (match) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+
+
     function renderDashboard() {
         const totalUsers = allUsers.length;
         const totalAdmins = allSubAdmins.length;
@@ -2104,32 +2520,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('totalAdminsCard').addEventListener('click', () => navigateTo('create-admin'));
     }
     
-    function renderSubAdminUserDashboard() {
+    function renderSubAdminInstitutionDashboard() {
         const loggedInSubAdmin = allSubAdmins.find(admin => admin.username === localStorage.getItem('username'));
         if (!loggedInSubAdmin) return;
 
         const assignedUserIds = loggedInSubAdmin.assignedUserIds || [];
+        const accessibleUsers = allUsers.filter(user => assignedUserIds.includes(user.id));
+        
+        let subAdminInstIds = [];
+        accessibleUsers.forEach(user => {
+            (user.accessibleInstitutions || []).forEach(inst => subAdminInstIds.push(inst.id));
+        });
 
-        if (assignedUserIds.length === 0) {
-            mainContent.innerHTML = `<div class="no-data-container"><h3>কোনো ব্যবহারকারী নির্ধারিত নেই</h3><p>আপনাকে এখনো কোনো ব্যবহারকারী পরিচালনার দায়িত্ব দেওয়া হয়নি।</p></div>`;
+        const subAdminInstitutions = allInstitutions.filter(inst => subAdminInstIds.includes(inst.id));
+
+        mainContent.innerHTML = `<div class="page-header"><h1>প্রতিষ্ঠানসমূহ</h1></div><div class="institution-grid" id="institutionGrid"></div>`;
+        const grid = document.getElementById('institutionGrid');
+
+        if (subAdminInstitutions.length === 0) {
+            grid.innerHTML = `<div class="no-data-container" style="grid-column: 1/-1;"><h3>কোনো প্রতিষ্ঠান পাওয়া যায়নি</h3></div>`;
             return;
         }
 
+        subAdminInstitutions.forEach(inst => {
+            const classStudents = (inst.classes || []).reduce((classAcc, c) => classAcc + c.students.length, 0);
+            const totalInstStudents = (inst.students ? inst.students.length : 0) + classStudents;
+            const card = document.createElement('div');
+            card.className = 'institution-card';
+            card.innerHTML = `<div><h3>${inst.name || 'নাম নেই'}</h3><p><i class="fas fa-map-marker-alt"></i> ${inst.address || 'ঠিকানা নেই'}</p></div><div class="student-count"><span><i class="fas fa-users"></i> মোট শিক্ষার্থী: ${convertToBengaliNumber(totalInstStudents)} জন</span><i class="fas fa-chevron-right"></i></div>`;
+            card.addEventListener('click', () => navigateTo('institutionDetails', inst.id));
+            grid.appendChild(card);
+        });
+    }
+
+    function renderSubAdminUserList() {
+        const loggedInSubAdmin = allSubAdmins.find(admin => admin.username === localStorage.getItem('username'));
+        if (!loggedInSubAdmin) return;
+
+        const assignedUserIds = loggedInSubAdmin.assignedUserIds || [];
         const accessibleUsers = allUsers.filter(user => assignedUserIds.includes(user.id));
 
+        mainContent.innerHTML = `<div class="page-header"><h1>ইউজার আইডি সমূহ</h1></div><div class="user-grid" id="userGrid"></div>`;
+        const userGrid = document.getElementById('userGrid');
+
         if (accessibleUsers.length === 0) {
-            mainContent.innerHTML = `<div class="no-data-container"><h3>নির্ধারিত ব্যবহারকারী খুঁজে পাওয়া যায়নি</h3></div>`;
+            userGrid.innerHTML = `<div class="no-data-container" style="grid-column: 1/-1;"><h3>কোনো ইউজার নির্ধারিত নেই</h3></div>`;
             return;
         }
-        
-        mainContent.innerHTML = `<div class="page-header"></div><div class="user-grid" id="userGrid"></div>`;
-        const userGrid = document.getElementById('userGrid');
 
         accessibleUsers.forEach(user => {
             const card = document.createElement('div');
-            card.className = 'user-card';
+            const isJustAdded = lastAddedUserId === user.id;
+            card.className = `user-card ${isJustAdded ? 'highlight-added' : ''}`;
             
-            // Presence Badge with timestamp data
             const lastActiveTime = user.lastLogin || user.createdAt;
             const presence = getPresenceInfo(lastActiveTime);
             if (presence) {
@@ -2151,6 +2594,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.appendChild(cardContent);
             userGrid.appendChild(card);
         });
+
+        if (lastAddedUserId) {
+            setTimeout(() => {
+                const highlighted = document.querySelector('.highlight-added');
+                if (highlighted) highlighted.classList.remove('highlight-added');
+                lastAddedUserId = null;
+            }, 5000);
+        }
     }
     
     async function deleteInstitution(institutionId) {
@@ -2203,7 +2654,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        const tableHeaders = ['ক্রমিক', 'ছবি', 'নাম', 'পিতার নাম', 'মোবাইল', 'শ্রেণী', 'প্রতিষ্ঠান'];
+        const tableHeaders = ['ক্রমিক', 'ছবি', 'নাম', 'পিতার নাম', 'মোাবাইল', 'শ্রেণী', 'প্রতিষ্ঠান'];
         const tableHeaderHTML = `<thead><tr>${tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
 
         let tableRows = allStudentsList.map((student, index) => {
@@ -2336,7 +2787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const isLast = index === studentList.length - 1;
 
                     return `<tr data-student-id="${student.id}" data-institution-id="${institution.id}" ${classDataAttr}>
-                        <td>${convertToBengaliNumber(index + 1)}</td>
+                        <td class="sl-no">${convertToBengaliNumber(index + 1)}</td>
                         ${photoCell}
                         ${cells}
                         <td class="table-actions-col non-printable">
@@ -2351,6 +2802,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </tr>`;
                 }).join('');
 
+                const editableClassTitle = isClass ? `<h2 class="editable-class-name" data-class-id="${listId}">${title}</h2>` : `<h2>${title}</h2>`;
+
                 return `
                 <div class="routine-container print-area" id="print-area-${listId}">
                     <div class="routine-header">
@@ -2358,13 +2811,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${logoHTML}
                             ${institutionDetailsHTML}
                         </div>
-                        <h2>${title}</h2>
+                        ${editableClassTitle}
                     </div>
                     <div class="routine-table-wrapper"><table class="routine-table resizable-table" id="studentTable-${listId}">${tableHeaderHTML}<tbody>${tableRows}</tbody></table></div>
                 </div>`;
             };
             contentHTML += createStudentListHTML(institution.students, 'শিক্ষার্থীদের তালিকা (সাধারণ)', 'main');
-            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `<span class="print-hidden">শ্রেণী: </span>${cls.name}`, cls.id, true); });
+            (institution.classes || []).forEach(cls => { contentHTML += createStudentListHTML(cls.students, `${cls.name}`, cls.id, true); });
             const printButtonHTML = `<div style="position: relative;"><button class="action-btn" id="printBtn"><i class="fas fa-print"></i> প্রিন্ট</button><div class="dropdown-menu" id="printOptions" style="right: auto; left: 0; width: 200px;"></div></div>`;
             const imageDownloadButtonHTML = `<div style="position: relative;"><button class="action-btn" id="imageDownloadBtn"><i class="fas fa-images"></i> ছবি ডাউনলোড</button><div class="dropdown-menu" id="imageDownloadOptions"></div></div>`;
             mainContent.innerHTML = `
@@ -2516,7 +2969,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const card = document.createElement('div');
             card.className = 'user-card';
             
-            // Presence Badge with timestamp for real-time update
             const lastActiveTime = user.lastLogin || user.createdAt;
             const presence = getPresenceInfo(lastActiveTime);
             if (presence) {
@@ -2782,7 +3234,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 
-                // Presence Badge
                 const lastActiveTime = user.lastLogin || user.createdAt;
                 const presence = getPresenceInfo(lastActiveTime);
                 if (presence) {
@@ -2979,7 +3430,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // UPDATED: Form Settings View with Searchable Institution Select
     function renderSettingsView() { 
         mainContent.innerHTML = `
             <div class="page-header"><h1>ফর্ম সেটিংস</h1></div>
@@ -3138,7 +3588,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listContainer.insertBefore(li.nextElementSibling, li);
                 }
                 
-                // Keep selected institution context
                 const searchInput = document.getElementById('instSearchInput');
                 if(searchInput && searchInput.value) {
                     const inst = allInstitutions.find(i => i.name === searchInput.value);
@@ -3349,112 +3798,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    async function renderFirebaseSettingsView() {
-        mainContent.innerHTML = `
-            <div class="page-header">
-                <h1>Firebase সেটিংস</h1>
-                <p>এখানে নতুন Firebase প্রোজেক্টের কনফিগারেশন যোগ করুন। প্যানেলটি কোন প্রোজেক্টের ডেটা দেখাবে তা উপরের ডানদিকের ড্রপডাউন থেকে পরিবর্তন করা যাবে।</p>
-            </div>
-            <div class="routine-container">
-                <form class="admin-form settings-card" id="firebaseSettingsForm">
-                    <h4>নতুন Firebase প্রোজেক্ট যোগ করুন</h4>
-                    <div class="form-group">
-                        <label for="firebaseProjectName">প্রোজেক্টের নাম (শনাক্তকরণের জন্য)</label>
-                        <input type="text" id="firebaseProjectName" placeholder="e.g., New Client Project" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="firebaseConfigJson">Firebase কনফিগারেশন (JSON অবজেক্ট)</label>
-                        <textarea id="firebaseConfigJson" placeholder='{\n  "apiKey": "...",\n  "authDomain": "...",\n  ...\n}' required></textarea>
-                    </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-plus-circle"></i> প্রোজেক্ট যোগ করুন</button>
-                </form>
-
-                <div class="settings-list-container">
-                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
-                    <h3 style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">সংরক্ষিত প্রোজেক্ট তালিকা</h3>
-                    <ul class="settings-card-list" id="firebaseProjectsList"></ul>
-                </div>
-            </div>`;
-        
-        await loadAndDisplayFirebaseProjects();
-
-        document.getElementById('firebaseSettingsForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const projectName = document.getElementById('firebaseProjectName').value;
-            const configJson = document.getElementById('firebaseConfigJson').value;
-
-            try {
-                const configObject = JSON.parse(configJson);
-                configObject.projectName = projectName; 
-                configObject.id = `firebase_${Date.now()}`;
-
-                const docRef = db.collection('_configs').doc('firebase');
-                const doc = await docRef.get();
-                let projects = doc.exists ? doc.data().projects || [] : [];
-                projects.push(configObject);
-                await docRef.set({ projects });
-
-                showModal({type: 'success', title: 'সফল', message: 'Firebase প্রোজেক্ট সফলভাবে যোগ করা হয়েছে।'});
-                e.target.reset();
-                await loadAndDisplayFirebaseProjects();
-                await populateFirebaseSwitcher(); 
-            } catch (error) {
-                console.error("Error adding Firebase project:", error);
-                showModal({type: 'danger', title: 'ত্রুটি', message: 'প্রোজেক্ট যোগ করতে সমস্যা হয়েছে। নিশ্চিত করুন যে কনফিগারেশনটি একটি বৈধ JSON।'});
-            }
-        });
-    }
-
-    async function loadAndDisplayFirebaseProjects() {
-        const listEl = document.getElementById('firebaseProjectsList');
-        listEl.innerHTML = `<div class="spinner"></div>`;
-        try {
-            const doc = await db.collection('_configs').doc('firebase').get();
-            const projects = (doc.exists && doc.data().projects) ? doc.data().projects : [];
-            const allProjects = [defaultConfig, ...projects];
-
-            listEl.innerHTML = '';
-            allProjects.forEach(proj => {
-                const isDefault = proj.projectId === defaultConfig.projectId;
-                const item = document.createElement('li');
-                item.className = 'settings-list-item';
-                item.innerHTML = `
-                    <div class="info">
-                        <h4>${proj.projectName} ${isDefault ? '(ডিফল্ট)' : ''}</h4>
-                        <p>Project ID: ${proj.projectId}</p>
-                    </div>
-                    <div class="actions">
-                        ${!isDefault ? `<button class="modal-footer button btn-danger deleteBtn" data-id="${proj.id}"><i class="fas fa-trash-alt"></i></button>` : ''}
-                    </div>`;
-                listEl.appendChild(item);
-            });
-
-            listEl.querySelectorAll('.deleteBtn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const projectId = e.currentTarget.dataset.id;
-                    showModal({
-                        type: 'delete',
-                        title: 'আপনি কি নিশ্চিত?',
-                        message: 'আপনি এই Firebase প্রোজেক্ট কনফিগারেশনটি মুছে ফেলছেন।',
-                        onConfirm: async () => {
-                            const docRef = db.collection('_configs').doc('firebase');
-                            const doc = await docRef.get();
-                            let currentProjects = doc.data().projects || [];
-                            const updatedProjects = currentProjects.filter(p => p.id !== projectId);
-                            await docRef.set({ projects: updatedProjects });
-                            showModal({type: 'success', title: 'সফল', message: 'প্রোজেক্ট মুছে ফেলা হয়েছে।'});
-                            await loadAndDisplayFirebaseProjects();
-                            await populateFirebaseSwitcher();
-                        }
-                    });
-                });
-            });
-        } catch (error) {
-            console.error("Error loading Firebase projects:", error);
-            listEl.innerHTML = `<p style="color: var(--danger-color); text-align: center;">প্রোজেক্ট তালিকা লোড করা যায়নি।</p>`;
-        }
-    }
-
     function showModal({ type, title, message, onConfirm }) {
         const modalHeader = document.getElementById('modalHeader'); const modalBody = document.getElementById('modalBody'); const modalFooter = document.getElementById('modalFooter');
         modalHeader.innerHTML = ''; modalFooter.innerHTML = '';
@@ -3482,7 +3825,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function hideModal() { 
         customModal.classList.remove('active'); 
-        customModal.querySelector('.modal-container').classList.remove('modal-small');
+        customModal.querySelector('.modal-container').classList.remove('login-style-modal');
     }
     customModal.addEventListener('click', (e) => { if (e.target === customModal) hideModal(); });
 
@@ -3563,6 +3906,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 instNameEl.contentEditable = true;
                 instAddressEl.contentEditable = true;
                 instNumberEl.contentEditable = true;
+                
+                document.querySelectorAll('.editable-class-name').forEach(el => el.contentEditable = true);
+                
                 instNameEl.focus();
                 
                 editInstBtn.classList.add('hidden');
@@ -3580,6 +3926,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 try {
                     await db.collection('institutions').doc(institutionId).update(updatedData);
+                    
+                    const classTitleElements = document.querySelectorAll('.editable-class-name');
+                    for(let el of classTitleElements) {
+                        const classId = el.dataset.classId;
+                        const newTitle = el.textContent.trim();
+                        await db.collection('institutions').doc(institutionId).collection('classes').doc(classId).update({ name: newTitle });
+                        el.contentEditable = false;
+                    }
+
                     instNameEl.contentEditable = false;
                     instAddressEl.contentEditable = false;
                     instNumberEl.contentEditable = false;
@@ -3605,17 +3960,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (e.target.closest('.edit-btn')) {
                     row.querySelectorAll('td[data-field]').forEach(cell => cell.contentEditable = true);
+                    row.querySelector('.sl-no').contentEditable = true;
                     row.querySelector('.edit-btn').classList.add('hidden');
                     row.querySelector('.save-btn').classList.remove('hidden');
                     row.querySelector('td[contenteditable="true"]')?.focus();
                 } else if (e.target.closest('.save-btn')) { 
                     row.querySelectorAll('td[data-field]').forEach(cell => cell.contentEditable = false);
+                    row.querySelector('.sl-no').contentEditable = false;
                     row.querySelector('.edit-btn').classList.remove('hidden');
                     row.querySelector('.save-btn').classList.add('hidden');
+                    
                     const updatedData = {};
                     row.querySelectorAll('td[data-field]').forEach(cell => {
                         updatedData[cell.dataset.field] = cell.textContent;
                     });
+                    
+                    const newSerial = convertToEnglishNumber(row.querySelector('.sl-no').textContent) - 1;
+                    updatedData.order = newSerial;
                     
                     let studentRef = classId 
                         ? db.collection('institutions').doc(instId).collection('classes').doc(classId).collection('students').doc(studentId)
@@ -3623,6 +3984,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     studentRef.update(updatedData)
                         .then(() => { 
+                            updateStudentOrder(row.closest('tbody'));
                             showModal({ type: 'success', title: 'সফল', message: 'শিক্ষার্থীর তথ্য সফলভাবে আপডেট করা হয়েছে।' }); 
                         })
                         .catch(err => { console.error("Error updating student:", err); showModal({ type: 'danger', title: 'ত্রুটি', message: 'তথ্য আপডেট করা সম্ভব হয়নি।'}); });
@@ -3660,7 +4022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function updateStudentOrder(tbody) {
-        const rows = tbody.querySelectorAll('tr');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
         const batch = db.batch();
 
         rows.forEach((row, index) => {
@@ -3676,7 +4038,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             batch.update(studentRef, { order: index });
 
-            row.cells[0].textContent = convertToBengaliNumber(index + 1);
+            row.querySelector('.sl-no').textContent = convertToBengaliNumber(index + 1);
 
             row.querySelector('.up-btn').disabled = (index === 0);
             row.querySelector('.down-btn').disabled = (index === rows.length - 1);
@@ -3869,7 +4231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     case 'pdf': exportToPDF(headers, data, fileName, institution.name, institution.address); break;
                     case 'csv': case 'tsv': exportToSeparatedValues(headers, data, fileName, format); break;
                     case 'doc': exportToDocx(headers, dataAsObjects, fileName, institution.name, institution.address); break;
-                    case 'html': exportToHtml(headers, data, fileName, institution.name, institution.address); break;
+                    case 'html': exportToHtml(headers, data, fileName, institutionName, address); break;
                     case 'jpg': await exportToJpg(selectedClassId, fileName, institution.name); break;
                 }
                  setTimeout(hideModal, 1000);
@@ -4127,7 +4489,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- ADD USER MODAL (FOR SUB-ADMIN) - Design Improvements ---
     if(addUserMenuBtn) {
         addUserMenuBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -4135,38 +4496,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // UPDATED ADD USER MODAL (Professional UI Design)
     function showAddUserModal() {
+        const modalContainer = customModal.querySelector('.modal-container');
+        modalContainer.classList.add('login-style-modal');
+        
         const modalHeader = document.getElementById('modalHeader');
         const modalBody = document.getElementById('modalBody');
         const modalFooter = document.getElementById('modalFooter');
-        const container = customModal.querySelector('.modal-container');
         
-        container.classList.add('modal-small');
-
-        modalHeader.innerHTML = `<div class="icon info"><i class="fas fa-user-plus"></i></div><h3>ইউজার যুক্ত করুন</h3>`;
-        modalBody.innerHTML = `
-            <div class="form-group">
-                <label for="addUserMobile">ইউজারের মোবাইল নম্বর</label>
-                <input type="tel" id="addUserMobile" placeholder="01XXXXXXXXX" maxlength="11" required>
-                <p id="addUserMsg" style="margin-top: 10px; font-size: 0.85rem; font-weight: 500; height: 1.2em;"></p>
+        modalHeader.innerHTML = `
+            <div class="icon-box">
+                <i class="fas fa-user-plus"></i>
             </div>
+            <h3>নতুন ইউজার</h3>
         `;
-        modalFooter.innerHTML = `<button class="btn-secondary" id="closeAddUserModal">বাতিল</button><button class="btn-primary" id="confirmAddUser">নিশ্চিত করুন</button>`;
+        
+        modalBody.innerHTML = `
+            <p>মেম্বার যোগ করতে মোবাইল নাম্বার দিন</p>
+            <div class="form-group">
+                <label>মোাবাইল নাম্বার</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone-alt"></i>
+                    <input type="tel" id="addUserMobile" placeholder="01XXXXXXXXX" maxlength="11" required>
+                </div>
+            </div>
+            <p id="addUserMsg" style="margin-top: -10px; margin-bottom: 10px; font-size: 0.85rem; color: #ff8a8a; min-height: 1.1em;"></p>
+        `;
+        
+        modalFooter.innerHTML = `
+            <button class="btn-submit-user" id="confirmAddUser">
+                <i class="fas fa-plus-circle"></i>
+                ইউজার যোগ করুন
+            </button>
+            <button class="btn-cancel-user" id="closeAddUserModal">বাতিল করুন</button>
+        `;
         
         document.getElementById('closeAddUserModal').onclick = hideModal;
         document.getElementById('confirmAddUser').onclick = async () => {
             const mobile = document.getElementById('addUserMobile').value.trim();
             const msgEl = document.getElementById('addUserMsg');
             
-            if (!mobile || mobile.length < 11) {
-                msgEl.style.color = 'var(--danger-color)';
-                msgEl.textContent = 'সঠিক মোবাইল নম্বর প্রদান করুন।';
+            if (mobile.length < 11) {
+                msgEl.textContent = '১১ ডিজিটের সঠিক মোবাইল নাম্বার দিন।';
                 return;
             }
 
             const foundUser = allUsers.find(u => u.id === mobile);
             if (!foundUser) {
-                msgEl.style.color = 'var(--danger-color)';
                 msgEl.textContent = 'এই নম্বর দিয়ে কোনো ইউজার পাওয়া যায়নি।';
                 return;
             }
@@ -4176,26 +4553,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (assignedIds.includes(mobile)) {
                 msgEl.style.color = 'var(--accent-color)';
-                msgEl.textContent = 'ইউজারটি ইতিপূর্বেই তালিকায় রয়েছে।';
+                msgEl.textContent = 'এই ইউজারটি ইতিমধ্যে যুক্ত আছে।';
                 return;
             }
 
             assignedIds.push(mobile);
             try {
+                lastAddedUserId = mobile; 
                 await db.collection('subAdmins').doc(currentSubAdmin.id).update({ assignedUserIds: assignedIds });
                 hideModal();
-                showModal({ type: 'success', title: 'সফল', message: `"${foundUser.name}" সফলভাবে আপনার লিস্টে এড হয়েছে।` });
             } catch (err) {
                 console.error(err);
-                msgEl.style.color = 'var(--danger-color)';
-                msgEl.textContent = 'সার্ভার ত্রুটি, পুনরায় চেষ্টা করুন।';
+                msgEl.textContent = 'ত্রুটি হয়েছে, পুনরায় চেষ্টা করুন।';
             }
         };
         
         customModal.classList.add('active');
     }
 
-    // --- LOGIN & INITIALIZATION ---
     if(loginPasswordToggle) {
         loginPasswordToggle.addEventListener('click', () => {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -4238,7 +4613,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            errorMessage.textContent = 'লগইন করার সময় একটি ত্রুটি হয়েছে।';
+            errorMessage.textContent = 'লগইন করার সময় একটি ত্রুটি হয়েছে।';
             errorMessage.style.display = 'block';
         }
     });
@@ -4305,7 +4680,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const createAdminLink = document.querySelector('.sidebar-nav a[data-view="create-admin"]');
         const settingsLink = document.querySelector('.sidebar-nav a[data-view="settings"]');
         const cloudinaryLink = document.querySelector('.sidebar-nav a[data-view="cloudinary-settings"]');
-        const firebaseLink = document.querySelector('.sidebar-nav a[data-view="firebase-settings"]');
+        const adminMsgSidebar = document.getElementById('adminMsgSidebar');
         const firebaseSwitcher = document.getElementById('firebaseSwitcherContainer');
         
         if (role === 'subAdmin') {
@@ -4314,22 +4689,264 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(createAdminLink) createAdminLink.parentElement.style.display = 'none';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
             if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'none';
-            if(firebaseLink) firebaseLink.parentElement.style.display = 'none';
             if(firebaseSwitcher) firebaseSwitcher.style.display = 'none';
+            if(adminMsgSidebar) adminMsgSidebar.classList.add('hidden');
+            document.getElementById('subAdminMessenger').classList.remove('hidden');
+            initSubAdminMessenger();
         } else { 
             if(usersLink) usersLink.parentElement.style.display = 'block';
             if(addUserLi) addUserLi.classList.add('hidden');
             if(createAdminLink) createAdminLink.parentElement.style.display = 'block';
             if(settingsLink) settingsLink.parentElement.style.display = 'block';
             if(cloudinaryLink) cloudinaryLink.parentElement.style.display = 'block';
-            if(firebaseLink) firebaseLink.parentElement.style.display = 'block';
             if(firebaseSwitcher) firebaseSwitcher.style.display = 'block';
+            if(adminMsgSidebar) adminMsgSidebar.classList.remove('hidden');
+            document.getElementById('subAdminMessenger').classList.add('hidden');
             populateFirebaseSwitcher();
         }
     }
 
+    // --- MESSENGER LOGIC ---
+    let chatUnsubscribe = null;
+
+    function initSubAdminMessenger() {
+        const floatingBtn = document.getElementById('floatingMsgBtn');
+        const chatModal = document.getElementById('chatModal');
+        const closeBtn = document.getElementById('closeChatBtn');
+        const sendBtn = document.getElementById('sendChatBtn');
+        const chatInput = document.getElementById('chatInput');
+        const chatBody = document.getElementById('chatBody');
+        const attachBtn = document.getElementById('chatAttachBtn');
+        const fileInput = document.getElementById('chatFileInput');
+
+        const currentUser = localStorage.getItem('username');
+        const adminId = 'Ebrahim';
+
+        floatingBtn.onclick = () => {
+            chatModal.classList.toggle('active');
+            if(chatModal.classList.contains('active')) {
+                markMessagesAsRead(adminId, currentUser);
+                scrollToBottom(chatBody);
+            }
+        };
+
+        closeBtn.onclick = () => chatModal.classList.remove('active');
+
+        // Real-time chat listener
+        if(chatUnsubscribe) chatUnsubscribe();
+        chatUnsubscribe = db.collection('messages')
+            .where('chatId', 'in', [`${currentUser}_${adminId}`, `${adminId}_${currentUser}`])
+            .orderBy('time', 'asc')
+            .onSnapshot(snap => {
+                renderMessages(snap, chatBody, currentUser);
+                if(chatModal.classList.contains('active')) markMessagesAsRead(adminId, currentUser);
+            });
+
+        sendBtn.onclick = () => sendTextMessage(currentUser, adminId, chatInput);
+        chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendTextMessage(currentUser, adminId, chatInput); };
+
+        attachBtn.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleImageUpload(e, currentUser, adminId);
+    }
+
+    async function sendTextMessage(from, to, input) {
+        const text = input.value.trim();
+        if(!text) return;
+        input.value = '';
+        
+        await db.collection('messages').add({
+            from, to, text,
+            chatId: `${from}_${to}`,
+            time: firebase.firestore.FieldValue.serverTimestamp(),
+            read: false,
+            type: 'text'
+        });
+    }
+
+    async function handleImageUpload(e, from, to) {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        // Reuse existing Cloudinary logic
+        const configDoc = await db.collection('_configs').doc('cloudinary').get();
+        const activeAcc = (configDoc.exists && configDoc.data().accounts) ? configDoc.data().accounts.find(a => a.isActive) : null;
+        
+        if(!activeAcc) {
+            showModal({type: 'danger', title: 'ত্রুটি', message: 'Cloudinary অ্যাকাউন্ট সক্রিয় নেই।'});
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'ml_default'); 
+
+        try {
+            showModal({type: 'info', title: 'আপলোড হচ্ছে...', message: 'আপনার ছবিটি পাঠানো হচ্ছে।'});
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${activeAcc.cloudName}/image/upload`, { method: 'POST', body: formData });
+            const data = await res.json();
+            
+            await db.collection('messages').add({
+                from, to,
+                imageUrl: data.secure_url,
+                chatId: `${from}_${to}`,
+                time: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false,
+                type: 'image'
+            });
+            hideModal();
+        } catch (error) {
+            console.error(error);
+            showModal({type: 'danger', title: 'ত্রুটি', message: 'ছবি আপলোড করতে সমস্যা হয়েছে।'});
+        }
+    }
+
+    function renderMessages(snap, container, currentUser) {
+        container.innerHTML = '';
+        snap.forEach(doc => {
+            const m = doc.data();
+            const div = document.createElement('div');
+            div.className = `msg-bubble ${m.from === currentUser ? 'sent' : 'received'}`;
+            
+            let content = m.text ? `<div>${m.text}</div>` : '';
+            if(m.imageUrl) content += `<img src="${m.imageUrl}" onclick="showImagePreview('${m.imageUrl}', 'Sent Image')">`;
+            
+            const time = m.time ? new Date(m.time.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
+            content += `<span class="msg-time">${time}</span>`;
+            
+            div.innerHTML = content;
+            container.appendChild(div);
+        });
+        scrollToBottom(container);
+    }
+
+    function markMessagesAsRead(from, to) {
+        db.collection('messages')
+            .where('from', '==', from)
+            .where('to', '==', to)
+            .where('read', '==', false)
+            .get().then(snap => {
+                snap.forEach(doc => doc.ref.update({ read: true }));
+            });
+    }
+
+    function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
+
+    function renderAdminMessengerView() {
+        mainContent.innerHTML = `
+            <div class="admin-messenger">
+                <div class="messenger-sidebar">
+                    <div class="messenger-sidebar-header">চ্যাট লিস্ট</div>
+                    <div class="messenger-user-list" id="messengerUserList"></div>
+                </div>
+                <div class="messenger-chat-area" id="messengerChatArea">
+                    <div class="no-chat-selected">
+                        <i class="fas fa-comments"></i>
+                        <h3>একটি চ্যাট সিলেক্ট করুন</h3>
+                        <p>সাব-অ্যাডমিনদের সাথে কথা বলতে তাদের আইডিতে ক্লিক করুন।</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const listEl = document.getElementById('messengerUserList');
+        allSubAdmins.forEach(admin => {
+            const item = document.createElement('div');
+            item.className = 'msg-user-item';
+            item.innerHTML = `
+                <div class="avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="user-details">
+                    <h4>${admin.name}</h4>
+                    <p>@${admin.username}</p>
+                </div>
+                <span class="unread-badge hidden" id="badge_${admin.username}">0</span>
+            `;
+            item.onclick = () => openAdminChat(admin);
+            listEl.appendChild(item);
+            
+            // Sync specific unread count for this user
+            db.collection('messages')
+                .where('from', '==', admin.username)
+                .where('to', '==', 'Ebrahim')
+                .where('read', '==', false)
+                .onSnapshot(snap => {
+                    const badge = document.getElementById(`badge_${admin.username}`);
+                    if(snap.size > 0) {
+                        badge.textContent = snap.size;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+        });
+    }
+
+    function openAdminChat(subAdmin) {
+        const area = document.getElementById('messengerChatArea');
+        const adminId = 'Ebrahim';
+        
+        document.querySelectorAll('.msg-user-item').forEach(i => i.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        area.innerHTML = `
+            <div class="chat-header" style="background: var(--card-background); color: var(--text-color); border-bottom: 1px solid var(--border-color);">
+                <div class="user-info">
+                    <i class="fas fa-user-circle" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                    <div style="font-weight: 700;">${subAdmin.name} (@${subAdmin.username})</div>
+                    <div class="status-dot"></div>
+                </div>
+            </div>
+            <div class="chat-body" id="adminChatBody"></div>
+            <div class="chat-footer">
+                <button class="attach-btn" id="adminChatAttachBtn"><i class="fas fa-image"></i></button>
+                <input type="file" id="adminChatFileInput" accept="image/*" class="hidden">
+                <input type="text" id="adminChatInput" placeholder="উওর দিন...">
+                <button id="adminSendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        `;
+
+        const body = document.getElementById('adminChatBody');
+        const input = document.getElementById('adminChatInput');
+        const sendBtn = document.getElementById('adminSendBtn');
+        const attachBtn = document.getElementById('adminChatAttachBtn');
+        const fileInput = document.getElementById('adminChatFileInput');
+
+        if(chatUnsubscribe) chatUnsubscribe();
+        chatUnsubscribe = db.collection('messages')
+            .where('chatId', 'in', [`${subAdmin.username}_${adminId}`, `${adminId}_${subAdmin.username}`])
+            .orderBy('time', 'asc')
+            .onSnapshot(snap => {
+                renderMessages(snap, body, adminId);
+                markMessagesAsRead(subAdmin.username, adminId);
+            });
+
+        sendBtn.onclick = () => sendTextMessage(adminId, subAdmin.username, input);
+        input.onkeypress = (e) => { if(e.key === 'Enter') sendTextMessage(adminId, subAdmin.username, input); };
+        
+        attachBtn.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleImageUpload(e, adminId, subAdmin.username);
+    }
+
+    function syncAdminMessageBadges() {
+        db.collection('messages')
+            .where('to', '==', 'Ebrahim')
+            .where('read', '==', false)
+            .onSnapshot(snap => {
+                const badge = document.getElementById('sidebarMsgBadge');
+                if(snap.size > 0) {
+                    badge.textContent = snap.size;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+    }
+
     function initApp() {
-        applyTheme(localStorage.getItem('theme') || 'light');
+        const defaultTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(defaultTheme);
         
         const toggleIcon = menuToggleBtn.querySelector('i');
         if (window.innerWidth >= 1024) {
